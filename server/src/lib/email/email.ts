@@ -3,6 +3,8 @@ import { render } from "@react-email/components";
 import { IS_CLOUD } from "../const.js";
 import { InvitationEmail } from "./templates/InvitationEmail.js";
 import { LimitExceededEmail } from "./templates/LimitExceededEmail.js";
+import { WeeklyReportEmail } from "./templates/WeeklyReportEmail.js";
+import type { OrganizationReport } from "../../services/weeklyReportTypes.js";
 
 let resend: Resend | undefined;
 
@@ -66,4 +68,19 @@ export const sendLimitExceededEmail = async (
   );
 
   await sendEmail(email, `Action Required: ${organizationName} has exceeded its monthly event limit`, html);
+};
+
+export const sendWeeklyReportEmail = async (
+  email: string,
+  userName: string,
+  organizationReport: OrganizationReport
+) => {
+  const html = await render(
+    WeeklyReportEmail({
+      userName,
+      organizationReport,
+    })
+  );
+
+  await sendEmail(email, `Weekly Analytics Report - ${organizationReport.organizationName}`, html);
 };

@@ -72,6 +72,7 @@ import { siteConfig } from "./lib/siteConfig.js";
 import { trackEvent } from "./services/tracker/trackEvent.js";
 // need to import telemetry service here to start it
 import { telemetryService } from "./services/telemetryService.js";
+import { weeklyReportService } from "./services/weeklyReportService.js";
 import { extractSiteId } from "./utils.js";
 import { getTrackingConfig } from "./api/sites/getTrackingConfig.js";
 
@@ -407,6 +408,9 @@ const start = async () => {
     await Promise.all([initializeClickhouse(), initPostgres()]);
 
     telemetryService.startTelemetryCron();
+    if (IS_CLOUD) {
+      weeklyReportService.startWeeklyReportCron();
+    }
 
     // Start the server first
     await server.listen({ port: 3001, host: "0.0.0.0" });
