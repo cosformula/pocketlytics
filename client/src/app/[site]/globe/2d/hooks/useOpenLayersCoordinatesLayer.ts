@@ -101,7 +101,6 @@ export function useOpenLayersCoordinatesLayer({ mapInstanceRef, mapViewRef, mapV
       const count = feature.get("count");
       const zoom = map.getView().getZoom() || 2;
       const radius = getRadius(count, zoom);
-      console.log(radius);
 
       return new Style({
         image: new Circle({

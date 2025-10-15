@@ -10,6 +10,7 @@ import "ol/ol.css";
 import { useOpenLayersCountriesLayer } from "../hooks/useOpenLayersCountriesLayer";
 import { useOpenLayersSubdivisionsLayer } from "../hooks/useOpenLayersSubdivisionsLayer";
 import { useOpenLayersCoordinatesLayer } from "../hooks/useOpenLayersCoordinatesLayer";
+import { useOpenLayersTimelineLayer } from "../hooks/useOpenLayersTimelineLayer";
 
 interface OpenLayersMapProps {
   mapView: "countries" | "subdivisions" | "coordinates" | "timeline";
@@ -72,6 +73,12 @@ export function OpenLayersMap({ mapView }: OpenLayersMapProps) {
   });
 
   useOpenLayersCoordinatesLayer({
+    mapInstanceRef,
+    mapViewRef,
+    mapView,
+  });
+
+  useOpenLayersTimelineLayer({
     mapInstanceRef,
     mapViewRef,
     mapView,
