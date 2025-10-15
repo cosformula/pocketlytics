@@ -76,7 +76,7 @@ export default function GlobePage() {
           {mapMode === "3D" ? (
             <MapboxMap mapContainer={mapContainer} />
           ) : (
-            <OpenLayersMap key="openlayers-map" mapView={mapView} />
+            <OpenLayersMap key="openlayers-map" mapView={mapView} onSessionSelect={setSelectedSession} />
           )}
           <div className="absolute bottom-2 left-4 z-99999 right-4 flex flex-col gap-2 pointer-events-none">
             <div className="flex items-end gap-2 justify-between">

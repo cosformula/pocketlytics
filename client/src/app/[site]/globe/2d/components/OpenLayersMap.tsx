@@ -14,9 +14,10 @@ import { useOpenLayersTimelineLayer } from "../hooks/useOpenLayersTimelineLayer"
 
 interface OpenLayersMapProps {
   mapView: "countries" | "subdivisions" | "coordinates" | "timeline";
+  onSessionSelect?: (session: any) => void;
 }
 
-export function OpenLayersMap({ mapView }: OpenLayersMapProps) {
+export function OpenLayersMap({ mapView, onSessionSelect }: OpenLayersMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<Map | null>(null);
   const mapViewRef = useRef<typeof mapView>(mapView);
@@ -78,11 +79,19 @@ export function OpenLayersMap({ mapView }: OpenLayersMapProps) {
     mapView,
   });
 
-  useOpenLayersTimelineLayer({
+  const { selectedSession, setSelectedSession } = useOpenLayersTimelineLayer({
     mapInstanceRef,
     mapViewRef,
     mapView,
   });
+
+  // Pass selected session to parent
+  useEffect(() => {
+    if (selectedSession && onSessionSelect) {
+      onSessionSelect(selectedSession);
+      setSelectedSession(null);
+    }
+  }, [selectedSession, onSessionSelect, setSelectedSession]);
 
   return <div ref={mapRef} className="w-full h-full" />;
 }
