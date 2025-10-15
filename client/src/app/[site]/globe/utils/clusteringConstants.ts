@@ -7,7 +7,7 @@
 export const CLUSTER_MAX_ZOOM = 11;
 
 // Minimum number of points required to form a visible cluster
-export const MIN_CLUSTER_SIZE = 10;
+export const MIN_CLUSTER_SIZE = 20;
 
 // Only enable clustering when total session count exceeds this threshold (performance optimization)
 export const CLUSTERING_THRESHOLD = 500;
