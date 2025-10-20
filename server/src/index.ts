@@ -194,18 +194,27 @@ server.register(
           server.log.info("Turnstile verification successful - passing to better-auth");
 
           // Verification passed, forward to better-auth
-          reply.raw.setHeaders(mapHeaders(reply.getHeaders()));
+          const headers = mapHeaders(reply.getHeaders());
+          for (const [key, value] of Object.entries(headers)) {
+            reply.raw.setHeader(key, value);
+          }
           await authHandler(request.raw, reply.raw);
         });
       }
 
       // All other auth routes
       fastify.all("/api/auth/*", async (request, reply: any) => {
-        reply.raw.setHeaders(mapHeaders(reply.getHeaders()));
+        const headers = mapHeaders(reply.getHeaders());
+        for (const [key, value] of Object.entries(headers)) {
+          reply.raw.setHeader(key, value);
+        }
         await authHandler(request.raw, reply.raw);
       });
       fastify.all("/auth/*", async (request, reply: any) => {
-        reply.raw.setHeaders(mapHeaders(reply.getHeaders()));
+        const headers = mapHeaders(reply.getHeaders());
+        for (const [key, value] of Object.entries(headers)) {
+          reply.raw.setHeader(key, value);
+        }
         await authHandler(request.raw, reply.raw);
       });
     });
