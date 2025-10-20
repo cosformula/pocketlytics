@@ -94,6 +94,7 @@ export default function SignupPage() {
         email,
         name: email.split("@")[0], // Use email prefix as default name
         password,
+        ...(IS_CLOUD && turnstileToken ? { turnstileToken } : {}),
       });
 
       if (data?.user) {
