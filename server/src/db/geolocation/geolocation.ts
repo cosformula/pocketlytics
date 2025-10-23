@@ -1,126 +1,13 @@
-import type { City, SubdivisionsRecord } from "@maxmind/geoip2-node";
+import type { City } from "@maxmind/geoip2-node";
 import { Reader } from "@maxmind/geoip2-node";
 import { readFile } from "fs/promises";
 import path from "path";
 import { IS_CLOUD } from "../../lib/const.js";
 import { logger } from "../../lib/logger/logger.js";
+import { IPAPIResponse, LocationResponse } from "./types.js";
 
 // Adjust path to find the database relative to project root
 const dbPath = path.join(process.cwd(), "GeoLite2-City.mmdb");
-
-export type LocationResponse = {
-  city?: string;
-  country?: string;
-  region?: string;
-  countryIso?: string;
-  latitude?: number;
-  longitude?: number;
-  timeZone?: string;
-  error?: string;
-
-  vpn?: string;
-  crawler?: string;
-  datacenter?: string;
-  isProxy?: boolean;
-  isTor?: boolean;
-  isSatellite?: boolean;
-
-  company?: {
-    name?: string;
-    domain?: string;
-    type?: string;
-    abuseScore?: number;
-  };
-
-  asn?: {
-    asn?: number;
-    org?: string;
-    domain?: string;
-    type?: string;
-    abuseScore?: number;
-  };
-} | null;
-
-type IPAPIResponse = {
-  ip: string;
-  rir?: string;
-  is_bogon?: boolean;
-  is_mobile?: boolean;
-  is_satellite?: boolean;
-  is_crawler?: string | boolean;
-  is_datacenter?: boolean;
-  is_tor?: boolean;
-  is_proxy?: boolean;
-  is_vpn?: boolean;
-  is_abuser?: boolean;
-  elapsed_ms?: number;
-  location?: {
-    city?: string;
-    country?: string;
-    country_code?: string;
-    latitude?: number;
-    longitude?: number;
-    timezone?: string;
-    state?: string;
-    continent?: string;
-    continent_code?: string;
-    postal_code?: string;
-    zip?: string;
-    region?: string;
-    region_code?: string;
-  };
-  asn?: {
-    asn?: number;
-    abuser_score?: string;
-    route?: string;
-    descr?: string;
-    country?: string;
-    active?: boolean;
-    org?: string;
-    domain?: string;
-    abuse?: string;
-    type?: string;
-    created?: string;
-    updated?: string;
-    rir?: string;
-    whois?: string;
-  };
-  vpn?: {
-    ip?: string;
-    service?: string;
-    url?: string;
-    type?: string;
-    last_seen?: number;
-    last_seen_str?: string;
-    exit_node_region?: string;
-    country_code?: string;
-    city_name?: string;
-    latitude?: number;
-    longitude?: number;
-  };
-  datacenter?: {
-    datacenter?: string;
-    network?: string;
-    region?: string;
-    country?: string;
-    city?: string;
-  };
-  company?: {
-    name?: string;
-    abuser_score?: string;
-    domain?: string;
-    type?: string;
-    network?: string;
-    whois?: string;
-  };
-  abuse?: {
-    name?: string;
-    address?: string;
-    country?: string;
-    email?: string;
-    phone?: string;
-  };
-};
 
 let reader: Reader | null = null;
 
@@ -156,13 +43,100 @@ function extractLocationData(response: City | null): LocationResponse {
 
 const apiKey = process.env.IPAPI_KEY;
 
+// Cache configuration
+const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+const CLEANUP_INTERVAL_MS = 60 * 60 * 1000; // Run cleanup every hour
+
+interface CacheEntry {
+  data: LocationResponse;
+  timestamp: number;
+}
+
+// In-memory cache for IP geolocation data
+const ipCache = new Map<string, CacheEntry>();
+
+// Periodic cleanup function to remove expired entries
+function cleanupExpiredEntries(): void {
+  const now = Date.now();
+  let removedCount = 0;
+
+  for (const [ip, entry] of ipCache.entries()) {
+    const age = now - entry.timestamp;
+    if (age > CACHE_TTL_MS) {
+      ipCache.delete(ip);
+      removedCount++;
+    }
+  }
+
+  if (removedCount > 0) {
+    logger.info(`Cleaned up ${removedCount} expired IP cache entries. Current cache size: ${ipCache.size}`);
+  }
+}
+
+// Start periodic cleanup
+const cleanupInterval = setInterval(cleanupExpiredEntries, CLEANUP_INTERVAL_MS);
+
+// Cleanup on process exit
+process.on("SIGTERM", () => {
+  clearInterval(cleanupInterval);
+});
+process.on("SIGINT", () => {
+  clearInterval(cleanupInterval);
+});
+
+function getCachedIP(ip: string): LocationResponse | null {
+  const entry = ipCache.get(ip);
+  if (!entry) {
+    return null;
+  }
+
+  const now = Date.now();
+  const age = now - entry.timestamp;
+
+  if (age > CACHE_TTL_MS) {
+    // Entry expired, remove it
+    ipCache.delete(ip);
+    return null;
+  }
+
+  return entry.data;
+}
+
+function setCachedIP(ip: string, data: LocationResponse): void {
+  ipCache.set(ip, {
+    data,
+    timestamp: Date.now(),
+  });
+}
+
 async function getLocationFromIPAPI(ips: string[]): Promise<Record<string, LocationResponse>> {
   if (!apiKey) {
     logger.warn("IPAPI_KEY not configured for cloud geolocation");
     return {};
   }
 
-  const localInfo = await getLocationFromLocal(ips);
+  // Check cache first
+  const results: Record<string, LocationResponse> = {};
+  const uncachedIps: string[] = [];
+
+  for (const ip of ips) {
+    const cached = getCachedIP(ip);
+    if (cached !== null) {
+      results[ip] = cached;
+    } else {
+      uncachedIps.push(ip);
+    }
+  }
+
+  // If all IPs were cached, return immediately
+  if (uncachedIps.length === 0) {
+    logger.info(`All ${ips.length} IPs served from cache`);
+    return results;
+  }
+
+  logger.info(`Cache hit: ${ips.length - uncachedIps.length}/${ips.length}, fetching ${uncachedIps.length} from IPAPI`);
+
+  const localInfo = await getLocationFromLocal(uncachedIps);
   try {
     const response = await fetch("https://api.ipapi.is/", {
       method: "POST",
@@ -170,27 +144,26 @@ async function getLocationFromIPAPI(ips: string[]): Promise<Record<string, Locat
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        ips,
+        ips: uncachedIps,
         key: apiKey,
       }),
     });
 
     if (!response.ok) {
       logger.error(`IPAPI request failed: ${response.status} ${response.statusText}`);
-      return localInfo;
+      return { ...results, ...localInfo };
     }
 
     const data = (await response.json()) as Record<string, IPAPIResponse>;
 
-    const results: Record<string, LocationResponse> = {};
-    for (const ip of ips) {
+    for (const ip of uncachedIps) {
       const item = data[ip];
 
       if (!item) {
         continue;
       }
 
-      results[ip] = {
+      const locationData: LocationResponse = {
         city: item.location?.city,
         country: item.location?.country,
         countryIso: item.location?.country_code,
@@ -220,11 +193,15 @@ async function getLocationFromIPAPI(ips: string[]): Promise<Record<string, Locat
           abuseScore: Number(item.asn?.abuser_score?.split(" ")[0]),
         },
       };
+
+      // Cache the result
+      setCachedIP(ip, locationData);
+      results[ip] = locationData;
     }
     return results;
   } catch (error) {
     logger.error("Error fetching from IPAPI:", error);
-    return {};
+    return { ...results, ...localInfo };
   }
 }
 
