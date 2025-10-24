@@ -38,63 +38,57 @@ const ALLOWED_FILE_TYPES = ["text/csv"];
 const ALLOWED_EXTENSIONS = [".csv"];
 const DATA_SOURCES = [{ value: "umami", label: "Umami" }] as const;
 
-// Validation schema matching backend requirements
-const importFormSchema = z
-  .object({
-    source: z.enum(["umami"], { required_error: "Please select a data source" }),
-    file: z
-      .custom<FileList>()
-      .refine(files => files?.length === 1, "Please select a file")
-      .refine(
-        files => {
-          const file = files?.[0];
-          return file && file.size <= MAX_FILE_SIZE;
-        },
-        `File size must be less than ${MAX_FILE_SIZE / 1024 / 1024}MB`
-      )
-      .refine(files => {
+const importFormSchema = z.object({
+  source: z.enum(["umami"], { required_error: "Please select a data source" }),
+  file: z
+    .custom<FileList>()
+    .refine(files => files?.length === 1, "Please select a file")
+    .refine(
+      files => {
         const file = files?.[0];
-        if (!file) return false;
-        const extension = "." + file.name.split(".").pop()?.toLowerCase();
-        return ALLOWED_EXTENSIONS.includes(extension) || ALLOWED_FILE_TYPES.includes(file.type);
-      }, "Only CSV files are accepted")
-      .refine(files => {
-        const file = files?.[0];
-        return file && file.name.length <= 255;
-      }, "Filename is too long"),
-    dateRange: z
-      .object({
-        startDate: z.custom<DateTime>().optional(),
-        endDate: z.custom<DateTime>().optional(),
-      })
-      .refine(
-        data => {
-          if (!data.startDate || !data.endDate) return true;
-          return data.startDate <= data.endDate;
-        },
-        { message: "Start date must be before or equal to end date", path: ["startDate"] }
-      )
-      .refine(
-        data => {
-          if (!data.startDate) return true;
-          const today = DateTime.utc().startOf("day");
-          return data.startDate <= today;
-        },
-        { message: "Start date cannot be in the future", path: ["startDate"] }
-      )
-      .refine(
-        data => {
-          if (!data.endDate) return true;
-          const today = DateTime.utc().startOf("day");
-          return data.endDate <= today;
-        },
-        { message: "End date cannot be in the future", path: ["endDate"] }
-      ),
-  })
-  .refine(data => data.file?.[0] !== undefined, {
-    message: "Please select a file",
-    path: ["file"],
-  });
+        return file && file.size <= MAX_FILE_SIZE;
+      },
+      `File size must be less than ${MAX_FILE_SIZE / 1024 / 1024}MB`
+    )
+    .refine(files => {
+      const file = files?.[0];
+      if (!file) return false;
+      const extension = "." + file.name.split(".").pop()?.toLowerCase();
+      return ALLOWED_EXTENSIONS.includes(extension) || ALLOWED_FILE_TYPES.includes(file.type);
+    }, "Only CSV files are accepted")
+    .refine(files => {
+      const file = files?.[0];
+      return file && file.name.length <= 255;
+    }, "Filename is too long"),
+  dateRange: z
+    .object({
+      startDate: z.custom<DateTime>().optional(),
+      endDate: z.custom<DateTime>().optional(),
+    })
+    .refine(
+      data => {
+        if (!data.startDate || !data.endDate) return true;
+        return data.startDate <= data.endDate;
+      },
+      { message: "Start date must be before or equal to end date" }
+    )
+    .refine(
+      data => {
+        if (!data.startDate) return true;
+        const today = DateTime.utc().startOf("day");
+        return data.startDate <= today;
+      },
+      { message: "Start date cannot be in the future" }
+    )
+    .refine(
+      data => {
+        if (!data.endDate) return true;
+        const today = DateTime.utc().startOf("day");
+        return data.endDate <= today;
+      },
+      { message: "End date cannot be in the future" }
+    ),
+});
 
 type ImportFormData = z.infer<typeof importFormSchema>;
 
