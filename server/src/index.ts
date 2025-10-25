@@ -67,7 +67,7 @@ import { listOrganizationMembers } from "./api/user/listOrganizationMembers.js";
 import { updateAccountSettings } from "./api/user/updateAccountSettings.js";
 import { initializeClickhouse } from "./db/clickhouse/clickhouse.js";
 import { initPostgres } from "./db/postgres/initPostgres.js";
-import { getSessionFromReq, mapHeaders } from "./lib/auth-utils.js";
+import { getSessionFromReq, getUserHasAccessToSitePublic, mapHeaders } from "./lib/auth-utils.js";
 import { auth } from "./lib/auth.js";
 import { IS_CLOUD } from "./lib/const.js";
 import { siteConfig } from "./lib/siteConfig.js";
@@ -261,8 +261,7 @@ server.addHook("onRequest", async (request, reply) => {
     const siteId = extractSiteId(processedUrl);
 
     if (siteId) {
-      // Import getUserHasAccessToSitePublic dynamically to check all access methods
-      const { getUserHasAccessToSitePublic } = await import("./lib/auth-utils.js");
+      // Check all access methods: direct access, public site, or valid private key
       const hasAccess = await getUserHasAccessToSitePublic(request, siteId);
 
       if (hasAccess) {
