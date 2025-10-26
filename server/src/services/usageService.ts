@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { DateTime } from "luxon";
 import * as cron from "node-cron";
 import Stripe from "stripe";
@@ -6,7 +6,7 @@ import { processResults } from "../api/analytics/utils.js";
 import { clickhouse } from "../db/clickhouse/clickhouse.js";
 import { db } from "../db/postgres/postgres.js";
 import { member, organization, sites, user } from "../db/postgres/schema.js";
-import { DEFAULT_EVENT_LIMIT, getStripePrices, IS_CLOUD, StripePlan } from "../lib/const.js";
+import { APPSUMO_TIER_LIMITS, DEFAULT_EVENT_LIMIT, getStripePrices, IS_CLOUD, StripePlan } from "../lib/const.js";
 import { sendLimitExceededEmail } from "../lib/email/email.js";
 import { createServiceLogger } from "../lib/logger/logger.js";
 import { stripe } from "../lib/stripe.js";
@@ -104,8 +104,8 @@ class UsageService {
   }
 
   /**
-   * Gets event limit and billing period start date for an organization based on their Stripe subscription.
-   * Fetches directly from Stripe if the organization has a stripeCustomerId.
+   * Gets event limit and billing period start date for an organization based on their Stripe subscription or AppSumo license.
+   * Checks AppSumo first, then Stripe if no AppSumo license found.
    * @returns [eventLimit, periodStartDate]
    */
   private async getOrganizationSubscriptionInfo(orgData: {
@@ -117,8 +117,28 @@ class UsageService {
     if (orgData.name === "tomato 2" || orgData.name === "Zam") {
       return [Infinity, this.getStartOfMonth()];
     }
+
+    // Check for AppSumo license first
+    try {
+      const appsumoLicense = await db.execute(
+        sql`SELECT tier, status FROM as_licenses WHERE organization_id = ${orgData.id} AND status = 'active' LIMIT 1`
+      );
+
+      if (Array.isArray(appsumoLicense) && appsumoLicense.length > 0) {
+        const license = appsumoLicense[0] as any;
+        const tier = license.tier as keyof typeof APPSUMO_TIER_LIMITS;
+        const eventLimit = APPSUMO_TIER_LIMITS[tier] || APPSUMO_TIER_LIMITS["1"];
+
+        this.logger.info(`Organization ${orgData.name} has AppSumo tier ${tier} license`);
+        return [eventLimit, this.getStartOfMonth()];
+      }
+    } catch (error) {
+      this.logger.error(error as Error, `Error checking AppSumo license for organization ${orgData.name}`);
+      // Continue to Stripe check if AppSumo check fails
+    }
+
     if (!orgData.stripeCustomerId) {
-      // No Stripe customer ID, use default limit and start of current month
+      // No Stripe customer ID and no AppSumo license, use default limit and start of current month
       return [DEFAULT_EVENT_LIMIT, this.getStartOfMonth()];
     }
 

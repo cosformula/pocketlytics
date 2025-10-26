@@ -1,10 +1,10 @@
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { DateTime } from "luxon";
 import Stripe from "stripe";
 import { db } from "../../db/postgres/postgres.js";
 import { organization } from "../../db/postgres/schema.js";
-import { DEFAULT_EVENT_LIMIT, getStripePrices } from "../../lib/const.js";
+import { APPSUMO_TIER_LIMITS, DEFAULT_EVENT_LIMIT, getStripePrices } from "../../lib/const.js";
 import { stripe } from "../../lib/stripe.js";
 
 function getStartOfMonth() {
@@ -32,6 +32,34 @@ export async function getSubscriptionInner(organizationId: string) {
 
   if (!org) {
     return null;
+  }
+
+  try {
+    const appsumoLicense = await db.execute(
+      sql`SELECT tier, status FROM as_licenses WHERE organization_id = ${organizationId} AND status = 'active' LIMIT 1`
+    );
+
+    if (Array.isArray(appsumoLicense) && appsumoLicense.length > 0) {
+      const license = appsumoLicense[0] as any;
+      const tier = license.tier as keyof typeof APPSUMO_TIER_LIMITS;
+      const eventLimit = APPSUMO_TIER_LIMITS[tier] || APPSUMO_TIER_LIMITS["1"];
+
+      return {
+        id: null,
+        planName: `appsumo-${tier}`,
+        status: "active",
+        currentPeriodEnd: getStartOfNextMonth(),
+        currentPeriodStart: getStartOfMonth(),
+        eventLimit: eventLimit,
+        monthlyEventCount: org.monthlyEventCount || 0,
+        interval: "lifetime",
+        cancelAtPeriodEnd: false,
+        isPro: false, // AppSumo has standard features
+      };
+    }
+  } catch (error) {
+    console.error("Error checking AppSumo license:", error);
+    // Continue to Stripe check if AppSumo check fails
   }
 
   // Check if organization has an active Stripe subscription
