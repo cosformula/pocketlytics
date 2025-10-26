@@ -81,7 +81,7 @@ export async function handleAppSumoWebhook(
 
     // Log webhook event for audit trail
     await db.execute(sql`
-      INSERT INTO appsumo_webhook_events (
+      INSERT INTO as_webhook_events (
         license_key,
         event,
         payload,
@@ -162,13 +162,13 @@ async function handlePurchaseEvent(
 
   // Check if license already exists
   const existing = await db.execute(
-    sql`SELECT id FROM appsumo_licenses WHERE license_key = ${licenseKey} LIMIT 1`
+    sql`SELECT id FROM as_licenses WHERE license_key = ${licenseKey} LIMIT 1`
   );
 
   if (Array.isArray(existing) && existing.length === 0) {
     // Create placeholder - will be linked to org when user activates
     await db.execute(sql`
-      INSERT INTO appsumo_licenses (
+      INSERT INTO as_licenses (
         organization_id,
         license_key,
         tier,
@@ -197,7 +197,7 @@ async function handleActivateEvent(licenseKey: string, tier: any) {
   const tierValue = tier?.toString() || "1";
 
   await db.execute(sql`
-    UPDATE appsumo_licenses
+    UPDATE as_licenses
     SET
       status = 'active',
       tier = ${tierValue},
@@ -214,7 +214,7 @@ async function handleUpgradeEvent(licenseKey: string, tier: any) {
   const tierValue = tier?.toString() || "1";
 
   await db.execute(sql`
-    UPDATE appsumo_licenses
+    UPDATE as_licenses
     SET
       tier = ${tierValue},
       updated_at = NOW()
@@ -229,7 +229,7 @@ async function handleDowngradeEvent(licenseKey: string, tier: any) {
   const tierValue = tier?.toString() || "1";
 
   await db.execute(sql`
-    UPDATE appsumo_licenses
+    UPDATE as_licenses
     SET
       tier = ${tierValue},
       updated_at = NOW()
@@ -242,7 +242,7 @@ async function handleDowngradeEvent(licenseKey: string, tier: any) {
  */
 async function handleDeactivateEvent(licenseKey: string) {
   await db.execute(sql`
-    UPDATE appsumo_licenses
+    UPDATE as_licenses
     SET
       status = 'inactive',
       deactivated_at = NOW(),
@@ -262,7 +262,7 @@ async function handleMigrateEvent(
   const tierValue = tier?.toString() || "1";
 
   await db.execute(sql`
-    UPDATE appsumo_licenses
+    UPDATE as_licenses
     SET
       tier = ${tierValue},
       parent_license_key = ${parentLicenseKey || null},

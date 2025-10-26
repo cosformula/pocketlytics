@@ -1,7 +1,7 @@
 import { eq, sql } from "drizzle-orm";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { db } from "../../db/postgres/postgres.js";
-import { appsumoLicenses } from "../../db/postgres/schema-appsumo.js";
+import { asLicenses } from "../../db/postgres/schema-appsumo.js";
 import { getSessionFromReq } from "../../lib/auth-utils.js";
 import { IS_CLOUD } from "../../lib/const.js";
 
@@ -148,7 +148,7 @@ export async function activateAppSumoLicense(
 
     // Step 3: Check if license already exists
     const existingLicense = await db.execute(
-      sql`SELECT organization_id FROM appsumo_licenses WHERE license_key = ${licenseData.licenseKey} LIMIT 1`
+      sql`SELECT organization_id FROM as_licenses WHERE license_key = ${licenseData.licenseKey} LIMIT 1`
     );
 
     if (Array.isArray(existingLicense) && existingLicense.length > 0) {
@@ -163,7 +163,7 @@ export async function activateAppSumoLicense(
 
       // License exists as placeholder (from purchase webhook) - update it
       await db.execute(sql`
-        UPDATE appsumo_licenses
+        UPDATE as_licenses
         SET
           organization_id = ${organizationId},
           tier = ${licenseData.tier},
@@ -175,7 +175,7 @@ export async function activateAppSumoLicense(
     } else {
       // Step 4: License doesn't exist - create new record
       await db.execute(sql`
-        INSERT INTO appsumo_licenses (
+        INSERT INTO as_licenses (
           organization_id,
           license_key,
           tier,
