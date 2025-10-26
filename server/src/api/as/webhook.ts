@@ -7,10 +7,18 @@ interface AppSumoWebhookPayload {
   test?: boolean;
   event: string;
   license_key: string;
-  tier?: string | number;
-  parent_license_key?: string;
+  prev_license_key?: string; // Used in upgrade/downgrade events
+  event_timestamp?: number; // Unix timestamp in milliseconds
+  created_at?: number; // Unix timestamp in seconds
   license_status?: string;
-  event_timestamp?: string;
+  tier?: string | number;
+  extra?: {
+    reason?: string;
+  };
+  // Deal add-on specific fields
+  partner_plan_name?: string;
+  parent_license_key?: string;
+  unit_quantity?: number;
 }
 
 /**
@@ -75,8 +83,10 @@ export async function handleAppSumoWebhook(
       event,
       tier,
       parent_license_key,
+      prev_license_key,
       license_status,
       event_timestamp,
+      extra,
     } = payload;
 
     // Log webhook event for audit trail
@@ -100,32 +110,44 @@ export async function handleAppSumoWebhook(
     switch (event) {
       case "purchase":
         // License purchased - create placeholder record
+        // Note: license_status will be "inactive" until user activates
         await handlePurchaseEvent(license_key, tier, parent_license_key);
         break;
 
       case "activate":
-        // License activated - should already be handled by activate endpoint
-        // But we can update the status if needed
+        // License activated by user
+        // Note: license_status is "inactive" in webhook, becomes active after our 200 response
         await handleActivateEvent(license_key, tier);
         break;
 
       case "upgrade":
         // License upgraded to higher tier
-        await handleUpgradeEvent(license_key, tier);
+        // Note: Creates NEW license_key with prev_license_key pointing to old one
+        // AppSumo sends simultaneous deactivate event for old license (we skip it)
+        await handleUpgradeEvent(license_key, tier, prev_license_key);
         break;
 
       case "downgrade":
         // License downgraded to lower tier
-        await handleDowngradeEvent(license_key, tier);
+        // Note: Creates NEW license_key with prev_license_key pointing to old one
+        // AppSumo sends simultaneous deactivate event for old license (we skip it)
+        await handleDowngradeEvent(license_key, tier, prev_license_key);
         break;
 
       case "deactivate":
-        // License refunded or canceled - mark as inactive
-        await handleDeactivateEvent(license_key);
+        // License refunded or canceled
+        // Note: license_status is "active" in webhook (for refunds), becomes deactivated after our 200 response
+        // For upgrade/downgrade, license_status is already "deactivated" - we skip these
+        const isUpgradeOrDowngradeDeactivation =
+          extra?.reason === "Upgraded by customer" || extra?.reason === "Downgraded by customer";
+        if (!isUpgradeOrDowngradeDeactivation) {
+          await handleDeactivateEvent(license_key);
+        }
         break;
 
       case "migrate":
-        // Add-on migration when parent license changes
+        // Add-on migration when parent license is upgraded/downgraded
+        // Note: parent_license_key is updated to point to new parent license
         await handleMigrateEvent(license_key, tier, parent_license_key);
         break;
 
@@ -208,32 +230,126 @@ async function handleActivateEvent(licenseKey: string, tier: any) {
 }
 
 /**
- * Handle upgrade event - update tier
+ * Handle upgrade event - create new license and transfer organization
  */
-async function handleUpgradeEvent(licenseKey: string, tier: any) {
+async function handleUpgradeEvent(licenseKey: string, tier: any, prevLicenseKey?: string) {
   const tierValue = tier?.toString() || "1";
 
+  if (!prevLicenseKey) {
+    console.warn("No prev_license_key provided for upgrade event");
+    return;
+  }
+
+  // Get the old license to find the organization
+  const oldLicenseResult = await db.execute(
+    sql`SELECT organization_id FROM as_licenses WHERE license_key = ${prevLicenseKey} LIMIT 1`
+  );
+
+  if (!Array.isArray(oldLicenseResult) || oldLicenseResult.length === 0) {
+    console.error(`Old license not found: ${prevLicenseKey}`);
+    return;
+  }
+
+  const oldLicense = oldLicenseResult[0] as any;
+  const organizationId = oldLicense.organization_id;
+
+  // Create new license with the organization transferred
+  await db.execute(sql`
+    INSERT INTO as_licenses (
+      organization_id,
+      license_key,
+      tier,
+      status,
+      activated_at,
+      created_at,
+      updated_at
+    ) VALUES (
+      ${organizationId},
+      ${licenseKey},
+      ${tierValue},
+      ${organizationId ? 'active' : 'pending'},
+      ${organizationId ? sql`NOW()` : null},
+      NOW(),
+      NOW()
+    )
+    ON CONFLICT (license_key) DO UPDATE SET
+      organization_id = ${organizationId},
+      tier = ${tierValue},
+      status = ${organizationId ? 'active' : 'pending'},
+      activated_at = ${organizationId ? sql`NOW()` : null},
+      updated_at = NOW()
+  `);
+
+  // Deactivate the old license
   await db.execute(sql`
     UPDATE as_licenses
     SET
-      tier = ${tierValue},
+      status = 'inactive',
+      deactivated_at = NOW(),
       updated_at = NOW()
-    WHERE license_key = ${licenseKey}
+    WHERE license_key = ${prevLicenseKey}
   `);
 }
 
 /**
- * Handle downgrade event - update tier
+ * Handle downgrade event - create new license and transfer organization
  */
-async function handleDowngradeEvent(licenseKey: string, tier: any) {
+async function handleDowngradeEvent(licenseKey: string, tier: any, prevLicenseKey?: string) {
   const tierValue = tier?.toString() || "1";
 
+  if (!prevLicenseKey) {
+    console.warn("No prev_license_key provided for downgrade event");
+    return;
+  }
+
+  // Get the old license to find the organization
+  const oldLicenseResult = await db.execute(
+    sql`SELECT organization_id FROM as_licenses WHERE license_key = ${prevLicenseKey} LIMIT 1`
+  );
+
+  if (!Array.isArray(oldLicenseResult) || oldLicenseResult.length === 0) {
+    console.error(`Old license not found: ${prevLicenseKey}`);
+    return;
+  }
+
+  const oldLicense = oldLicenseResult[0] as any;
+  const organizationId = oldLicense.organization_id;
+
+  // Create new license with the organization transferred
+  await db.execute(sql`
+    INSERT INTO as_licenses (
+      organization_id,
+      license_key,
+      tier,
+      status,
+      activated_at,
+      created_at,
+      updated_at
+    ) VALUES (
+      ${organizationId},
+      ${licenseKey},
+      ${tierValue},
+      ${organizationId ? 'active' : 'pending'},
+      ${organizationId ? sql`NOW()` : null},
+      NOW(),
+      NOW()
+    )
+    ON CONFLICT (license_key) DO UPDATE SET
+      organization_id = ${organizationId},
+      tier = ${tierValue},
+      status = ${organizationId ? 'active' : 'pending'},
+      activated_at = ${organizationId ? sql`NOW()` : null},
+      updated_at = NOW()
+  `);
+
+  // Deactivate the old license
   await db.execute(sql`
     UPDATE as_licenses
     SET
-      tier = ${tierValue},
+      status = 'inactive',
+      deactivated_at = NOW(),
       updated_at = NOW()
-    WHERE license_key = ${licenseKey}
+    WHERE license_key = ${prevLicenseKey}
   `);
 }
 
