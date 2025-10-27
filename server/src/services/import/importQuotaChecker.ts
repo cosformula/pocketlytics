@@ -4,7 +4,7 @@ import { db } from "../../db/postgres/postgres.js";
 import { sites } from "../../db/postgres/schema.js";
 import { eq } from "drizzle-orm";
 import { processResults } from "../../api/analytics/utils.js";
-import { getOrganizationSubscriptionInfo } from "../../lib/subscriptionUtils.js";
+import { getOrganizationSubscriptionInfo } from "../../lib/subUtils.js";
 import { IS_CLOUD } from "../../lib/const.js";
 
 export class ImportQuotaTracker {
