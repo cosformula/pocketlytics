@@ -4,39 +4,39 @@ import { parse } from "@fast-csv/parse";
 import { DateTime } from "luxon";
 import { getJobQueue } from "../../../queues/jobQueueFactory.js";
 import { r2Storage } from "../../storage/r2StorageService.js";
-import { CSV_PARSE_QUEUE, CsvParseJob, DATA_INSERT_QUEUE } from "./jobs.js";
+import { CSV_PARSE_QUEUE, CsvParseJob, DATA_INSERT_QUEUE, DataInsertJob } from "./jobs.js";
 import { UmamiEvent, umamiHeaders } from "../mappings/umami.js";
 import { updateImportStatus } from "../importStatusManager.js";
 import { ImportLimiter } from "../importLimiter.js";
 import { deleteImportFile } from "../utils.js";
 
-const getImportDataHeaders = (source: string) => {
-  switch (source) {
+const getImportDataHeaders = (platform: string) => {
+  switch (platform) {
     case "umami":
       return umamiHeaders;
     default:
-      throw new Error(`Unsupported import source: ${source}`);
+      throw new Error(`Unsupported platform: ${platform}`);
   }
 };
 
-const createR2FileStream = async (storageLocation: string, source: string) => {
+const createR2FileStream = async (storageLocation: string, platform: string) => {
   console.log(`[CSV Parser] Reading from R2: ${storageLocation}`);
   const fileStream = await r2Storage.getImportFileStream(storageLocation);
   return fileStream.pipe(
     parse({
-      headers: getImportDataHeaders(source),
+      headers: getImportDataHeaders(platform),
       renameHeaders: true,
       ignoreEmpty: true,
     })
   );
 };
 
-const createLocalFileStream = async (storageLocation: string, source: string) => {
+const createLocalFileStream = async (storageLocation: string, platform: string) => {
   console.log(`[CSV Parser] Reading from local disk: ${storageLocation}`);
   await access(storageLocation, constants.F_OK | constants.R_OK);
   return createReadStream(storageLocation).pipe(
     parse({
-      headers: getImportDataHeaders(source),
+      headers: getImportDataHeaders(platform),
       renameHeaders: true,
       ignoreEmpty: true,
     })
@@ -86,7 +86,7 @@ export async function registerCsvParseWorker() {
   const jobQueue = getJobQueue();
 
   await jobQueue.work<CsvParseJob>(CSV_PARSE_QUEUE, { batchSize: 1, pollingIntervalSeconds: 10 }, async ([job]) => {
-    const { site, importId, source, storageLocation, isR2Storage, organization, startDate, endDate } = job.data;
+    const { site, importId, platform, storageLocation, isR2Storage, organization, startDate, endDate } = job.data;
 
     let stream: ReturnType<typeof parse> | null = null;
     let processingTimeout: NodeJS.Timeout | null = null;
@@ -106,8 +106,8 @@ export async function registerCsvParseWorker() {
       let chunksSent = 0;
 
       stream = isR2Storage
-        ? await createR2FileStream(storageLocation, source)
-        : await createLocalFileStream(storageLocation, source);
+        ? await createR2FileStream(storageLocation, platform)
+        : await createLocalFileStream(storageLocation, platform);
 
       // Add explicit error handler before starting to consume the stream
       stream.on("error", error => {
@@ -156,10 +156,10 @@ export async function registerCsvParseWorker() {
         totalAccepted++;
 
         if (chunk.length >= chunkSize) {
-          await jobQueue.send(DATA_INSERT_QUEUE, {
+          await jobQueue.send<DataInsertJob>(DATA_INSERT_QUEUE, {
             site,
             importId,
-            source,
+            platform,
             chunk,
             chunkNumber: chunksSent,
             allChunksSent: false,
@@ -191,10 +191,10 @@ export async function registerCsvParseWorker() {
 
       // Send final chunk if any data remains
       if (chunk.length > 0) {
-        await jobQueue.send(DATA_INSERT_QUEUE, {
+        await jobQueue.send<DataInsertJob>(DATA_INSERT_QUEUE, {
           site,
           importId,
-          source,
+          platform,
           chunk,
           chunkNumber: chunksSent,
           allChunksSent: false,
@@ -203,10 +203,10 @@ export async function registerCsvParseWorker() {
       }
 
       // Send finalization signal with total chunk count
-      await jobQueue.send(DATA_INSERT_QUEUE, {
+      await jobQueue.send<DataInsertJob>(DATA_INSERT_QUEUE, {
         site,
         importId,
-        source,
+        platform,
         chunk: [],
         totalChunks: chunksSent,
         allChunksSent: true,

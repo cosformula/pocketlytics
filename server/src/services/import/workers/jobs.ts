@@ -7,7 +7,7 @@ export const DATA_INSERT_QUEUE = "data-insert";
 interface ImportJob {
   site: string;
   importId: string;
-  source: "umami";
+  platform: "umami";
 }
 
 export interface CsvParseJob extends ImportJob {

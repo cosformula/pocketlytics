@@ -38,10 +38,10 @@ interface ImportManagerProps {
 const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
 const ALLOWED_FILE_TYPES = ["text/csv"];
 const ALLOWED_EXTENSIONS = [".csv"];
-const DATA_SOURCES = [{ value: "umami", label: "Umami" }] as const;
+const PLATFORMS = [{ value: "umami", label: "Umami" }] as const;
 
 const importFormSchema = z.object({
-  source: z.enum(["umami"], { required_error: "Please select a data source" }),
+  platform: z.enum(["umami"], { required_error: "Please select a platform" }),
   file: z
     .custom<FileList>()
     .refine(files => files.length === 1, "Please select a file")
@@ -114,7 +114,7 @@ export function ImportManager({ siteId, disabled }: ImportManagerProps) {
     resolver: zodResolver(importFormSchema),
     mode: "onChange",
     defaultValues: {
-      source: "" as "umami",
+      platform: "" as "umami",
       dateRange: {},
     },
   });
@@ -144,7 +144,7 @@ export function ImportManager({ siteId, disabled }: ImportManagerProps) {
     mutation.mutate(
       {
         file,
-        source: data.source,
+        platform: data.platform,
         startDate,
         endDate,
       },
@@ -256,14 +256,14 @@ export function ImportManager({ siteId, disabled }: ImportManagerProps) {
           )}
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            {/* Data Source Selection */}
+            {/* Platform Selection */}
             <div className="space-y-2">
-              <Label htmlFor="source" className="flex items-center gap-2">
+              <Label htmlFor="platform" className="flex items-center gap-2">
                 <Database className="h-4 w-4" />
-                Data Source
+                Platform
               </Label>
               <Controller
-                name="source"
+                name="platform"
                 control={control}
                 render={({ field }) => (
                   <Select
@@ -272,19 +272,19 @@ export function ImportManager({ siteId, disabled }: ImportManagerProps) {
                     disabled={disabled || mutation.isPending || hasActiveImport}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select data source" />
+                      <SelectValue placeholder="Select platform" />
                     </SelectTrigger>
                     <SelectContent>
-                      {DATA_SOURCES.map(dataSource => (
-                        <SelectItem key={dataSource.value} value={dataSource.value}>
-                          {dataSource.label}
+                      {PLATFORMS.map(platform => (
+                        <SelectItem key={platform.value} value={platform.value}>
+                          {platform.label}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 )}
               />
-              {errors.source && <p className="text-sm text-red-600">{errors.source.message}</p>}
+              {errors.platform && <p className="text-sm text-red-600">{errors.platform.message}</p>}
             </div>
 
             {/* Date Range Picker */}
@@ -426,7 +426,7 @@ export function ImportManager({ siteId, disabled }: ImportManagerProps) {
                 <TableHeader>
                   <TableRow>
                     <TableHead>File</TableHead>
-                    <TableHead>Source</TableHead>
+                    <TableHead>Platform</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead className="text-right">Events</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
@@ -446,7 +446,7 @@ export function ImportManager({ siteId, disabled }: ImportManagerProps) {
                         </TableCell>
                         <TableCell>
                           <Badge variant="outline" className="capitalize">
-                            {imp.source}
+                            {imp.platform}
                           </Badge>
                         </TableCell>
                         <TableCell>

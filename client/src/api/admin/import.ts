@@ -4,7 +4,7 @@ import { APIResponse } from "@/api/types";
 
 interface GetSiteImportsResponse {
   importId: string;
-  source: "umami";
+  platform: "umami";
   status: "pending" | "processing" | "completed" | "failed";
   importedEvents: number;
   errorMessage: string | null;
@@ -14,7 +14,7 @@ interface GetSiteImportsResponse {
 
 interface ImportSiteDataParams {
   file: File;
-  source: string;
+  platform: string;
   startDate?: string;
   endDate?: string;
 }
@@ -49,7 +49,7 @@ export function useImportSiteData(site: number) {
     mutationFn: async (params: ImportSiteDataParams) => {
       const formData = new FormData();
 
-      formData.append("source", params.source);
+      formData.append("platform", params.platform);
       if (params.startDate) {
         formData.append("startDate", params.startDate);
       }

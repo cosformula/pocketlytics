@@ -36,9 +36,9 @@ export async function getSiteImports(request: FastifyRequest<GetSiteImportsReque
     const imports = await getImportsForSite(siteId);
 
     return reply.send({
-      data: imports.map(({ importId, source, status, importedEvents, errorMessage, startedAt, fileName }) => ({
+      data: imports.map(({ importId, platform, status, importedEvents, errorMessage, startedAt, fileName }) => ({
         importId,
-        source,
+        platform,
         status,
         importedEvents,
         errorMessage,

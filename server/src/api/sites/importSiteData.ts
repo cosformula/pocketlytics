@@ -11,7 +11,7 @@ import { getJobQueue } from "../../queues/jobQueueFactory.js";
 import { ImportLimiter } from "../../services/import/importLimiter.js";
 import { updateImportStatus } from "../../services/import/importStatusManager.js";
 import { deleteImportFile, getImportStorageLocation } from "../../services/import/utils.js";
-import { CSV_PARSE_QUEUE } from "../../services/import/workers/jobs.js";
+import { CSV_PARSE_QUEUE, CsvParseJob } from "../../services/import/workers/jobs.js";
 import { r2Storage } from "../../services/storage/r2StorageService.js";
 
 const isValidDate = (date: string) => {
@@ -25,7 +25,7 @@ const importDataFieldsSchema = z
   .object({
     fields: z
       .object({
-        source: z.enum(["umami"]),
+        platform: z.enum(["umami"]),
         startDate: z.string().refine(isValidDate, { message: "Invalid start date format" }).optional(),
         endDate: z.string().refine(isValidDate, { message: "Invalid end date format" }).optional(),
       })
@@ -87,7 +87,7 @@ export async function importSiteData(request: FastifyRequest<ImportDataRequest>,
 
     const parsedFields = importDataFieldsSchema.safeParse({
       fields: {
-        source: (data.fields.source as any)?.value,
+        platform: (data.fields.platform as any)?.value,
         startDate: (data.fields.startDate as any)?.value,
         endDate: (data.fields.endDate as any)?.value,
       },
@@ -97,7 +97,7 @@ export async function importSiteData(request: FastifyRequest<ImportDataRequest>,
       return reply.status(400).send({ error: "Validation error" });
     }
 
-    const { source, startDate, endDate } = parsedFields.data.fields;
+    const { platform, startDate, endDate } = parsedFields.data.fields;
     const siteId = Number(site);
     const importId = randomUUID();
 
@@ -114,8 +114,7 @@ export async function importSiteData(request: FastifyRequest<ImportDataRequest>,
       importId,
       siteId,
       organizationId: organization,
-      source,
-      status: "pending",
+      platform,
       fileName: data.filename,
     });
 
@@ -143,10 +142,10 @@ export async function importSiteData(request: FastifyRequest<ImportDataRequest>,
 
     try {
       const jobQueue = getJobQueue();
-      await jobQueue.send(CSV_PARSE_QUEUE, {
+      await jobQueue.send<CsvParseJob>(CSV_PARSE_QUEUE, {
         site,
         importId,
-        source,
+        platform,
         storageLocation: storage.location,
         isR2Storage: storage.isR2,
         organization,

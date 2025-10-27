@@ -600,7 +600,7 @@ export const notificationChannels = pgTable(
   ]
 );
 
-export const importSourceEnum = pgEnum("import_source_enum", ["umami"]);
+export const importPlatformEnum = pgEnum("import_platform_enum", ["umami"]);
 
 export const importStatusEnum = pgEnum("import_status_enum", ["pending", "processing", "completed", "failed"]);
 
@@ -611,7 +611,7 @@ export const importStatus = pgTable(
     importId: text("import_id").primaryKey().notNull(),
     siteId: integer("site_id").notNull(),
     organizationId: text("organization_id").notNull(),
-    source: importSourceEnum("source").notNull(),
+    platform: importPlatformEnum("platform").notNull(),
     status: importStatusEnum("status").notNull().default("pending"),
     importedEvents: integer("imported_events").notNull().default(0),
     errorMessage: text("error_message"),

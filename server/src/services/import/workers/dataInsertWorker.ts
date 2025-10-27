@@ -4,12 +4,12 @@ import { DataInsertJob, DATA_INSERT_QUEUE } from "./jobs.js";
 import { clickhouse } from "../../../db/clickhouse/clickhouse.js";
 import { updateImportStatus, updateImportProgress } from "../importStatusManager.js";
 
-const getImportDataMapping = (source: string) => {
-  switch (source) {
+const getImportDataMapping = (platform: string) => {
+  switch (platform) {
     case "umami":
       return UmamiImportMapper;
     default:
-      throw new Error(`Unsupported import source: ${source}`);
+      throw new Error(`Unsupported platform: ${platform}`);
   }
 };
 
@@ -17,7 +17,7 @@ export async function registerDataInsertWorker() {
   const jobQueue = getJobQueue();
 
   await jobQueue.work<DataInsertJob>(DATA_INSERT_QUEUE, { batchSize: 1, pollingIntervalSeconds: 2 }, async ([job]) => {
-    const { site, importId, source, chunk, chunkNumber, totalChunks, allChunksSent } = job.data;
+    const { site, importId, platform, chunk, chunkNumber, totalChunks, allChunksSent } = job.data;
 
     // Handle finalization signal
     if (allChunksSent) {
@@ -40,7 +40,7 @@ export async function registerDataInsertWorker() {
 
     // Process data chunk
     try {
-      const dataMapper = getImportDataMapping(source);
+      const dataMapper = getImportDataMapping(platform);
       const transformedRecords = dataMapper.transform(chunk, site, importId);
 
       // Insert to ClickHouse (critical - must succeed)
