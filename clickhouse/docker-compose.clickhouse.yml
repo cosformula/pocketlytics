@@ -40,6 +40,7 @@ services:
 
 volumes:
   clickhouse-data:
+    external: true
 
 configs:
   clickhouse_network:
