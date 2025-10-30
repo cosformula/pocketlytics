@@ -36,6 +36,7 @@ interface ImportManagerProps {
 }
 
 const MAX_FILE_SIZE = IS_CLOUD ? 500 * 1024 * 1024 : 50 * 1024 * 1024 * 1024; // 500 MB for cloud, 50 GB for self-hosted
+const CONFIRM_THRESHOLD = IS_CLOUD ? 100 * 1024 * 1024 : 1024 * 1024 * 1024; // Show confirmation for files > 100 MB (cloud) or > 1 GB (self-hosted)
 const ALLOWED_FILE_TYPES = ["text/csv"];
 const ALLOWED_EXTENSIONS = [".csv"];
 const PLATFORMS = [{ value: "umami", label: "Umami" }] as const;
@@ -94,6 +95,17 @@ const importFormSchema = z.object({
 
 type ImportFormData = z.infer<typeof importFormSchema>;
 
+function formatFileSize(bytes: number): string {
+  const sizeInMB = bytes / 1024 / 1024;
+  const sizeInGB = bytes / 1024 / 1024 / 1024;
+
+  if (sizeInGB < 1) {
+    return `${sizeInMB.toFixed(2)} MB`;
+  } else {
+    return `${sizeInGB.toFixed(2)} GB`;
+  }
+}
+
 export function ImportManager({ siteId, disabled }: ImportManagerProps) {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [deleteImportId, setDeleteImportId] = useState<string | null>(null);
@@ -126,7 +138,7 @@ export function ImportManager({ siteId, disabled }: ImportManagerProps) {
     const file = data.file[0];
     if (!file) return;
 
-    if (file.size > 100 * 1024 * 1024) {
+    if (file.size > CONFIRM_THRESHOLD) {
       setShowConfirmDialog(true);
     } else {
       executeImport(data);
@@ -242,8 +254,7 @@ export function ImportManager({ siteId, disabled }: ImportManagerProps) {
             Import Data
           </CardTitle>
           <CardDescription>
-            Import data from other analytics platforms.{" "}
-            {IS_CLOUD && `Supports CSV files up to ${MAX_FILE_SIZE / 1024 / 1024} MB.`}
+            Import data from other analytics platforms. Supports CSV files up to {formatFileSize(MAX_FILE_SIZE)}.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -326,7 +337,7 @@ export function ImportManager({ siteId, disabled }: ImportManagerProps) {
               />
               {selectedFile && (
                 <p className="text-sm text-muted-foreground">
-                  Selected: {selectedFile.name} ({(selectedFile.size / 1024 / 1024).toFixed(2)} MB)
+                  Selected: {selectedFile.name} ({formatFileSize(selectedFile.size)})
                 </p>
               )}
               {errors.file && <p className="text-sm text-red-600">{errors.file.message as string}</p>}
@@ -502,8 +513,16 @@ export function ImportManager({ siteId, disabled }: ImportManagerProps) {
           <AlertDialogHeader>
             <AlertDialogTitle>Confirm Large File Import</AlertDialogTitle>
             <AlertDialogDescription>
-              You're about to import a large file ({selectedFile ? (selectedFile.size / 1024 / 1024).toFixed(2) : "?"}{" "}
-              MB). This may take several minutes to process. Are you sure you want to continue?
+              You're about to import a large file ({selectedFile ? formatFileSize(selectedFile.size) : "?"}). This may
+              take several minutes to process.
+              {!IS_CLOUD && selectedFile && (
+                <>
+                  {" "}
+                  Ensure your server has at least {Math.ceil((selectedFile.size / 1024 / 1024 / 1024) * 2)} GB of free
+                  disk space.
+                </>
+              )}{" "}
+              Are you sure you want to continue?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
