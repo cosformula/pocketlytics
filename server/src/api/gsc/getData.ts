@@ -7,12 +7,12 @@ import { getUserHasAccessToSite } from "../../lib/auth-utils.js";
 import { db } from "../../db/postgres/postgres.js";
 
 /**
- * Fetches search query data from Google Search Console API
+ * Fetches data from Google Search Console API with support for multiple dimensions
  */
-export async function getGSCQueries(req: FastifyRequest<GetGSCDataRequest>, res: FastifyReply) {
+export async function getGSCData(req: FastifyRequest<GetGSCDataRequest>, res: FastifyReply) {
   try {
     const { site } = req.params;
-    const { startDate, endDate } = req.query;
+    const { startDate, endDate, dimension } = req.query;
     const siteId = Number(site);
 
     if (isNaN(siteId)) {
@@ -21,6 +21,10 @@ export async function getGSCQueries(req: FastifyRequest<GetGSCDataRequest>, res:
 
     if (!startDate || !endDate) {
       return res.status(400).send({ error: "Missing startDate or endDate" });
+    }
+
+    if (!dimension) {
+      return res.status(400).send({ error: "Missing dimension parameter" });
     }
 
     // Check if user has access to this site
@@ -54,8 +58,8 @@ export async function getGSCQueries(req: FastifyRequest<GetGSCDataRequest>, res:
         body: JSON.stringify({
           startDate,
           endDate,
-          dimensions: ["query"],
-          rowLimit: 100, // Top 100 queries
+          dimensions: [dimension],
+          rowLimit: 100,
         }),
       }
     );
@@ -68,18 +72,18 @@ export async function getGSCQueries(req: FastifyRequest<GetGSCDataRequest>, res:
 
     const data: GSCResponse = await gscResponse.json();
 
-    // Transform the response to a simpler format
-    const queries = (data.rows || []).map(row => ({
-      query: row.keys[0],
+    // Transform the response to a simpler format with unified "name" field
+    const results = (data.rows || []).map(row => ({
+      name: row.keys[0],
       clicks: row.clicks,
       impressions: row.impressions,
       ctr: row.ctr,
       position: row.position,
     }));
 
-    return res.send({ data: queries });
+    return res.send({ data: results });
   } catch (error) {
-    console.error("Error fetching GSC queries:", error);
-    return res.status(500).send({ error: "Failed to fetch GSC queries" });
+    console.error("Error fetching GSC data:", error);
+    return res.status(500).send({ error: "Failed to fetch GSC data" });
   }
 }

@@ -24,7 +24,7 @@ export async function gscCallback(req: FastifyRequest<GSCCallbackRequest>, res: 
 
     if (error) {
       console.error("OAuth error:", error);
-      return res.redirect(`${process.env.CLIENT_URL}/error?message=OAuth failed`);
+      return res.redirect(`${process.env.BASE_URL}/error?message=OAuth failed`);
     }
 
     if (!code || !state) {
@@ -67,7 +67,7 @@ export async function gscCallback(req: FastifyRequest<GSCCallbackRequest>, res: 
 
     if (!tokenResponse.ok) {
       console.error("Token exchange failed:", await tokenResponse.text());
-      return res.redirect(`${process.env.CLIENT_URL}/error?message=Token exchange failed`);
+      return res.redirect(`${process.env.BASE_URL}/error?message=Token exchange failed`);
     }
 
     const tokens: TokenResponse = await tokenResponse.json();
@@ -76,7 +76,7 @@ export async function gscCallback(req: FastifyRequest<GSCCallbackRequest>, res: 
     const properties = await getGSCProperties(tokens.access_token);
 
     if (properties.length === 0) {
-      return res.redirect(`${process.env.CLIENT_URL}/error?message=No GSC properties found`);
+      return res.redirect(`${process.env.BASE_URL}/error?message=No GSC properties found`);
     }
 
     // Use the first property by default
@@ -114,9 +114,9 @@ export async function gscCallback(req: FastifyRequest<GSCCallbackRequest>, res: 
     }
 
     // Redirect back to the client with success
-    return res.redirect(`${process.env.CLIENT_URL}/${siteId}/settings?gsc=success`);
+    return res.redirect(`${process.env.BASE_URL}/${siteId}/settings?gsc=success`);
   } catch (error) {
     console.error("Error handling GSC callback:", error);
-    return res.redirect(`${process.env.CLIENT_URL}/error?message=Callback failed`);
+    return res.redirect(`${process.env.BASE_URL}/error?message=Callback failed`);
   }
 }

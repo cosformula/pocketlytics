@@ -2,8 +2,10 @@ import { useQuery } from "@tanstack/react-query";
 import { useStore } from "../../lib/store";
 import { authedFetch, getQueryParams } from "../utils";
 
-export type GSCQuery = {
-  query: string;
+export type GSCDimension = "query" | "page" | "country" | "device";
+
+export type GSCData = {
+  name: string;
   clicks: number;
   impressions: number;
   ctr: number;
@@ -11,18 +13,21 @@ export type GSCQuery = {
 };
 
 /**
- * Hook to fetch search query data from Google Search Console
+ * Hook to fetch data from Google Search Console for a specific dimension
  */
-export function useGSCQueries() {
+export function useGSCData(dimension: GSCDimension) {
   const { site, time } = useStore();
 
   const timeParams = getQueryParams(time);
 
   return useQuery({
-    queryKey: ["gsc-queries", site, timeParams],
+    queryKey: ["gsc-data", dimension, site, timeParams],
     enabled: !!site,
     queryFn: () => {
-      return authedFetch<{ data: GSCQuery[] }>(`/gsc/queries/${site}`, timeParams).then((res) => res.data);
+      return authedFetch<{ data: GSCData[] }>(`/gsc/data/${site}`, {
+        ...timeParams,
+        dimension,
+      }).then((res) => res.data);
     },
     // Refetch less frequently since GSC data updates slowly
     staleTime: 5 * 60 * 1000, // 5 minutes

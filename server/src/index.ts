@@ -84,8 +84,7 @@ import { connectGSC } from "./api/gsc/connect.js";
 import { gscCallback } from "./api/gsc/callback.js";
 import { getGSCStatus } from "./api/gsc/status.js";
 import { disconnectGSC } from "./api/gsc/disconnect.js";
-import { getGSCQueries } from "./api/gsc/getQueries.js";
-import { getGSCPages } from "./api/gsc/getPages.js";
+import { getGSCData } from "./api/gsc/getData.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -250,6 +249,7 @@ const ANALYTICS_ROUTES = [
   "/api/error-events/",
   "/api/error-bucketed/",
   "/api/session-replay/",
+  "/api/gsc/data/",
 ];
 
 server.addHook("onRequest", async (request, reply) => {
@@ -370,8 +370,7 @@ server.get("/api/gsc/connect/:site", connectGSC);
 server.get("/api/gsc/callback", gscCallback);
 server.get("/api/gsc/status/:site", getGSCStatus);
 server.delete("/api/gsc/disconnect/:site", disconnectGSC);
-server.get("/api/gsc/queries/:site", getGSCQueries);
-server.get("/api/gsc/pages/:site", getGSCPages);
+server.get("/api/gsc/data/:site", getGSCData);
 
 // UPTIME MONITORING
 // Only register uptime routes when IS_CLOUD is true (Redis is available)

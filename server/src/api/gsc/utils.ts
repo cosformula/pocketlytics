@@ -4,7 +4,7 @@ import { eq } from "drizzle-orm";
 
 interface GSCTokens {
   access_token: string;
-  refresh_token: string;
+  refresh_token?: string; // Optional because refresh might not return a new refresh_token
   expires_in: number;
 }
 
@@ -24,10 +24,10 @@ export async function refreshGSCToken(siteId: number): Promise<string | null> {
     const now = new Date();
     const fiveMinutesFromNow = new Date(now.getTime() + 5 * 60 * 1000);
 
-    if (expiresAt > fiveMinutesFromNow) {
-      // Token is still valid
-      return connection.accessToken;
-    }
+    // if (expiresAt > fiveMinutesFromNow) {
+    //   // Token is still valid
+    //   return connection.accessToken;
+    // }
 
     // Token is expired or about to expire, refresh it
     const tokenResponse = await fetch("https://oauth2.googleapis.com/token", {
@@ -49,18 +49,26 @@ export async function refreshGSCToken(siteId: number): Promise<string | null> {
     }
 
     const tokens: GSCTokens = await tokenResponse.json();
+    console.log("--------------------------------");
+    console.log({ tokens });
 
     // Update the connection with new access token
     const newExpiresAt = new Date(Date.now() + tokens.expires_in * 1000);
-    await db
-      .update(gscConnections)
-      .set({
-        accessToken: tokens.access_token,
-        expiresAt: newExpiresAt.toISOString(),
-        updatedAt: new Date().toISOString(),
-      })
-      .where(eq(gscConnections.siteId, siteId));
 
+    // Only update refresh_token if a new one was provided
+    const updateData: any = {
+      accessToken: tokens.access_token,
+      expiresAt: newExpiresAt.toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    if (tokens.refresh_token) {
+      updateData.refreshToken = tokens.refresh_token;
+    }
+
+    await db.update(gscConnections).set(updateData).where(eq(gscConnections.siteId, siteId));
+
+    console.log(`Successfully refreshed GSC token for site ${siteId}, expires at ${newExpiresAt.toISOString()}`);
     return tokens.access_token;
   } catch (error) {
     console.error("Error refreshing GSC token:", error);
