@@ -8,6 +8,7 @@ import { ConfirmationModal } from "@/components/ConfirmationModal";
 import { useStore } from "@/lib/store";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { SiGoogle } from "@icons-pack/react-simple-icons";
 
 interface GSCManagerProps {
   disabled?: boolean;
@@ -37,7 +38,7 @@ export function GSCManager({ disabled = false }: GSCManagerProps) {
           toast.success("Google Search Console disconnected");
           resolve(undefined);
         },
-        onError: (error) => {
+        onError: error => {
           toast.error("Failed to disconnect Google Search Console");
           reject(error);
         },
@@ -97,7 +98,8 @@ export function GSCManager({ disabled = false }: GSCManagerProps) {
           </ConfirmationModal>
         </div>
       ) : (
-        <Button onClick={() => connect()} disabled={disabled || isConnecting} className="w-full">
+        <Button onClick={() => connect()} disabled={disabled || isConnecting}>
+          <SiGoogle />
           {isConnecting ? "Connecting..." : "Connect Google Search Console"}
         </Button>
       )}
