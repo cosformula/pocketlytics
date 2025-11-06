@@ -6,17 +6,21 @@ import { IJobQueue } from "../queues/jobQueue.js";
 import { r2Storage } from "../../storage/r2StorageService.js";
 import { CSV_PARSE_QUEUE, CsvParseJob, DATA_INSERT_QUEUE, DataInsertJob } from "./jobs.js";
 import { UmamiEvent, umamiHeaders } from "../mappings/umami.js";
+import { SimpleAnalyticsEvent, simpleAnalyticsHeaders } from "../mappings/simpleAnalytics.js";
 import { updateImportStatus } from "../importStatusManager.js";
 import { deleteImportFile } from "../utils.js";
 import { ImportQuotaTracker } from "../importQuotaChecker.js";
 import { createServiceLogger } from "../../../lib/logger/logger.js";
+import { ImportPlatform } from "../platforms.js";
 
 const logger = createServiceLogger("import:csv-parser");
 
-const getImportDataHeaders = (platform: string) => {
+const getImportDataHeaders = (platform: ImportPlatform) => {
   switch (platform) {
     case "umami":
       return umamiHeaders;
+    case "simple_analytics":
+      return simpleAnalyticsHeaders;
     default:
       throw new Error(`Unsupported platform: ${platform}`);
   }
@@ -30,7 +34,7 @@ const safeUpdateStatusToFailed = async (importId: string, errorMessage: string) 
   }
 };
 
-const createR2FileStream = async (storageLocation: string, platform: string) => {
+const createR2FileStream = async (storageLocation: string, platform: ImportPlatform) => {
   logger.info({ storageLocation }, "Reading from R2");
   const fileStream = await r2Storage.getImportFileStream(storageLocation);
   return fileStream.pipe(
@@ -42,7 +46,7 @@ const createR2FileStream = async (storageLocation: string, platform: string) => 
   );
 };
 
-const createLocalFileStream = async (storageLocation: string, platform: string) => {
+const createLocalFileStream = async (storageLocation: string, platform: ImportPlatform) => {
   logger.info({ storageLocation }, "Reading from local disk");
   await access(storageLocation, constants.F_OK | constants.R_OK);
   return createReadStream(storageLocation).pipe(
@@ -54,7 +58,7 @@ const createLocalFileStream = async (storageLocation: string, platform: string) 
   );
 };
 
-const createDateRangeFilter = (startDateStr?: string, endDateStr?: string) => {
+const createDateRangeFilter = (platform: ImportPlatform, startDateStr?: string, endDateStr?: string) => {
   const startDate = startDateStr
     ? DateTime.fromFormat(startDateStr, "yyyy-MM-dd", { zone: "utc" }).startOf("day")
     : null;
@@ -69,7 +73,11 @@ const createDateRangeFilter = (startDateStr?: string, endDateStr?: string) => {
   }
 
   return (dateStr: string) => {
-    const createdAt = DateTime.fromFormat(dateStr, "yyyy-MM-dd HH:mm:ss", { zone: "utc" });
+    const createdAt =
+      platform === "umami"
+        ? DateTime.fromFormat(dateStr, "yyyy-MM-dd HH:mm:ss", { zone: "utc" })
+        : DateTime.fromISO(dateStr, { zone: "utc" });
+
     if (!createdAt.isValid) {
       return false;
     }
@@ -99,7 +107,7 @@ export async function createCsvParseWorker(jobQueue: IJobQueue) {
       const chunkSize = 5000;
       const INACTIVITY_TIMEOUT_MS = 90 * 1000;
 
-      let chunk: UmamiEvent[] = [];
+      let chunk: UmamiEvent[] | SimpleAnalyticsEvent[] = [];
       let totalSkippedQuota = 0;
       let totalProcessed = 0;
 
@@ -128,21 +136,23 @@ export async function createCsvParseWorker(jobQueue: IJobQueue) {
       // Set initial timeout
       resetTimeout();
 
-      const isDateInRange = createDateRangeFilter(startDate, endDate);
+      const isDateInRange = createDateRangeFilter(platform, startDate, endDate);
 
       for await (const data of stream) {
+        const dateField = platform === "umami" ? data.created_at : data.added_iso;
+
         // Skip rows with missing or invalid dates
-        if (!data.created_at) {
+        if (!dateField) {
           continue;
         }
 
         // Apply user-specified date range filter
-        if (!isDateInRange(data.created_at)) {
+        if (!isDateInRange(dateField)) {
           continue;
         }
 
         // Check per-month quota (includes historical window check)
-        if (!quotaTracker.canImportEvent(data.created_at)) {
+        if (!quotaTracker.canImportEvent(dateField, platform)) {
           totalSkippedQuota++;
           continue;
         }

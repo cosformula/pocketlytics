@@ -603,7 +603,7 @@ export const notificationChannels = pgTable(
   ]
 );
 
-export const importPlatformEnum = pgEnum("import_platform_enum", ["umami"]);
+export const importPlatformEnum = pgEnum("import_platform_enum", ["umami", "simple_analytics"]);
 
 export const importStatusEnum = pgEnum("import_status_enum", ["pending", "processing", "completed", "failed"]);
 

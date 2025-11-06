@@ -12,6 +12,7 @@ import { updateImportStatus } from "../../services/import/importStatusManager.js
 import { deleteImportFile, getImportStorageLocation } from "../../services/import/utils.js";
 import { CSV_PARSE_QUEUE, CsvParseJob } from "../../services/import/workers/jobs.js";
 import { r2Storage } from "../../services/storage/r2StorageService.js";
+import { IMPORT_PLATFORMS } from "../../services/import/platforms.js";
 
 const isValidDate = (date: string) => {
   const dt = DateTime.fromFormat(date, "yyyy-MM-dd", { zone: "utc" });
@@ -24,7 +25,7 @@ const importDataFieldsSchema = z
   .object({
     fields: z
       .object({
-        platform: z.enum(["umami"]),
+        platform: z.enum(IMPORT_PLATFORMS),
         startDate: z.string().refine(isValidDate, { message: "Invalid start date format" }).optional(),
         endDate: z.string().refine(isValidDate, { message: "Invalid end date format" }).optional(),
       })

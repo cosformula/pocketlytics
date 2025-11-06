@@ -7,6 +7,7 @@ import { processResults } from "../../api/analytics/utils.js";
 import { getBestSubscription, type SubscriptionInfo } from "../../lib/subscriptionUtils.js";
 import { IS_CLOUD } from "../../lib/const.js";
 import { createServiceLogger } from "../../lib/logger/logger.js";
+import { ImportPlatform } from "./platforms.js";
 
 const logger = createServiceLogger("import:quota-checker");
 
@@ -166,14 +167,18 @@ export class ImportQuotaTracker {
     }
   }
 
-  canImportEvent(timestamp: string): boolean {
+  canImportEvent(dateStr: string, platform: ImportPlatform): boolean {
     if (this.monthlyLimit === Infinity) {
       return true;
     }
 
-    const dt = DateTime.fromFormat(timestamp, "yyyy-MM-dd HH:mm:ss", { zone: "utc" });
+    const dt =
+      platform === "umami"
+        ? DateTime.fromFormat(dateStr, "yyyy-MM-dd HH:mm:ss", { zone: "utc" })
+        : DateTime.fromISO(dateStr, { zone: "utc" });
+
     if (!dt.isValid) {
-      logger.warn({ timestamp }, "Invalid timestamp format");
+      logger.warn({ date: dateStr }, "Invalid date format");
       return false;
     }
 

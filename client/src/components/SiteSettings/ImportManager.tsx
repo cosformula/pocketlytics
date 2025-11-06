@@ -29,6 +29,7 @@ import { useGetSiteImports, useImportSiteData, useDeleteSiteImport } from "@/api
 import { SplitDateRangePicker } from "@/components/SplitDateRangePicker";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { IS_CLOUD } from "@/lib/const";
+import { IMPORT_PLATFORMS, IMPORT_PLATFORMS_CHOICES } from "@/lib/platforms";
 
 interface ImportManagerProps {
   siteId: number;
@@ -39,10 +40,9 @@ const MAX_FILE_SIZE = IS_CLOUD ? 500 * 1024 * 1024 : 50 * 1024 * 1024 * 1024; //
 const CONFIRM_THRESHOLD = IS_CLOUD ? 100 * 1024 * 1024 : 1024 * 1024 * 1024; // Show confirmation for files > 100 MB (cloud) or > 1 GB (self-hosted)
 const ALLOWED_FILE_TYPES = ["text/csv"];
 const ALLOWED_EXTENSIONS = [".csv"];
-const PLATFORMS = [{ value: "umami", label: "Umami" }] as const;
 
 const importFormSchema = z.object({
-  platform: z.enum(["umami"], { required_error: "Please select a platform" }),
+  platform: z.enum(IMPORT_PLATFORMS, { required_error: "Please select a platform" }),
   file: z
     .custom<FileList>()
     .refine(files => files.length === 1, "Please select a file")
@@ -126,7 +126,7 @@ export function ImportManager({ siteId, disabled }: ImportManagerProps) {
     resolver: zodResolver(importFormSchema),
     mode: "onChange",
     defaultValues: {
-      platform: "" as "umami",
+      platform: undefined,
       dateRange: {},
     },
   });
@@ -288,7 +288,7 @@ export function ImportManager({ siteId, disabled }: ImportManagerProps) {
                       <SelectValue placeholder="Select platform" />
                     </SelectTrigger>
                     <SelectContent>
-                      {PLATFORMS.map(platform => (
+                      {IMPORT_PLATFORMS_CHOICES.map(platform => (
                         <SelectItem key={platform.value} value={platform.value}>
                           {platform.label}
                         </SelectItem>

@@ -1,20 +1,12 @@
 import { IJobQueue } from "../queues/jobQueue.js";
-import { UmamiImportMapper } from "../mappings/umami.js";
+import { UmamiEvent, UmamiImportMapper } from "../mappings/umami.js";
+import { SimpleAnalyticsEvent, SimpleAnalyticsImportMapper } from "../mappings/simpleAnalytics.js";
 import { DataInsertJob, DATA_INSERT_QUEUE } from "./jobs.js";
 import { clickhouse } from "../../../db/clickhouse/clickhouse.js";
 import { updateImportStatus, updateImportProgress } from "../importStatusManager.js";
 import { createServiceLogger } from "../../../lib/logger/logger.js";
 
 const logger = createServiceLogger("import:data-insert");
-
-const getImportDataMapping = (platform: string) => {
-  switch (platform) {
-    case "umami":
-      return UmamiImportMapper;
-    default:
-      throw new Error(`Unsupported platform: ${platform}`);
-  }
-};
 
 const safeUpdateStatusToFailed = async (importId: string, errorMessage: string) => {
   try {
@@ -35,8 +27,15 @@ export async function createDataInsertWorker(jobQueue: IJobQueue) {
         return;
       }
 
-      const dataMapper = getImportDataMapping(platform);
-      const transformedRecords = dataMapper.transform(chunk, site, importId);
+      let transformedRecords;
+
+      if (platform === "umami") {
+        transformedRecords = UmamiImportMapper.transform(chunk as UmamiEvent[], site, importId);
+      } else if (platform === "simple_analytics") {
+        transformedRecords = SimpleAnalyticsImportMapper.transform(chunk as SimpleAnalyticsEvent[], site, importId);
+      } else {
+        throw new Error(`Unsupported platform: ${platform}`);
+      }
 
       await clickhouse.insert({
         table: "events",

@@ -1,10 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { authedFetch } from "@/api/utils";
 import { APIResponse } from "@/api/types";
+import { ImportPlatform } from "@/lib/platforms";
 
 interface GetSiteImportsResponse {
   importId: string;
-  platform: "umami";
+  platform: ImportPlatform;
   status: "pending" | "processing" | "completed" | "failed";
   importedEvents: number;
   errorMessage: string | null;
@@ -14,7 +15,7 @@ interface GetSiteImportsResponse {
 
 interface ImportSiteDataParams {
   file: File;
-  platform: string;
+  platform: ImportPlatform;
   startDate?: string;
   endDate?: string;
 }

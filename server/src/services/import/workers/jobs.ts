@@ -1,4 +1,6 @@
 import { UmamiEvent } from "../mappings/umami.js";
+import { SimpleAnalyticsEvent } from "../mappings/simpleAnalytics.js";
+import { ImportPlatform } from "../platforms.js";
 
 export const CSV_PARSE_QUEUE = "csv-parse";
 
@@ -7,7 +9,7 @@ export const DATA_INSERT_QUEUE = "data-insert";
 interface ImportJob {
   site: string;
   importId: string;
-  platform: "umami";
+  platform: ImportPlatform;
 }
 
 export interface CsvParseJob extends ImportJob {
@@ -19,6 +21,6 @@ export interface CsvParseJob extends ImportJob {
 }
 
 export interface DataInsertJob extends ImportJob {
-  chunk: UmamiEvent[];
+  chunk: UmamiEvent[] | SimpleAnalyticsEvent[];
   allChunksSent: boolean; // Finalization signal
 }
