@@ -283,19 +283,21 @@ export default function HomePage() {
         </section>
 
         <section className="py-14 md:py-20 w-full max-w-6xl px-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-16">
-            {features.map(feature => {
-              const Icon = feature.icon;
-              return (
-                <div key={feature.title} className="space-y-4">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500/20 to-emerald-600/10 border border-emerald-500/30 shadow-md shadow-emerald-500/10 flex items-center justify-center">
-                    <Icon className="w-5 h-5 text-emerald-400" />
+          <div className="bg-neutral-900/30 backdrop-blur-sm border border-neutral-800/50 rounded-2xl p-4 md:p-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12\0">
+              {features.map(feature => {
+                const Icon = feature.icon;
+                return (
+                  <div key={feature.title} className="space-y-4">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500/20 to-emerald-600/10 border border-emerald-500/30 shadow-md shadow-emerald-500/10 flex items-center justify-center">
+                      <Icon className="w-5 h-5 text-emerald-400" />
+                    </div>
+                    <h3 className="text-2xl font-medium tracking-tight">{feature.title}</h3>
+                    <p className="text-neutral-300 text-base">{feature.description}</p>
                   </div>
-                  <h3 className="text-2xl font-medium tracking-tight">{feature.title}</h3>
-                  <p className="text-neutral-300 text-base">{feature.description}</p>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
         </section>
 
@@ -314,20 +316,11 @@ export default function HomePage() {
             <div className="columns-1 md:columns-2 lg:columns-3 gap-4 space-y-4">
               <TweetCard id="1934145508999877089" className="break-inside-avoid mb-4" />
               <TweetCard id="1920470706761929048" className="break-inside-avoid mb-4" />
-              <TweetCard id="1919290867451404670" className="break-inside-avoid mb-4" />
-              <TweetCard id="1927817460993884321" className="break-inside-avoid mb-4" />
-
               <TweetCard id="1921928423284629758" className="break-inside-avoid mb-4" />
-              <TweetCard id="1920318739335033226" className="break-inside-avoid mb-4" />
-              <TweetCard id="1920425974954381456" className="break-inside-avoid mb-4" />
-
-              {/* <TweetCard
-                id="1921878010417848443"
-                className="break-inside-avoid mb-4"
-              /> */}
               <TweetCard id="1920899082253434950" className="break-inside-avoid mb-4" />
-              <TweetCard id="1920379817113088341" className="break-inside-avoid mb-4" />
-              <TweetCard id="1919793785384386576" className="break-inside-avoid mb-4" />
+              <TweetCard id="1982378431166963982" className="break-inside-avoid mb-4" />
+              <TweetCard id="1927817460993884321" className="break-inside-avoid mb-4" />
+              <TweetCard id="1971933281324355679" className="break-inside-avoid mb-4" />
             </div>
           </div>
         </section>
@@ -383,7 +376,7 @@ export default function HomePage() {
 
                 <AccordionItem value="item-3" className="border-b border-neutral-800/50">
                   <AccordionTrigger className="px-6 py-4 text-base md:text-lg font-medium hover:text-emerald-400 transition-colors">
-                    Rybbit vs. Plausible/Umami/Simple Analytics
+                    Rybbit vs. Plausible/Umami/Fathom
                   </AccordionTrigger>
                   <AccordionContent className="px-6 pb-4 text-neutral-300">
                     <p>

@@ -40,11 +40,11 @@ export const MagicTweet = ({ tweet, className, ...props }: { tweet: Tweet; class
     >
       <TweetHeader tweet={enrichedTweet} />
       <TweetBody tweet={enrichedTweet} />
-      {tweet.id_str !== "1920425974954381456" && (
+      {/* {tweet.id_str !== "1920425974954381456" && (
         <div className="hidden sm:block">
           <TweetMedia tweet={enrichedTweet} />
         </div>
-      )}
+      )} */}
     </div>
   );
 };
