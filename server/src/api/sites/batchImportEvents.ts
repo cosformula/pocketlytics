@@ -12,38 +12,14 @@ import { createServiceLogger } from "../../lib/logger/logger.js";
 
 const logger = createServiceLogger("import:batch");
 
-// Zod schema for Umami event (from CSV)
-const umamiEventSchema = z.object({
-  session_id: z.string(),
-  hostname: z.string(),
-  browser: z.string(),
-  os: z.string(),
-  device: z.string(),
-  screen: z.string(),
-  language: z.string(),
-  country: z.string(),
-  region: z.string(),
-  city: z.string(),
-  url_path: z.string(),
-  url_query: z.string(),
-  referrer_path: z.string(),
-  referrer_query: z.string(),
-  referrer_domain: z.string(),
-  page_title: z.string(),
-  event_type: z.string(),
-  event_name: z.string(),
-  distinct_id: z.string(),
-  created_at: z.string(),
-});
-
 const batchImportRequestSchema = z
   .object({
     params: z.object({
       site: z.string().min(1),
+      importId: z.string().uuid(),
     }),
     body: z.object({
-      events: z.array(umamiEventSchema).min(1).max(10000), // Properly typed Umami events
-      importId: z.string().uuid(),
+      events: z.array(UmamiImportMapper.umamiEventKeyOnlySchema).min(1).max(10000),
     }),
   })
   .strict();
@@ -62,11 +38,11 @@ export async function batchImportEvents(request: FastifyRequest<BatchImportReque
 
     if (!parsed.success) {
       logger.error({ error: parsed.error }, "Validation error");
-      return reply.status(400).send({ error: "Validation error", details: parsed.error.flatten() });
+      return reply.status(400).send({ error: "Validation error" });
     }
 
-    const { site } = parsed.data.params;
-    const { events, importId } = parsed.data.body;
+    const { site, importId } = parsed.data.params;
+    const { events } = parsed.data.body;
     const siteId = Number(site);
 
     const userHasAccess = await getUserHasAdminAccessToSite(request, site);
@@ -96,7 +72,6 @@ export async function batchImportEvents(request: FastifyRequest<BatchImportReque
       return reply.status(400).send({ error: "Import has failed" });
     }
 
-    // Update status to processing if still pending
     if (importRecord.status === "pending") {
       await updateImportStatus(importId, "processing");
     }
@@ -104,20 +79,18 @@ export async function batchImportEvents(request: FastifyRequest<BatchImportReque
     // Auto-detect platform if not set (first batch)
     let detectedPlatform = importRecord.platform;
     if (!detectedPlatform) {
-      // Detect platform based on event structure
-      // For now, we only support Umami, so if events match Umami schema, it's Umami
-      detectedPlatform = "umami";
+      const firstEvent = events[0];
 
-      // Update import record with detected platform
-      await db
-        .update(importStatus)
-        .set({ platform: detectedPlatform })
-        .where(eq(importStatus.importId, importId));
+      if (UmamiImportMapper.umamiEventKeyOnlySchema.safeParse(firstEvent).success) {
+        detectedPlatform = "umami";
+      } else {
+        logger.error({ importId, firstEventKeys: Object.keys(firstEvent) }, "Unable to detect platform from event structure");
+        return reply.status(400).send({ error: "Unable to detect platform from event structure" });
+      }
 
-      logger.info({ importId, detectedPlatform }, "Auto-detected platform");
+      await db.update(importStatus).set({ platform: detectedPlatform }).where(eq(importStatus.importId, importId));
     }
 
-    // Get organization ID for quota checking
     const [siteRecord] = await db
       .select({ organizationId: sites.organizationId })
       .from(sites)
@@ -130,16 +103,14 @@ export async function batchImportEvents(request: FastifyRequest<BatchImportReque
     }
 
     try {
-      // Create quota tracker for server-side quota checking
       const quotaTracker = await ImportQuotaTracker.create(siteRecord.organizationId);
 
-      // Filter events based on quota availability
       const eventsWithinQuota: UmamiEvent[] = [];
       let skippedDueToQuota = 0;
 
       for (const event of events) {
         if (!event.created_at) {
-          continue; // Skip events without timestamp
+          continue;
         }
 
         if (quotaTracker.canImportEvent(event.created_at)) {
@@ -149,8 +120,7 @@ export async function batchImportEvents(request: FastifyRequest<BatchImportReque
         }
       }
 
-      // If all events were skipped due to quota, log warning
-      if (eventsWithinQuota.length === 0 && events.length > 0) {
+      if (eventsWithinQuota.length === 0) {
         const quotaSummary = quotaTracker.getSummary();
         const errorMessage =
           `All ${events.length} events exceeded monthly quotas or fell outside the ${quotaSummary.totalMonthsInWindow}-month historical window. ` +
@@ -165,7 +135,6 @@ export async function batchImportEvents(request: FastifyRequest<BatchImportReque
         });
       }
 
-      // Transform events using server-side mapper (single source of truth)
       const transformedEvents = UmamiImportMapper.transform(eventsWithinQuota, site, importId);
 
       if (transformedEvents.length === 0) {
@@ -177,7 +146,6 @@ export async function batchImportEvents(request: FastifyRequest<BatchImportReque
         });
       }
 
-      // Insert transformed events into ClickHouse
       await clickhouse.insert({
         table: "events",
         values: transformedEvents,
@@ -193,7 +161,6 @@ export async function batchImportEvents(request: FastifyRequest<BatchImportReque
         "Batch inserted successfully"
       );
 
-      // Update progress
       await updateImportProgress(importId, transformedEvents.length);
 
       return reply.send({

@@ -143,7 +143,7 @@ export class CSVWorkerManager {
     this.uploadInProgress = true;
 
     try {
-      const response = await fetch(`/api/batch-import-events/${this.siteId}`, {
+      const response = await fetch(`/api/batch-import-events/${this.siteId}/${this.importId}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -151,7 +151,6 @@ export class CSVWorkerManager {
         credentials: "include",
         body: JSON.stringify({
           events,
-          importId: this.importId,
         }),
       });
 

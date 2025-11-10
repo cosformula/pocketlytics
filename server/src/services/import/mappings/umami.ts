@@ -3,6 +3,7 @@ import { getChannel } from "../../tracker/getChannel.js";
 import { RybbitEvent } from "./rybbit.js";
 import { z } from "zod";
 import { createServiceLogger } from "../../../lib/logger/logger.js";
+import { deriveKeyOnlySchema } from "./utils.js";
 
 const logger = createServiceLogger("import:umami-mapper");
 
@@ -192,6 +193,8 @@ export class UmamiImportMapper {
     distinct_id: z.string().max(64),
     created_at: z.string().regex(/^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]) ([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/),
   });
+
+  static readonly umamiEventKeyOnlySchema = deriveKeyOnlySchema(UmamiImportMapper.umamiEventSchema);
 
   static transform(events: UmamiEvent[], site: string, importId: string): RybbitEvent[] {
     return events.reduce<RybbitEvent[]>((acc, event) => {
