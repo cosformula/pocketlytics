@@ -22,7 +22,7 @@ import { authClient } from "../../lib/auth";
 import { resetStore, useStore } from "../../lib/store";
 import { SubscriptionData, useStripeSubscription } from "../../lib/subscription/useStripeSubscription";
 import { isValidDomain, normalizeDomain } from "../../lib/utils";
-import { FREE_SITE_LIMIT, PRO_SITE_LIMIT, STANDARD_SITE_LIMIT } from "../../lib/const";
+import { FREE_SITE_LIMIT, IS_CLOUD, PRO_SITE_LIMIT, STANDARD_SITE_LIMIT } from "../../lib/const";
 
 const getSiteLimit = (subscription: SubscriptionData | undefined) => {
   if (subscription?.planName.includes("standard")) {
@@ -51,7 +51,7 @@ export function AddSite({ trigger, disabled }: { trigger?: React.ReactNode; disa
   const { data: sites, refetch } = useGetSitesFromOrg(activeOrganization?.id);
   const { data: subscription } = useStripeSubscription();
 
-  const isOverSiteLimit = getSiteLimit(subscription) <= (sites?.sites?.length || 0);
+  const isOverSiteLimit = getSiteLimit(subscription) <= (sites?.sites?.length || 0) && IS_CLOUD;
 
   const finalDisabled = disabled || isOverSiteLimit;
 
