@@ -8,9 +8,6 @@ import { ImportQuotaTracker } from "../../services/import/importQuotaChecker.js"
 import { db } from "../../db/postgres/postgres.js";
 import { sites, importStatus } from "../../db/postgres/schema.js";
 import { eq } from "drizzle-orm";
-import { createServiceLogger } from "../../lib/logger/logger.js";
-
-const logger = createServiceLogger("import:batch");
 
 const batchImportRequestSchema = z
   .object({
@@ -37,7 +34,6 @@ export async function batchImportEvents(request: FastifyRequest<BatchImportReque
     });
 
     if (!parsed.success) {
-      logger.error({ error: parsed.error }, "Validation error");
       return reply.status(400).send({ error: "Validation error" });
     }
 
@@ -53,22 +49,18 @@ export async function batchImportEvents(request: FastifyRequest<BatchImportReque
     // Verify import exists and is in valid state
     const importRecord = await getImportById(importId);
     if (!importRecord) {
-      logger.error({ importId }, "Import not found");
       return reply.status(404).send({ error: "Import not found" });
     }
 
     if (importRecord.siteId !== siteId) {
-      logger.error({ importId, siteId, recordSiteId: importRecord.siteId }, "Import site mismatch");
       return reply.status(400).send({ error: "Import does not belong to this site" });
     }
 
     if (importRecord.status === "completed") {
-      logger.warn({ importId }, "Attempt to add events to completed import");
       return reply.status(400).send({ error: "Import already completed" });
     }
 
     if (importRecord.status === "failed") {
-      logger.warn({ importId }, "Attempt to add events to failed import");
       return reply.status(400).send({ error: "Import has failed" });
     }
 
@@ -84,7 +76,6 @@ export async function batchImportEvents(request: FastifyRequest<BatchImportReque
       if (UmamiImportMapper.umamiEventKeyOnlySchema.safeParse(firstEvent).success) {
         detectedPlatform = "umami";
       } else {
-        logger.error({ importId, firstEventKeys: Object.keys(firstEvent) }, "Unable to detect platform from event structure");
         return reply.status(400).send({ error: "Unable to detect platform from event structure" });
       }
 
@@ -98,7 +89,6 @@ export async function batchImportEvents(request: FastifyRequest<BatchImportReque
       .limit(1);
 
     if (!siteRecord) {
-      logger.error({ siteId }, "Site not found");
       return reply.status(404).send({ error: "Site not found" });
     }
 
@@ -126,8 +116,6 @@ export async function batchImportEvents(request: FastifyRequest<BatchImportReque
           `All ${events.length} events exceeded monthly quotas or fell outside the ${quotaSummary.totalMonthsInWindow}-month historical window. ` +
           `${quotaSummary.monthsAtCapacity} of ${quotaSummary.totalMonthsInWindow} months are at full capacity.`;
 
-        logger.warn({ importId, skippedDueToQuota }, errorMessage);
-
         return reply.status(400).send({
           success: false,
           error: "Quota exceeded",
@@ -138,7 +126,6 @@ export async function batchImportEvents(request: FastifyRequest<BatchImportReque
       const transformedEvents = UmamiImportMapper.transform(eventsWithinQuota, site, importId);
 
       if (transformedEvents.length === 0) {
-        logger.warn({ importId }, "No valid events after transformation");
         return reply.send({
           success: true,
           importedCount: 0,
@@ -152,15 +139,6 @@ export async function batchImportEvents(request: FastifyRequest<BatchImportReque
         format: "JSONEachRow",
       });
 
-      logger.info(
-        {
-          importId,
-          eventCount: transformedEvents.length,
-          skippedDueToQuota,
-        },
-        "Batch inserted successfully"
-      );
-
       await updateImportProgress(importId, transformedEvents.length);
 
       return reply.send({
@@ -169,8 +147,6 @@ export async function batchImportEvents(request: FastifyRequest<BatchImportReque
         message: `Imported ${transformedEvents.length} events${skippedDueToQuota > 0 ? ` (${skippedDueToQuota} skipped due to quota)` : ""}`,
       });
     } catch (insertError) {
-      logger.error({ importId, error: insertError }, "Failed to insert batch");
-
       return reply.status(500).send({
         success: false,
         error: "Failed to insert events",
@@ -178,7 +154,6 @@ export async function batchImportEvents(request: FastifyRequest<BatchImportReque
       });
     }
   } catch (error) {
-    logger.error({ error }, "Unexpected error in batch import");
     return reply.status(500).send({ error: "Internal server error" });
   }
 }
