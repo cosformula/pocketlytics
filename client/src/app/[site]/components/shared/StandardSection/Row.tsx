@@ -3,8 +3,8 @@ import NumberFlow from "@number-flow/react";
 import { round } from "lodash";
 import { ChevronDown, ChevronRight, SquareArrowOutUpRight } from "lucide-react";
 import { ReactNode, useState, useCallback } from "react";
-import { usePaginatedSingleCol } from "../../../../../api/analytics/useSingleCol";
-import { SingleColResponse } from "../../../../../api/analytics/useSingleCol";
+import { usePaginatedMetric } from "../../../../../api/analytics/useMetric";
+import { MetricResponse } from "../../../../../api/analytics/useMetric";
 import { addFilter, removeFilter, useStore } from "../../../../../lib/store";
 
 // Custom hook for filter handling logic
@@ -42,12 +42,12 @@ const RowItem = ({
   onFilterToggle,
   leftContent,
 }: {
-  item: SingleColResponse;
+  item: MetricResponse;
   ratio: number;
-  getKey: (item: SingleColResponse) => string;
-  getLabel: (item: SingleColResponse) => ReactNode;
-  getValue: (item: SingleColResponse) => string;
-  getLink?: (item: SingleColResponse) => string;
+  getKey: (item: MetricResponse) => string;
+  getLabel: (item: MetricResponse) => ReactNode;
+  getValue: (item: MetricResponse) => string;
+  getLink?: (item: MetricResponse) => string;
   filterParameter: FilterParameter;
   onFilterToggle: (parameter: FilterParameter, value: string) => void;
   leftContent?: ReactNode;
@@ -92,17 +92,17 @@ const Subrows = ({
   filterValue,
   getSubrowLabel,
 }: {
-  getKey: (item: SingleColResponse) => string;
-  getValue: (item: SingleColResponse) => string;
-  getLink?: (item: SingleColResponse) => string;
+  getKey: (item: MetricResponse) => string;
+  getValue: (item: MetricResponse) => string;
+  getLink?: (item: MetricResponse) => string;
   filterParameter: FilterParameter;
   filterValue: string;
-  getSubrowLabel?: (item: SingleColResponse) => ReactNode;
+  getSubrowLabel?: (item: MetricResponse) => ReactNode;
 }) => {
   const toggleFilter = useFilterToggle();
   const parameter = (filterParameter + "_version") as FilterParameter;
 
-  const { data, isLoading, isFetching } = usePaginatedSingleCol({
+  const { data, isLoading, isFetching } = usePaginatedMetric({
     parameter,
     limit: 10,
     page: 1,
@@ -153,14 +153,14 @@ export const Row = ({
   getSubrowLabel,
   hasSubrow,
 }: {
-  e: SingleColResponse;
+  e: MetricResponse;
   ratio: number;
-  getKey: (item: SingleColResponse) => string;
-  getLabel: (item: SingleColResponse) => ReactNode;
-  getValue: (item: SingleColResponse) => string;
-  getLink?: (item: SingleColResponse) => string;
+  getKey: (item: MetricResponse) => string;
+  getLabel: (item: MetricResponse) => ReactNode;
+  getValue: (item: MetricResponse) => string;
+  getLink?: (item: MetricResponse) => string;
   filterParameter: FilterParameter;
-  getSubrowLabel?: (item: SingleColResponse) => ReactNode;
+  getSubrowLabel?: (item: MetricResponse) => ReactNode;
   hasSubrow?: boolean;
 }) => {
   const toggleFilter = useFilterToggle();

@@ -12,7 +12,7 @@ import { authedFetch, getQueryParams } from "../utils";
 
 type PeriodTime = "current" | "previous";
 
-export type SingleColResponse = {
+export type MetricResponse = {
   value: string;
   title?: string;
   count: number;
@@ -23,7 +23,7 @@ export type SingleColResponse = {
   bounce_rate?: number;
 };
 
-export function useSingleCol({
+export function useMetric({
   parameter,
   limit = 1000,
   periodTime,
@@ -33,7 +33,7 @@ export function useSingleCol({
   limit?: number;
   periodTime?: PeriodTime;
   useFilters?: boolean;
-}): UseQueryResult<APIResponse<SingleColResponse[]>> {
+}): UseQueryResult<APIResponse<MetricResponse[]>> {
   const { time, previousTime, site, filters } = useStore();
   const timeToUse = periodTime === "previous" ? previousTime : time;
 
@@ -60,8 +60,8 @@ export function useSingleCol({
     queryKey,
     queryFn: async () => {
       const response = await authedFetch<{
-        data: APIResponse<SingleColResponse[]>;
-      }>(`/single-col/${site}`, queryParams);
+        data: APIResponse<MetricResponse[]>;
+      }>(`/metric/${site}`, queryParams);
       return response.data;
     },
     staleTime: 60_000,
@@ -79,11 +79,11 @@ export function useSingleCol({
 }
 
 type PaginatedResponse = {
-  data: SingleColResponse[];
+  data: MetricResponse[];
   totalCount: number;
 };
 
-export function usePaginatedSingleCol({
+export function usePaginatedMetric({
   parameter,
   limit = 10,
   page = 1,
@@ -111,7 +111,7 @@ export function usePaginatedSingleCol({
   return useQuery({
     queryKey: [parameter, time, site, filters, limit, page, additionalFilters],
     queryFn: async () => {
-      const response = await authedFetch<{ data: PaginatedResponse }>(`/single-col/${site}`, queryParams);
+      const response = await authedFetch<{ data: PaginatedResponse }>(`/metric/${site}`, queryParams);
       return response.data;
     },
     staleTime: 60_000,
@@ -129,7 +129,7 @@ export function usePaginatedSingleCol({
   });
 }
 
-export function useInfiniteSingleCol({
+export function useInfiniteMetric({
   parameter,
   limit = 25,
   useFilters = true,
@@ -141,7 +141,7 @@ export function useInfiniteSingleCol({
   const { time, site, filters } = useStore();
 
   return useInfiniteQuery({
-    queryKey: [parameter, time, site, filters, limit, "infinite-single-col"],
+    queryKey: [parameter, time, site, filters, limit, "infinite-metric"],
     queryFn: async ({ pageParam = 1 }) => {
       const queryParams = {
         ...getQueryParams(time),
@@ -153,7 +153,7 @@ export function useInfiniteSingleCol({
 
       const response = await authedFetch<{
         data: PaginatedResponse;
-      }>(`/single-col/${site}`, queryParams);
+      }>(`/metric/${site}`, queryParams);
       return response.data;
     },
     initialPageParam: 1,

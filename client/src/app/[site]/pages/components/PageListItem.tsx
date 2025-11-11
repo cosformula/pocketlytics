@@ -2,7 +2,7 @@
 
 import { useGetSite } from "@/api/admin/sites";
 import { useGetOverviewBucketed } from "@/api/analytics/useGetOverviewBucketed";
-import { SingleColResponse } from "@/api/analytics/useSingleCol";
+import { MetricResponse } from "@/api/analytics/useMetric";
 import { usePageMetadata } from "@/api/usePageMetadata";
 import { Card, CardContent } from "@/components/ui/card";
 import { Filter } from "@rybbit/shared";
@@ -19,7 +19,7 @@ import { PageSparklineChart } from "./PageSparklineChart";
 const MAX_TITLE_LENGTH = 90;
 
 type PageListItemProps = {
-  pageData: SingleColResponse;
+  pageData: MetricResponse;
   isLoading?: boolean;
 };
 

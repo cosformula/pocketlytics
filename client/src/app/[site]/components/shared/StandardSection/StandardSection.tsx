@@ -5,7 +5,7 @@ import { FilterParameter } from "@rybbit/shared";
 import { AlertCircle, Info, RefreshCcw } from "lucide-react";
 import Link from "next/link";
 import { ReactNode } from "react";
-import { SingleColResponse, usePaginatedSingleCol } from "../../../../../api/analytics/useSingleCol";
+import { MetricResponse, usePaginatedMetric } from "../../../../../api/analytics/useMetric";
 import { CardLoader } from "../../../../../components/ui/card";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../../../../../components/ui/tooltip";
 import { IS_CLOUD } from "../../../../../lib/const";
@@ -30,19 +30,19 @@ export function StandardSection({
   getSubrowLabel,
 }: {
   title: string;
-  getKey: (item: SingleColResponse) => string;
-  getLabel: (item: SingleColResponse) => ReactNode;
-  getValue: (item: SingleColResponse) => string;
-  getFilterLabel?: (item: SingleColResponse) => string;
-  getLink?: (item: SingleColResponse) => string;
+  getKey: (item: MetricResponse) => string;
+  getLabel: (item: MetricResponse) => ReactNode;
+  getValue: (item: MetricResponse) => string;
+  getFilterLabel?: (item: MetricResponse) => string;
+  getLink?: (item: MetricResponse) => string;
   countLabel?: string;
   filterParameter: FilterParameter;
   expanded: boolean;
   close: () => void;
   hasSubrow?: boolean;
-  getSubrowLabel?: (item: SingleColResponse) => ReactNode;
+  getSubrowLabel?: (item: MetricResponse) => ReactNode;
 }) {
-  const { data, isLoading, isFetching, error, refetch } = usePaginatedSingleCol({
+  const { data, isLoading, isFetching, error, refetch } = usePaginatedMetric({
     parameter: filterParameter,
     limit: 100,
     page: 1,

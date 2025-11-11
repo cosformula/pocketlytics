@@ -29,7 +29,7 @@ import { getPageTitles } from "./api/analytics/getPageTitles.js";
 import { getRetention } from "./api/analytics/getRetention.js";
 import { getSession } from "./api/analytics/getSession.js";
 import { getSessions } from "./api/analytics/getSessions.js";
-import { getSingleCol } from "./api/analytics/getSingleCol.js";
+import { getMetric } from "./api/analytics/getMetric.js";
 import { getUserInfo } from "./api/analytics/getUserInfo.js";
 import { getUserSessionCount } from "./api/analytics/getUserSessionCount.js";
 import { getUserSessions } from "./api/analytics/getUserSessions.js";
@@ -221,7 +221,7 @@ const ANALYTICS_ROUTES = [
   "/api/overview/",
   "/api/overview-bucketed/",
   "/api/error-bucketed/",
-  "/api/single-col/",
+  "/api/metric/",
   "/api/page-titles/",
   "/api/retention/",
   "/api/site-has-data/",
@@ -307,7 +307,7 @@ server.get("/api/metrics.js", async (_, reply) => reply.sendFile("web-vitals.iif
 server.get("/api/live-user-count/:site", { logLevel: "silent" }, getLiveUsercount);
 server.get("/api/overview/:site", getOverview);
 server.get("/api/overview-bucketed/:site", getOverviewBucketed);
-server.get("/api/single-col/:site", getSingleCol);
+server.get("/api/metric/:site", getMetric);
 server.get("/api/page-titles/:site", getPageTitles);
 server.get("/api/error-names/:site", getErrorNames);
 server.get("/api/error-events/:site", getErrorEvents);

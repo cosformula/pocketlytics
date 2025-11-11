@@ -11,8 +11,8 @@ import {
 import { useDebounce, useIntersectionObserver } from "@uidotdev/usehooks";
 import { ChevronDown, ChevronUp, Loader2, Search, SquareArrowOutUpRight } from "lucide-react";
 import { ReactNode, useEffect, useMemo, useState } from "react";
-import { useInfiniteSingleCol } from "../../../../../api/analytics/useSingleCol";
-import { SingleColResponse } from "../../../../../api/analytics/useSingleCol";
+import { useInfiniteMetric } from "../../../../../api/analytics/useMetric";
+import { MetricResponse } from "../../../../../api/analytics/useMetric";
 import { FilterParameter } from "@rybbit/shared";
 import { addFilter } from "../../../../../lib/store";
 import { cn, formatSecondsAsMinutesAndSeconds } from "../../../../../lib/utils";
@@ -20,18 +20,18 @@ import { cn, formatSecondsAsMinutesAndSeconds } from "../../../../../lib/utils";
 interface StandardSectionDialogProps {
   title: string;
   ratio: number;
-  getKey: (item: SingleColResponse) => string;
-  getLabel: (item: SingleColResponse) => ReactNode;
-  getValue: (item: SingleColResponse) => string;
-  getFilterLabel?: (item: SingleColResponse) => string;
-  getLink?: (item: SingleColResponse) => string;
+  getKey: (item: MetricResponse) => string;
+  getLabel: (item: MetricResponse) => ReactNode;
+  getValue: (item: MetricResponse) => string;
+  getFilterLabel?: (item: MetricResponse) => string;
+  getLink?: (item: MetricResponse) => string;
   countLabel?: string;
   filterParameter: FilterParameter;
   expanded?: boolean;
   close: () => void;
 }
 
-const columnHelper = createColumnHelper<SingleColResponse>();
+const columnHelper = createColumnHelper<MetricResponse>();
 
 export function StandardSectionDialog({
   title,
@@ -47,7 +47,7 @@ export function StandardSectionDialog({
   close,
 }: StandardSectionDialogProps) {
   const { data, isLoading, isFetching, error, refetch, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useInfiniteSingleCol({
+    useInfiniteMetric({
       parameter: filterParameter,
       limit: 100,
     });
@@ -75,7 +75,7 @@ export function StandardSectionDialog({
 
     const labelFnToUse = getFilterLabel || getValue;
 
-    return allItems.filter((item: SingleColResponse) => {
+    return allItems.filter((item: MetricResponse) => {
       const label = typeof labelFnToUse(item) === "string" ? (labelFnToUse(item) as string) : labelFnToUse(item);
 
       return String(label).toLowerCase().includes(debouncedSearchTerm.toLowerCase());

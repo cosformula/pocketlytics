@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Plus, Save, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { FunnelResponse, FunnelStep } from "../../../../api/analytics/funnels/useGetFunnel";
-import { useSingleCol } from "../../../../api/analytics/useSingleCol";
+import { useMetric } from "../../../../api/analytics/useMetric";
 import { ThreeDotLoader } from "../../../../components/Loaders";
 import { Label } from "../../../../components/ui/label";
 import { Switch } from "../../../../components/ui/switch";
@@ -51,19 +51,19 @@ export function FunnelForm({
   );
 
   // Fetch suggestions for paths, events, and hostnames
-  const { data: pathsData } = useSingleCol({
+  const { data: pathsData } = useMetric({
     parameter: "pathname",
     limit: 1000,
     useFilters: false,
   });
 
-  const { data: eventsData } = useSingleCol({
+  const { data: eventsData } = useMetric({
     parameter: "event_name",
     limit: 1000,
     useFilters: false,
   });
 
-  const { data: hostnamesData } = useSingleCol({
+  const { data: hostnamesData } = useMetric({
     parameter: "hostname",
     limit: 1000,
     useFilters: false,

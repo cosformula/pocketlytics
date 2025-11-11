@@ -393,7 +393,7 @@ const getQuery = (request: FastifyRequest<GetSingleColRequest>, isCountQuery: bo
   `;
 };
 
-export async function getSingleCol(req: FastifyRequest<GetSingleColRequest>, res: FastifyReply) {
+export async function getMetric(req: FastifyRequest<GetSingleColRequest>, res: FastifyReply) {
   const { parameter, page } = req.query;
   const site = req.params.site;
 
