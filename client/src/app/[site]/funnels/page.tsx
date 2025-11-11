@@ -14,6 +14,7 @@ import { MobileSidebar } from "../components/Sidebar/MobileSidebar";
 import { SubHeader } from "../components/SubHeader/SubHeader";
 import { Input } from "@/components/ui/input";
 import { useMemo, useState } from "react";
+import { ErrorState } from "../../../components/ErrorState";
 
 // Skeleton for the funnel row component
 const FunnelRowSkeleton = () => (
@@ -110,9 +111,10 @@ export default function FunnelsPage() {
             ))}
           </div>
         ) : error ? (
-          <div className="p-4 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-lg">
-            Failed to load funnels: {error instanceof Error ? error.message : "Unknown error"}
-          </div>
+          <ErrorState
+            title="Failed to load funnels"
+            message="There was a problem fetching the funnels. Please try again later."
+          />
         ) : filteredFunnels?.length ? (
           <div className="space-y-4">
             {filteredFunnels.map((funnel: SavedFunnel, index: number) => (

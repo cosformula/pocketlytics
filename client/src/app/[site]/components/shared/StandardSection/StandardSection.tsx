@@ -12,6 +12,7 @@ import { IS_CLOUD } from "../../../../../lib/const";
 import { Row } from "./Row";
 import { StandardSkeleton } from "./Skeleton";
 import { StandardSectionDialog } from "./StandardSectionDialog";
+import { ErrorState } from "../../../../../components/ErrorState";
 
 const MAX_ITEMS_TO_DISPLAY = 10;
 
@@ -82,23 +83,7 @@ export function StandardSection({
         {isLoading ? (
           <StandardSkeleton />
         ) : error ? (
-          <div className="py-6 flex-1 flex flex-col items-center justify-center gap-3 transition-all">
-            <AlertCircle className="text-amber-400 w-8 h-8" />
-            <div className="text-center">
-              <div className="text-neutral-100 font-medium mb-1">Failed to load data</div>
-              <div className="text-sm text-neutral-400 max-w-md mx-auto mb-3">
-                {error.message || "An error occurred while fetching data"}
-              </div>
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              className="bg-transparent hover:bg-neutral-800 border-neutral-700 text-neutral-300 hover:text-neutral-100"
-              onClick={() => refetch()}
-            >
-              <RefreshCcw className="w-3 h-3" /> Try Again
-            </Button>
-          </div>
+          <ErrorState title="Failed to load data" message={error.message} refetch={refetch} />
         ) : (
           <>
             {itemsForDisplay?.length ? (

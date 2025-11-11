@@ -13,6 +13,7 @@ import { Tabs, TabsList, TabsTrigger } from "../../../components/ui/tabs";
 import { useSetPageTitle } from "../../../hooks/useSetPageTitle";
 import { MobileSidebar } from "../components/Sidebar/MobileSidebar";
 import { RetentionChart } from "./RetentionChart";
+import { ErrorState } from "../../../components/ErrorState";
 
 // Available time range options (in days)
 const RANGE_OPTIONS = [
@@ -155,12 +156,10 @@ export default function RetentionPage() {
       <div className="pt-4">
         <Card>
           <CardContent>
-            <div className="p-8 text-center">
-              <div className="text-red-500 mb-2 font-medium">Error loading retention data</div>
-              <p className="text-neutral-500 text-sm">
-                There was a problem fetching the retention data. Please try again later.
-              </p>
-            </div>
+            <ErrorState
+              title="Failed to load retention data"
+              message="There was a problem fetching the retention data. Please try again later."
+            />
           </CardContent>
         </Card>
       </div>

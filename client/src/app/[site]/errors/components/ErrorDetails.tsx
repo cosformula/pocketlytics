@@ -16,6 +16,7 @@ import { Browser } from "../../components/shared/icons/Browser";
 import { CountryFlag } from "../../components/shared/icons/CountryFlag";
 import { OperatingSystem } from "../../components/shared/icons/OperatingSystem";
 import { useParams } from "next/navigation";
+import { ErrorState } from "../../../../components/ErrorState";
 
 interface ErrorDetailsProps {
   errorMessage: string;
@@ -282,13 +283,10 @@ export function ErrorDetails({ errorMessage }: ErrorDetailsProps) {
 
   if (isError) {
     return (
-      <div className="p-4 bg-neutral-900 border-t border-neutral-800">
-        <div className="text-center text-red-400">
-          <AlertTriangle className="w-6 h-6 mx-auto mb-2" />
-          <p>Error loading error details</p>
-          <p className="text-sm text-neutral-400">{error?.toString()}</p>
-        </div>
-      </div>
+      <ErrorState
+        title="Failed to load errors"
+        message="There was a problem fetching the errors. Please try again later."
+      />
     );
   }
 

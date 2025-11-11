@@ -29,6 +29,7 @@ import { Browser } from "../components/shared/icons/Browser";
 import { CountryFlag } from "../components/shared/icons/CountryFlag";
 import { OperatingSystem } from "../components/shared/icons/OperatingSystem";
 import { SubHeader } from "../components/SubHeader/SubHeader";
+import { ErrorState } from "../../../components/ErrorState";
 
 // Set up column helper
 const columnHelper = createColumnHelper<UsersResponse>();
@@ -263,7 +264,12 @@ export default function UsersPage() {
   });
 
   if (isError) {
-    return <div className="p-8 text-center text-red-500">An error occurred while fetching users data.</div>;
+    return (
+      <ErrorState
+        title="Failed to load users"
+        message="There was a problem fetching the users. Please try again later."
+      />
+    );
   }
 
   return (
