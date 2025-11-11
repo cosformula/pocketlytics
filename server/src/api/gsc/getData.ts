@@ -14,14 +14,14 @@ import { logger } from "../../lib/logger/logger.js";
 export async function getGSCData(req: FastifyRequest<GetGSCDataRequest>, res: FastifyReply) {
   try {
     const { site } = req.params;
-    const { startDate, endDate, dimension } = req.query;
+    const { start_date, end_date, dimension } = req.query;
     const siteId = Number(site);
 
     if (isNaN(siteId)) {
       return res.status(400).send({ error: "Invalid site ID" });
     }
 
-    if (!startDate || !endDate) {
+    if (!start_date || !end_date) {
       return res.status(400).send({ error: "Missing startDate or endDate" });
     }
 
@@ -58,8 +58,8 @@ export async function getGSCData(req: FastifyRequest<GetGSCDataRequest>, res: Fa
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          startDate,
-          endDate,
+          startDate: start_date,
+          endDate: end_date,
           dimensions: [dimension],
           rowLimit: 1000,
         }),
