@@ -33,18 +33,7 @@ export interface GetUsersRequest {
 }
 
 export async function getUsers(req: FastifyRequest<GetUsersRequest>, res: FastifyReply) {
-  const {
-    startDate,
-    endDate,
-    timeZone,
-    filters,
-    page = "1",
-    pageSize = "20",
-    sortBy = "last_seen",
-    sortOrder = "desc",
-    pastMinutesStart,
-    pastMinutesEnd,
-  } = req.query;
+  const { filters, page = "1", pageSize = "20", sortBy = "last_seen", sortOrder = "desc" } = req.query;
   const site = req.params.site;
 
   const pageNum = parseInt(page, 10);

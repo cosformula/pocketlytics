@@ -18,7 +18,7 @@ export interface GetEventNamesRequest {
 }
 
 export async function getEventNames(req: FastifyRequest<GetEventNamesRequest>, res: FastifyReply) {
-  const { startDate, endDate, timeZone, filters, pastMinutesStart, pastMinutesEnd } = req.query;
+  const { filters } = req.query;
   const site = req.params.site;
 
   const timeStatement = getTimeStatement(req.query);

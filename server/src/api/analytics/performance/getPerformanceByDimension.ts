@@ -54,19 +54,7 @@ type GetPerformanceByDimensionPaginatedResponse = {
 
 const getQuery = (request: FastifyRequest<GetPerformanceByDimensionRequest>, isCountQuery: boolean = false) => {
   const queryParams = request.query;
-  const {
-    startDate,
-    endDate,
-    timeZone,
-    filters,
-    limit,
-    page,
-    pastMinutesStart,
-    pastMinutesEnd,
-    sortBy,
-    sortOrder,
-    dimension,
-  } = queryParams;
+  const { filters, limit, page, sortBy, sortOrder, dimension } = queryParams;
 
   // Validate dimension
   const validDimensions = ["pathname", "country", "device_type", "browser", "operating_system", "region"];

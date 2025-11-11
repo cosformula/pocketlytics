@@ -1,6 +1,5 @@
 import { Filter, TimeBucket } from "@rybbit/shared";
 import { UseQueryOptions, UseQueryResult, useQuery } from "@tanstack/react-query";
-import { timeZone } from "../../lib/dateTimeUtils";
 import { useStore } from "../../lib/store";
 import { APIResponse } from "../types";
 import { authedFetch, getQueryParams } from "../utils";
@@ -32,7 +31,7 @@ export function useGetOverviewBucketed({
   dynamicFilters?: Filter[];
   refetchInterval?: number;
   overrideTime?:
-    | { mode: "past-minutes"; pastMinutesStart: number; pastMinutesEnd: number }
+    | { mode: "past-minutes"; past_minutes_start: number; past_minutes_end: number }
     | { mode: "range"; startDate: string; endDate: string };
   props?: Partial<UseQueryOptions<APIResponse<GetOverviewBucketedResponse>>>;
 }): UseQueryResult<APIResponse<GetOverviewBucketedResponse>> {
@@ -45,7 +44,6 @@ export function useGetOverviewBucketed({
 
   // Use getQueryParams utility to handle conditional logic
   const queryParams = getQueryParams(timeToUse, {
-    timeZone,
     bucket,
     filters: combinedFilters,
   });
@@ -55,8 +53,8 @@ export function useGetOverviewBucketed({
     timeToUse.mode === "past-minutes"
       ? [
           "overview-bucketed-past-minutes",
-          timeToUse.pastMinutesStart,
-          timeToUse.pastMinutesEnd,
+          timeToUse.past_minutes_start,
+          timeToUse.past_minutes_end,
           site,
           bucket,
           combinedFilters,

@@ -19,7 +19,7 @@ export interface GetEventPropertiesRequest {
 }
 
 export async function getEventProperties(req: FastifyRequest<GetEventPropertiesRequest>, res: FastifyReply) {
-  const { startDate, endDate, timeZone, eventName, filters, pastMinutesStart, pastMinutesEnd } = req.query;
+  const { eventName, filters } = req.query;
   const site = req.params.site;
 
   if (!eventName) {

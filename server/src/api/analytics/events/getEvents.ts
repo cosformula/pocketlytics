@@ -33,7 +33,7 @@ interface GetEventsRequest {
 
 export async function getEvents(req: FastifyRequest<GetEventsRequest>, res: FastifyReply) {
   const { site } = req.params;
-  const { startDate, endDate, timeZone, filters, page = "1", pageSize = "20", count } = req.query;
+  const { start_date, end_date, time_zone, filters, page = "1", pageSize = "20", count } = req.query;
 
   // Use count if provided (for backward compatibility), otherwise use pageSize
   const limit = count ? parseInt(count, 10) : parseInt(pageSize, 10);
@@ -41,7 +41,7 @@ export async function getEvents(req: FastifyRequest<GetEventsRequest>, res: Fast
 
   // Get time and filter statements if parameters are provided
   const timeStatement =
-    startDate || endDate ? getTimeStatement(req.query) : "AND timestamp > now() - INTERVAL 30 MINUTE"; // Default to last 30 minutes if no time range specified
+    start_date || end_date ? getTimeStatement(req.query) : "AND timestamp > now() - INTERVAL 30 MINUTE"; // Default to last 30 minutes if no time range specified
 
   const filterStatement = filters ? getFilterStatement(filters, Number(site), timeStatement) : "";
 
