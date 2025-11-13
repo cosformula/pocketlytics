@@ -1,35 +1,16 @@
 "use client";
 
+import { trackAdEvent } from "@/lib/trackAdEvent";
+import { Menu, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { Menu, X } from "lucide-react";
-import { trackAdEvent } from "@/lib/trackAdEvent";
-import { Banner } from "fumadocs-ui/components/banner";
-import { useGithubStarCount } from "../lib/useGithubStarCount";
 
 export function CustomHeader() {
-  const { starCount, isLoading } = useGithubStarCount();
-
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-neutral-800 bg-background/80 backdrop-blur-md">
-      {/* <Banner id="banner" changeLayout height="45px" variant="rainbow">
-        <div className="flex items-center justify-center">
-          <p className="text-sm font-medium">
-            Rybbit is launching on Product Hunt today!{" "}
-            <a
-              href="https://www.producthunt.com/products/rybbit"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline text-white"
-            >
-              Check it out and vote for us!
-            </a>
-          </p>
-        </div>
-      </Banner> */}
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3" aria-label="Global">
         {/* Logo */}
         <div className="flex items-center">
@@ -143,15 +124,6 @@ export function CustomHeader() {
             >
               Blog
             </Link>
-            <a
-              href="https://demo.rybbit.com/21"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block rounded-md px-3 py-2 text-base font-medium text-neutral-300 hover:bg-neutral-800 hover:text-white"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Demo
-            </a>
             <a
               href="https://github.com/rybbit-io/rybbit"
               target="_blank"

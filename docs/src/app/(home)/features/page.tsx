@@ -318,9 +318,7 @@ export default function FeaturesPage() {
       <section className="py-16 md:py-24 w-full">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center max-w-4xl mx-auto">
-            <SectionBadge className="mb-6">
-              Features
-            </SectionBadge>
+            <SectionBadge className="mb-6">Features</SectionBadge>
             <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6">
               Everything you need to understand your audience
             </h1>
@@ -335,15 +333,17 @@ export default function FeaturesPage() {
                 eventProps={{ location: "features_hero", button_text: "Get started for free" }}
                 className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-6 py-3 rounded-lg shadow-lg shadow-emerald-900/20 transform hover:-translate-y-0.5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50 cursor-pointer"
               >
-                Get started for free
+                Get started
               </TrackedButton>
               <TrackedButton
                 href="https://demo.rybbit.com/21"
                 eventName="demo"
+                target="_blank"
+                rel="noopener noreferrer"
                 eventProps={{ location: "features_hero", button_text: "View live demo" }}
                 className="w-full sm:w-auto bg-neutral-800 hover:bg-neutral-700 text-white font-medium px-6 py-3 rounded-lg border border-neutral-600 transform hover:-translate-y-0.5 transition-all duration-200 hover:border-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-400 focus:ring-opacity-50 cursor-pointer"
               >
-                View live demo
+                Live demo
               </TrackedButton>
             </div>
             <p className="text-neutral-400 text-sm flex items-center justify-center gap-2 mt-6">
