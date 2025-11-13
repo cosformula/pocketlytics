@@ -104,13 +104,10 @@ export async function getSitesUserHasAccessTo(req: FastifyRequest, adminOnly = f
 
 // for routes that are potentially public
 export async function getUserHasAccessToSitePublic(req: FastifyRequest, siteId: string | number) {
-  const [sites, config] = await Promise.all([
-    getSitesUserHasAccessTo(req),
-    siteConfig.getConfig(siteId),
-  ]);
+  const [userSites, config] = await Promise.all([getSitesUserHasAccessTo(req), siteConfig.getConfig(siteId)]);
 
   // Check if user has direct access to the site
-  const hasDirectAccess = sites.some(site => site.siteId === Number(siteId));
+  const hasDirectAccess = userSites.some(site => site.siteId === Number(siteId));
   if (hasDirectAccess) {
     return true;
   }
@@ -124,6 +121,47 @@ export async function getUserHasAccessToSitePublic(req: FastifyRequest, siteId: 
   const privateKey = req.headers["x-private-key"];
   if (privateKey && typeof privateKey === "string" && config?.privateLinkKey === privateKey) {
     return true;
+  }
+
+  // Check if a valid API key was provided in the header
+  const apiKey = req.headers["x-api-key"];
+  if (apiKey && typeof apiKey === "string") {
+    try {
+      // Verify the API key using Better Auth
+      const result = await auth.api.verifyApiKey({
+        body: { key: apiKey },
+      });
+
+      if (result.valid && result.key) {
+        // Get the userId from the API key
+        const apiKeyUserId = result.key.userId;
+
+        // Get the site's organization
+        const siteRecords = await db
+          .select({
+            organizationId: sites.organizationId,
+          })
+          .from(sites)
+          .where(eq(sites.siteId, Number(siteId)))
+          .limit(1);
+
+        if (siteRecords.length > 0 && siteRecords[0].organizationId) {
+          // Check if the API key's user is a member of the organization
+          const userMembership = await db
+            .select()
+            .from(member)
+            .where(and(eq(member.userId, apiKeyUserId), eq(member.organizationId, siteRecords[0].organizationId)))
+            .limit(1);
+
+          if (userMembership.length > 0) {
+            return true;
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error verifying API key:", error);
+      // Continue to return false if API key verification fails
+    }
   }
 
   return false;

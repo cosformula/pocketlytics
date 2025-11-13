@@ -69,6 +69,9 @@ import { addUserToOrganization } from "./api/user/addUserToOrganization.js";
 import { getUserOrganizations } from "./api/user/getUserOrganizations.js";
 import { listOrganizationMembers } from "./api/user/listOrganizationMembers.js";
 import { updateAccountSettings } from "./api/user/updateAccountSettings.js";
+import { listApiKeys } from "./api/user/listApiKeys.js";
+import { createApiKey } from "./api/user/createApiKey.js";
+import { deleteApiKey } from "./api/user/deleteApiKey.js";
 import { initializeClickhouse } from "./db/clickhouse/clickhouse.js";
 import { initPostgres } from "./db/postgres/initPostgres.js";
 import { getSessionFromReq, getUserHasAccessToSitePublic, mapHeaders } from "./lib/auth-utils.js";
@@ -373,6 +376,9 @@ server.get("/api/list-organization-members/:organizationId", listOrganizationMem
 server.get("/api/user/organizations", getUserOrganizations);
 server.post("/api/add-user-to-organization", addUserToOrganization);
 server.post("/api/user/account-settings", updateAccountSettings);
+server.get("/api/user/api-keys", listApiKeys);
+server.post("/api/user/api-keys", createApiKey);
+server.delete("/api/user/api-keys/:keyId", deleteApiKey);
 
 // GOOGLE SEARCH CONSOLE
 server.get("/api/gsc/connect/:site", connectGSC);
