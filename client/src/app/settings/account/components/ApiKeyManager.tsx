@@ -16,7 +16,7 @@ export function ApiKeyManager() {
   const [showApiKeyDialog, setShowApiKeyDialog] = useState(false);
   const [createdApiKey, setCreatedApiKey] = useState<string | null>(null);
 
-  const { data: apiKeys, isLoading: isLoadingApiKeys } = useListApiKeys();
+  const { data: apiKeys, isLoading: isLoadingApiKeys, isError, error, refetch } = useListApiKeys();
   const createApiKey = useCreateApiKey();
   const deleteApiKey = useDeleteApiKey();
 
@@ -77,6 +77,7 @@ export function ApiKeyManager() {
                 placeholder="API Key Name"
                 onKeyDown={e => {
                   if (e.key === "Enter") {
+                    e.preventDefault();
                     handleCreateApiKey();
                   }
                 }}
@@ -95,6 +96,15 @@ export function ApiKeyManager() {
             <h4 className="text-sm font-medium">Your API Keys</h4>
             {isLoadingApiKeys ? (
               <p className="text-xs text-neutral-500">Loading API keys...</p>
+            ) : isError ? (
+              <div className="space-y-2">
+                <p className="text-xs text-red-500">
+                  Failed to load API keys{error?.message ? `: ${error.message}` : ""}
+                </p>
+                <Button variant="outline" size="sm" onClick={() => refetch()}>
+                  Retry
+                </Button>
+              </div>
             ) : apiKeys && apiKeys.length > 0 ? (
               <div className=" rounded-lg">
                 <Table>
