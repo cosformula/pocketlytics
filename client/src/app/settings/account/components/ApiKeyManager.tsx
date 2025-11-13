@@ -156,39 +156,13 @@ export function ApiKeyManager() {
               </p>
             </div>
 
-            <div className="space-y-3 text-xs">
-              <p className="font-medium text-sm">How to use:</p>
-
-              <div className="space-y-2">
-                <p className="text-neutral-600 dark:text-neutral-400">
-                  <strong>Recommended - Authorization Header:</strong>
-                </p>
-                <div className="bg-neutral-100 dark:bg-neutral-800 p-2 rounded">
-                  <code className="text-xs break-all">Authorization: Bearer {createdApiKey}</code>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <p className="text-neutral-600 dark:text-neutral-400">
-                  <strong>Quick Testing Only - Query Parameter:</strong>
-                </p>
-                <div className="bg-neutral-100 dark:bg-neutral-800 p-2 rounded">
-                  <code className="text-xs break-all">?api_key={createdApiKey}</code>
-                </div>
-                <div className="rounded-lg bg-amber-50 dark:bg-amber-950 p-2 border border-amber-200 dark:border-amber-800">
-                  <p className="text-xs text-amber-800 dark:text-amber-200">
-                    ⚠️ Query parameters expose keys in server logs and browser history. Use only for quick testing.
-                  </p>
-                </div>
-              </div>
-            </div>
-
             <Button
               className="w-full"
               onClick={() => {
                 setShowApiKeyDialog(false);
                 setCreatedApiKey(null);
               }}
+              variant="success"
             >
               Done
             </Button>
