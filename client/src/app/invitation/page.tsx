@@ -5,7 +5,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { ThreeDotLoader } from "../../components/Loaders";
 import { RybbitLogo } from "../../components/RybbitLogo";
-import { TopBar } from "../../components/TopBar";
 import { Alert, AlertDescription, AlertTitle } from "../../components/ui/alert";
 import { Button } from "../../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
@@ -112,8 +111,6 @@ function InvitationContent() {
 export default function AcceptInvitation() {
   return (
     <div className="flex flex-col min-h-dvh">
-      <TopBar />
-
       <div className="flex justify-center items-center flex-grow p-4">
         <Suspense fallback={<ThreeDotLoader />}>
           <InvitationContent />
