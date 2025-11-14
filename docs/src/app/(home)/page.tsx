@@ -200,14 +200,14 @@ export default function HomePage() {
           <div className="absolute top-1/2 left-1/2 -translate-x-1/3 -translate-y-1/3 w-[350px] h-[350px] bg-sky-400/15 dark:bg-sky-400/20 rounded-full blur-[75px] opacity-50 dark:opacity-40"></div>
 
           {/* Iframe container with responsive visibility */}
-          <div className="relative z-10 rounded-lg overflow-hidden border-8 border-neutral-200/50 dark:border-neutral-100/5 shadow-2xl shadow-neutral-900/20 dark:shadow-emerald-900/10">
+          <div className="relative z-10 rounded-2xl overflow-hidden bg-neutral-400/10 dark:bg-neutral-100/5 border-8 shadow-2xl shadow-neutral-900/20 dark:shadow-emerald-900/10">
             {/* Remove mobile message and show iframe on all devices */}
             <iframe
               src="https://demo.rybbit.com/21/main?timeMode=range&wellKnown=last-3-days&bucket=hour&stat=users"
               // src="https://demo.rybbit.com/21/globe?timeMode=range&wellKnown=last-7-days&bucket=day&stat=users"
               width="1300"
               height="750"
-              className="w-full h-[600px] md:h-[700px] lg:h-[750px]"
+              className="w-full h-[600px] md:h-[700px] lg:h-[750px] rounded-xl"
               style={{ border: "none" }}
               title="Rybbit Analytics Demo"
             ></iframe>
