@@ -110,14 +110,14 @@ export default function ResetPasswordPage() {
         <CardContent>
           {resetSuccess ? (
             <div className="flex flex-col items-center space-y-6 py-4">
-              <div className="h-20 w-20 rounded-full bg-green-900/20 flex items-center justify-center border-2 border-green-500 text-green-500">
+              <div className="h-20 w-20 rounded-full bg-green-100 dark:bg-green-900/20 flex items-center justify-center border-2 border-green-500 text-green-500">
                 <span className="text-3xl font-bold">✓</span>
               </div>
               <div className="text-center space-y-2">
                 <h3 className="text-xl font-medium text-green-500">Success!</h3>
                 <p className="text-muted-foreground">Your password has been reset successfully.</p>
               </div>
-              <div className="w-full rounded-md bg-neutral-800/30 p-3 mt-4">
+              <div className="w-full rounded-md bg-neutral-100 dark:bg-neutral-800/30 p-3 mt-4">
                 <div className="flex justify-center">
                   <p className="text-sm text-muted-foreground">Redirecting to login page...</p>
                 </div>
