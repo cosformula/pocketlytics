@@ -3,7 +3,11 @@ import Link from "next/link";
 import { cn } from "../../lib/utils";
 
 function Root({ children }: { children: React.ReactNode }) {
-  return <div className="w-56 bg-neutral-100 border-r border-neutral-200 dark:bg-neutral-900 dark:border-neutral-850 flex flex-col">{children}</div>;
+  return (
+    <div className="w-56 bg-neutral-50 border-r border-neutral-150 dark:bg-neutral-900 dark:border-neutral-850 flex flex-col">
+      {children}
+    </div>
+  );
 }
 
 function Title({ children }: { children: React.ReactNode }) {
@@ -40,7 +44,7 @@ function Item({
         className={cn(
           "px-3 py-2 rounded-lg transition-colors w-full",
           active
-            ? "bg-neutral-200 text-neutral-900 dark:bg-neutral-800 dark:text-white"
+            ? "bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-white"
             : "text-neutral-700 hover:text-neutral-900 hover:bg-neutral-150 dark:text-neutral-200 dark:hover:text-white dark:hover:bg-neutral-800/50"
         )}
       >

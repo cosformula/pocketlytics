@@ -57,12 +57,12 @@ function SidebarContent() {
     const hasPrivateKey = segments.length > 1 && /^[a-f0-9]{12}$/i.test(segments[1]);
 
     // Route is either segments[1] (no key) or segments[2] (with key)
-    const route = hasPrivateKey ? (segments[2] || "main") : (segments[1] || "main");
+    const route = hasPrivateKey ? segments[2] || "main" : segments[1] || "main";
     return route === tabName.toLowerCase();
   };
 
   return (
-    <div className="w-56 bg-neutral-100 border-r border-neutral-200 dark:bg-neutral-900 dark:border-neutral-850 flex flex-col h-dvh">
+    <div className="w-56 bg-neutral-50 border-r border-neutral-150 dark:bg-neutral-900 dark:border-neutral-850 flex flex-col h-dvh">
       <div className="flex flex-col p-3 border-b border-neutral-300 dark:border-neutral-800">
         <SiteSelector />
       </div>
