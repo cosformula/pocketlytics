@@ -57,7 +57,7 @@ function PageviewItem({
       <div className="relative flex-shrink-0">
         {!isLast && (
           <div
-            className="absolute top-8 left-4 w-[1px] bg-neutral-300 dark:bg-neutral-700"
+            className="absolute top-8 left-4 w-[1px] bg-neutral-200 dark:bg-neutral-600/25"
             style={{
               height: "calc(100% - 20px)",
             }}
@@ -67,13 +67,7 @@ function PageviewItem({
         <div
           className={cn(
             "flex items-center justify-center w-8 h-8 rounded-full border",
-            isEvent
-              ? "bg-amber-900/30 border-amber-500/50"
-              : isError
-                ? "bg-red-900/30 border-red-500/50"
-                : isOutbound
-                  ? "bg-purple-900/30 border-purple-500/50"
-                  : "bg-blue-900/30 border-blue-500/50"
+            "bg-neutral-50 border-neutral-200 dark:bg-neutral-600/10 dark:border-neutral-600/25"
           )}
         >
           <span className="text-sm font-medium">{index + 1}</span>
