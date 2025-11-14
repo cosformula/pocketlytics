@@ -106,7 +106,7 @@ function SiteSelectorContent({ onSiteSelect }: { onSiteSelect: () => void }) {
                     onSiteSelect(); // Close popover immediately
                   }}
                   className={cn(
-                    "flex items-center justify-between p-2 cursor-pointer hover:bg-neutral-150 dark:hover:bg-neutral-800/50 transition-colors rounded-md border-b border-neutral-300 dark:border-neutral-800 last:border-b-0",
+                    "flex items-center justify-between p-2 cursor-pointer hover:bg-neutral-150 dark:hover:bg-neutral-800/50 transition-colors rounded-md border-b border-neutral-100 dark:border-neutral-800 last:border-b-0",
                     isSelected && "bg-neutral-100 dark:bg-neutral-800"
                   )}
                 >
@@ -137,7 +137,7 @@ function SiteSelectorContent({ onSiteSelect }: { onSiteSelect: () => void }) {
       </div>
 
       {/* Add Site Section */}
-      <div className="border-t border-neutral-300 dark:border-neutral-800 pt-2 mt-2">
+      <div className="mt-2">
         <AddSite
           trigger={
             <Button variant="ghost" className="w-full justify-start gap-2">
