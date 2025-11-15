@@ -65,7 +65,7 @@ export function PricingCard({ isLoggedIn }: { isLoggedIn: boolean }) {
       // Use NEXT_PUBLIC_BACKEND_URL if available, otherwise use relative path for same-origin requests
       const baseUrl = window.location.origin;
       const successUrl = `${baseUrl}/settings/organization/subscription?session_id={CHECKOUT_SESSION_ID}`;
-      const cancelUrl = `${baseUrl}/subscribe`;
+      const cancelUrl = `${baseUrl}/subscribe${siteId ? `?siteId=${siteId}` : ""}`;
 
       const response = await fetch(`${BACKEND_URL}/stripe/create-checkout-session`, {
         method: "POST",
