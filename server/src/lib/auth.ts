@@ -102,9 +102,6 @@ export const auth = betterAuth({
     user: process.env.POSTGRES_USER,
     password: process.env.POSTGRES_PASSWORD,
   }),
-  session: {
-    freshAge: 0, // Disable fresh session check (allows deletion without recent login)
-  },
   emailAndPassword: {
     enabled: true,
     // Disable email verification for now
