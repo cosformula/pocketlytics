@@ -21,6 +21,31 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
+  // Tool pages
+  const toolSlugs = [
+    "utm-builder",
+    "seo-title-generator",
+    "meta-description-generator",
+    "og-tag-generator",
+    "marketing-roi-calculator",
+    "ctr-calculator",
+    "bounce-rate-calculator",
+    "sample-size-calculator",
+    "traffic-value-calculator",
+    "page-speed-calculator",
+    "funnel-visualizer",
+    "ai-privacy-policy-generator",
+    "analytics-detector",
+    "privacy-policy-builder",
+  ];
+
+  const toolPages = toolSlugs.map(slug => ({
+    url: `${baseUrl}/tools/${slug}`,
+    lastModified: new Date(),
+    changeFrequency: "monthly" as const,
+    priority: 0.8,
+  }));
+
   // Static pages
   const staticPages = [
     {
@@ -42,6 +67,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
     },
     {
+      url: `${baseUrl}/tools`,
+      lastModified: new Date(),
+      changeFrequency: "weekly" as const,
+      priority: 0.85,
+    },
+    {
       url: `${baseUrl}/pricing`,
       lastModified: new Date(),
       changeFrequency: "monthly" as const,
@@ -49,5 +80,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ];
 
-  return [...staticPages, ...docPages, ...blogPosts];
+  return [...staticPages, ...toolPages, ...docPages, ...blogPosts];
 }

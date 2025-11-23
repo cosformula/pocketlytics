@@ -138,7 +138,7 @@ const tools = [
 
 export default function ToolsPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-neutral-50 to-neutral-100 dark:from-neutral-950 dark:to-neutral-900">
+    <div className="min-h-screen">
       <div className="max-w-[1300px] mx-auto px-6 py-20">
         {/* Header */}
         <div className="text-center mb-16">
