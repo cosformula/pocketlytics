@@ -18,10 +18,7 @@ const identifyPayloadSchema = z.object({
   is_new_identify: z.boolean().default(true),
 });
 
-export async function handleIdentify(
-  request: FastifyRequest,
-  reply: FastifyReply
-) {
+export async function handleIdentify(request: FastifyRequest, reply: FastifyReply) {
   try {
     const validationResult = identifyPayloadSchema.safeParse(request.body);
 
@@ -49,11 +46,7 @@ export async function handleIdentify(
     // Compute anonymous_id from request (same logic as tracking)
     const ipAddress = getIpAddress(request);
     const userAgent = request.headers["user-agent"] || "";
-    const anonymousId = await userIdService.generateUserId(
-      ipAddress,
-      userAgent,
-      siteId
-    );
+    const anonymousId = await userIdService.generateUserId(ipAddress, userAgent, siteId);
 
     // Create alias if this is a new identify call (links anonymous_id to user_id)
     if (is_new_identify) {
@@ -62,12 +55,7 @@ export async function handleIdentify(
         const existingAlias = await db
           .select()
           .from(userAliases)
-          .where(
-            and(
-              eq(userAliases.siteId, siteId),
-              eq(userAliases.anonymousId, anonymousId)
-            )
-          )
+          .where(and(eq(userAliases.siteId, siteId), eq(userAliases.anonymousId, anonymousId)))
           .limit(1);
 
         if (existingAlias.length === 0) {
@@ -78,10 +66,7 @@ export async function handleIdentify(
             userId: user_id,
           });
 
-          logger.info(
-            { siteId, anonymousId, userId: user_id },
-            "Created new user alias"
-          );
+          logger.info({ siteId, anonymousId, userId: user_id }, "Created new user alias");
         } else if (existingAlias[0].userId !== user_id) {
           // Anonymous ID already linked to a different user - log but don't error
           logger.warn(
@@ -96,10 +81,7 @@ export async function handleIdentify(
         }
       } catch (error) {
         // Handle unique constraint violation gracefully (race condition)
-        logger.debug(
-          { siteId, anonymousId, userId: user_id, error },
-          "Alias may already exist"
-        );
+        logger.debug({ siteId, anonymousId, userId: user_id, error }, "Alias may already exist");
       }
     }
 
@@ -109,18 +91,13 @@ export async function handleIdentify(
         const existingProfile = await db
           .select()
           .from(userProfiles)
-          .where(
-            and(
-              eq(userProfiles.siteId, siteId),
-              eq(userProfiles.userId, user_id)
-            )
-          )
+          .where(and(eq(userProfiles.siteId, siteId), eq(userProfiles.userId, user_id)))
           .limit(1);
 
         if (existingProfile.length > 0) {
           // Merge new traits with existing (new traits override old)
           const mergedTraits = {
-            ...(existingProfile[0].traits as Record<string, unknown>),
+            ...((existingProfile[0].traits as Record<string, unknown>) || {}),
             ...traits,
           };
 
@@ -130,12 +107,7 @@ export async function handleIdentify(
               traits: mergedTraits,
               updatedAt: new Date().toISOString(),
             })
-            .where(
-              and(
-                eq(userProfiles.siteId, siteId),
-                eq(userProfiles.userId, user_id)
-              )
-            );
+            .where(and(eq(userProfiles.siteId, siteId), eq(userProfiles.userId, user_id)));
 
           logger.info({ siteId, userId: user_id }, "Updated user profile traits");
         } else {
@@ -149,10 +121,7 @@ export async function handleIdentify(
           logger.info({ siteId, userId: user_id }, "Created new user profile");
         }
       } catch (error) {
-        logger.error(
-          { siteId, userId: user_id, error },
-          "Error updating user profile"
-        );
+        logger.error({ siteId, userId: user_id, error }, "Error updating user profile");
         // Don't fail the request if profile update fails
       }
     }
