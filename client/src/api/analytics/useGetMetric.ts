@@ -90,6 +90,7 @@ export function usePaginatedMetric({
   useFilters = true,
   enabled = true,
   additionalFilters = [],
+  customFilters = [],
 }: {
   parameter: FilterParameter;
   limit?: number;
@@ -97,6 +98,7 @@ export function usePaginatedMetric({
   useFilters?: boolean;
   enabled?: boolean;
   additionalFilters?: Filter[];
+  customFilters?: Filter[];
 }): UseQueryResult<PaginatedResponse> {
   const { time, site, filters } = useStore();
 
@@ -105,7 +107,7 @@ export function usePaginatedMetric({
     parameter,
     limit,
     page,
-    filters: useFilters ? [...filters, ...additionalFilters] : undefined,
+    filters: useFilters ? (customFilters.length > 0 ? customFilters : [...filters, ...additionalFilters]) : undefined,
   };
 
   return useQuery({

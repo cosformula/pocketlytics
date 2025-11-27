@@ -165,7 +165,7 @@ export function SessionCard({ session, onClick, userId, expandedByDefault }: Ses
   );
 }
 
-export const SessionCardSkeleton = memo(() => {
+export const SessionCardSkeleton = memo(({ userId }: { userId?: string }) => {
   // Function to get a random width class for skeletons
   const getRandomWidth = () => {
     const widths = ["w-16", "w-20", "w-24", "w-28", "w-32", "w-36", "w-40", "w-44", "w-48"];
@@ -187,16 +187,18 @@ export const SessionCardSkeleton = memo(() => {
   // Create multiple skeletons for a realistic loading state
   const skeletons = Array.from({ length: 25 }).map((_, index) => (
     <div
-      className="rounded-lg bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 overflow-hidden"
+      className="rounded-lg bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-850 overflow-hidden"
       key={index}
     >
       <div className="p-3">
         <div className="flex items-center gap-2">
           {/* Avatar and User ID */}
-          <div className="hidden md:flex items-center gap-2">
-            <Skeleton className="h-6 w-6 rounded-full" />
-            <Skeleton className="h-3 w-24" />
-          </div>
+          {!userId && (
+            <div className="hidden md:flex items-center gap-2">
+              <Skeleton className="h-6 w-6 rounded-full" />
+              <Skeleton className="h-3 w-24" />
+            </div>
+          )}
 
           {/* Icons section - matching actual component structure */}
           <div className="flex space-x-2 items-center">

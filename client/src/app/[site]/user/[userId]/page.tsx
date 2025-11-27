@@ -53,7 +53,7 @@ export default function UserPage() {
   return (
     <div className="p-2 md:p-4 max-w-[1200px] mx-auto">
       {/* Header */}
-      <div className="flex items-center gap-2 mb-2">
+      <div className="flex items-center gap-2 mb-4">
         <MobileSidebar />
         <Breadcrumb>
           <BreadcrumbList>

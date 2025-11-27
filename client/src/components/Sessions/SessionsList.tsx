@@ -64,7 +64,7 @@ export function SessionsList({
 
       {/* Session cards */}
       {isLoading ? (
-        <SessionCardSkeleton />
+        <SessionCardSkeleton userId={userId} />
       ) : (
         sessions.map((session, index) => (
           <SessionCard key={`${session.session_id}-${index}`} session={session} userId={userId} />

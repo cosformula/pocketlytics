@@ -28,7 +28,7 @@ export function StandardSection({
   close,
   hasSubrow,
   getSubrowLabel,
-  additionalFilters,
+  customFilters,
 }: {
   title: string;
   getKey: (item: MetricResponse) => string;
@@ -42,13 +42,13 @@ export function StandardSection({
   close: () => void;
   hasSubrow?: boolean;
   getSubrowLabel?: (item: MetricResponse) => ReactNode;
-  additionalFilters?: Filter[];
+  customFilters?: Filter[];
 }) {
   const { data, isLoading, isFetching, error, refetch } = usePaginatedMetric({
     parameter: filterParameter,
     limit: 100,
     page: 1,
-    additionalFilters,
+    customFilters,
   });
 
   const itemsForDisplay = data?.data;
