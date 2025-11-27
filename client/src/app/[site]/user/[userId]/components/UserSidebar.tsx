@@ -163,10 +163,9 @@ export function UserSidebar({ data, isLoading, sessionCount, getRegionName }: Us
               value={data?.country ? getCountryName(data.country) : "—"}
             />
             <InfoRow
-              icon={<Globe className="w-4 h-4" />}
               label="Region"
               value={
-                <span className="truncate max-w-[140px] inline-block">
+                <span className="truncate max-w-[160px] inline-block">
                   {data?.region ? getRegionName(data.region) : "—"}
                   {data?.city && `, ${data.city}`}
                 </span>
@@ -187,12 +186,12 @@ export function UserSidebar({ data, isLoading, sessionCount, getRegionName }: Us
               value={data?.device_type ?? "—"}
             />
             <InfoRow
-              icon={<Browser browser={data?.browser || "Unknown"} size={12} />}
+              icon={<Browser browser={data?.browser || "Unknown"} size={13} />}
               label="Browser"
               value={data?.browser ? `${data.browser}${data.browser_version ? ` v${data.browser_version}` : ""}` : "—"}
             />
             <InfoRow
-              icon={<OperatingSystem os={data?.operating_system || ""} size={12} />}
+              icon={<OperatingSystem os={data?.operating_system || ""} size={13} />}
               label="OS"
               value={
                 data?.operating_system
@@ -209,8 +208,13 @@ export function UserSidebar({ data, isLoading, sessionCount, getRegionName }: Us
       </SidebarCard>
 
       {/* Activity Calendar */}
-      <SidebarCard className="h-[160px]">
-        <VisitCalendar sessionCount={sessionCount} />
+      <SidebarCard className="h-[180px]">
+        <h3 className="text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wide mb-2">
+          Activity Calendar
+        </h3>
+        <div className="h-[160px]">
+          <VisitCalendar sessionCount={sessionCount} />
+        </div>
       </SidebarCard>
 
       {/* User Traits (identified users only) */}
@@ -234,7 +238,7 @@ export function UserSidebar({ data, isLoading, sessionCount, getRegionName }: Us
       )}
 
       {/* Linked Devices (identified users only) */}
-      {isIdentified && data?.linked_devices && data.linked_devices.length > 0 && (
+      {/* {isIdentified && data?.linked_devices && data.linked_devices.length > 0 && (
         <SidebarCard>
           <h3 className="text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wide mb-2 flex items-center gap-1.5">
             <Laptop className="w-3 h-3" />
@@ -256,7 +260,7 @@ export function UserSidebar({ data, isLoading, sessionCount, getRegionName }: Us
             ))}
           </div>
         </SidebarCard>
-      )}
+      )} */}
     </div>
   );
 }

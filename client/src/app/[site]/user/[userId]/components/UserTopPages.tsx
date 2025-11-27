@@ -1,12 +1,12 @@
 import { useParams } from "next/navigation";
+import { useState } from "react";
 import { useGetSite } from "../../../../../api/admin/sites";
 import { usePaginatedMetric } from "../../../../../api/analytics/useGetMetric";
-import { Card, CardContent, CardLoader } from "../../../../../components/ui/card";
+import { TabsContent, TabsList, TabsTrigger } from "../../../../../components/ui/basic-tabs";
+import { Card, CardContent } from "../../../../../components/ui/card";
+import { Tabs } from "../../../../../components/ui/tabs";
 import { truncateString } from "../../../../../lib/utils";
 import { StandardSection } from "../../../components/shared/StandardSection/StandardSection";
-import { Tabs } from "../../../../../components/ui/tabs";
-import { useState } from "react";
-import { TabsContent, TabsList, TabsTrigger } from "../../../../../components/ui/basic-tabs";
 
 type Tab = "pages" | "events";
 
@@ -29,20 +29,13 @@ export function UserTopPages() {
     <Card>
       <CardContent className="mt-2">
         <Tabs defaultValue="pages" value={tab} onValueChange={value => setTab(value as Tab)}>
-          <div className="flex flex-row gap-2 justify-between items-center">
-            <div className="overflow-x-auto">
-              <TabsList>
-                <TabsTrigger value="pages">Top Pages</TabsTrigger>
-              </TabsList>
-              <TabsList>
-                <TabsTrigger value="pages">Events</TabsTrigger>
-              </TabsList>
-            </div>
-            {/* <div className="w-7">
-              <Button size="smIcon" onClick={() => setExpanded(!expanded)}>
-                <Expand className="w-4 h-4" />
-              </Button>
-            </div> */}
+          <div className="flex flex-row gap-2 items-center">
+            <TabsList>
+              <TabsTrigger value="pages">Top Pages</TabsTrigger>
+            </TabsList>
+            <TabsList>
+              <TabsTrigger value="events">Events</TabsTrigger>
+            </TabsList>
           </div>
           <TabsContent value="pages">
             <StandardSection
