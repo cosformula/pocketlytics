@@ -19,10 +19,7 @@ function SelectGSCPropertyPageContent() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Parse properties from query params
-  const [properties] = useQueryState(
-    "properties",
-    parseAsJson<string[]>((value) => value as string[]).withDefault([])
-  );
+  const [properties] = useQueryState("properties", parseAsJson<string[]>(value => value as string[]).withDefault([]));
 
   const handleSubmit = async () => {
     if (!selectedProperty) {
@@ -81,7 +78,7 @@ function SelectGSCPropertyPageContent() {
             {properties.map(property => (
               <div
                 key={property}
-                className="flex items-center space-x-2 border border-neutral-100 dark:border-neutral-200 rounded-lg p-4 hover:bg-neutral-50 dark:hover:bg-neutral-800/30"
+                className="flex items-center space-x-2 border border-neutral-100 dark:border-neutral-750 rounded-lg p-4 hover:bg-neutral-50 dark:hover:bg-neutral-800/30"
               >
                 <RadioGroupItem value={property} id={property} />
                 <Label htmlFor={property} className="flex-1 cursor-pointer">
