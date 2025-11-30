@@ -38,7 +38,7 @@ You can also include any custom fields you need for segmentation and analysis.
 Sets a custom user ID for tracking logged-in users across devices and sessions, with optional user traits (metadata).
 
 - `userId` (String): The unique identifier for the user. This will be stored in localStorage and persist across browser sessions. **Note: Custom user IDs are stored exactly as provided without any hashing or modification.**
-- `traits` (Object, Optional): An object containing user metadata like email, name, username, or any custom fields. This data is stored in Rybbit and can be used to identify users in the dashboard.
+- `traits` (Object, Optional): An object containing user metadata like email, name, username, or any custom fields. This data is stored in Rybbit and can be used to identify users in the dashboard. Setting a trait to `null` removes it from the user's profile.
 
 ```javascript
 // Identify a user when they log in (without traits)
@@ -60,13 +60,18 @@ window.rybbit.identify("user_12345", {
 
 Updates the traits for the currently identified user without re-identifying them. Useful for updating user properties after initial identification.
 
-- `traits` (Object): An object containing user metadata. New traits are merged with existing traits.
+- `traits` (Object): An object containing user metadata. New traits are merged with existing traits. **Setting a trait to `null` removes it from the user's profile.**
 
 ```javascript
 // Update user traits after they upgrade their plan
 window.rybbit.setTraits({
   plan: "enterprise",
   upgraded_at: "2024-01-15"
+});
+
+// Remove a trait by setting it to null
+window.rybbit.setTraits({
+  temporary_flag: null  // This trait will be removed
 });
 ```
 

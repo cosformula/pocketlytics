@@ -109,10 +109,14 @@ export async function handleIdentify(request: FastifyRequest, reply: FastifyRepl
 
         if (existingProfile.length > 0) {
           // Merge new traits with existing (new traits override old)
-          const mergedTraits = {
+          // Traits with null values are removed from the result
+          const merged = {
             ...((existingProfile[0].traits as Record<string, unknown>) || {}),
             ...traits,
           };
+          const mergedTraits = Object.fromEntries(
+            Object.entries(merged).filter(([_, value]) => value !== null)
+          );
 
           await db
             .update(userProfiles)
@@ -124,11 +128,14 @@ export async function handleIdentify(request: FastifyRequest, reply: FastifyRepl
 
           logger.info({ siteId, userId: user_id }, "Updated user profile traits");
         } else {
-          // Create new profile
+          // Create new profile (filter out null values)
+          const filteredTraits = Object.fromEntries(
+            Object.entries(traits).filter(([_, value]) => value !== null)
+          );
           await db.insert(userProfiles).values({
             siteId,
             userId: user_id,
-            traits,
+            traits: filteredTraits,
           });
 
           logger.info({ siteId, userId: user_id }, "Created new user profile");
