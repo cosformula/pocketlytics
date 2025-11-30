@@ -8,6 +8,8 @@ import {
   DeviceTypeTooltipIcon,
   OperatingSystemTooltipIcon,
 } from "../../../../components/TooltipIcons/TooltipIcons";
+import { Avatar, generateName } from "../../../../components/Avatar";
+import { IdentifiedBadge } from "../../../../components/IdentifiedBadge";
 import { Badge } from "../../../../components/ui/badge";
 import { Skeleton } from "../../../../components/ui/skeleton";
 import { Button } from "../../../../components/ui/button";
@@ -29,6 +31,9 @@ import { useDeleteSessionReplay } from "../../../../api/analytics/sessionReplay/
 interface SessionReplayListItem {
   session_id: string;
   user_id: string;
+  identified_user_id: string;
+  is_identified: boolean;
+  traits: Record<string, unknown> | null;
   start_time: string;
   end_time?: string;
   duration_ms?: number;
@@ -54,6 +59,13 @@ export function ReplayCard({ replay }: { replay: SessionReplayListItem }) {
     zone: "utc",
   }).toLocal();
   const duration = replay.duration_ms ? Math.ceil(replay.duration_ms / 1000) : null;
+
+  // Calculate display name based on identification status
+  const isIdentified = replay.is_identified;
+  const traits = replay.traits;
+  const displayName = isIdentified
+    ? (traits?.username as string) || (traits?.name as string) || replay.identified_user_id
+    : generateName(replay.user_id);
 
   const formatDuration = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
@@ -87,10 +99,14 @@ export function ReplayCard({ replay }: { replay: SessionReplayListItem }) {
         setSessionId(replay.session_id);
       }}
     >
+      {/* User info row */}
+      <div className="flex items-center gap-1.5 mb-1.5">
+        <Avatar size={16} id={replay.user_id} />
+        <span className="text-xs text-neutral-700 dark:text-neutral-200 truncate max-w-[100px]">{displayName}</span>
+        {isIdentified && <IdentifiedBadge traits={traits} />}
+      </div>
+
       <div className="flex items-center gap-2 mb-1">
-        {/* <div className="text-xs text-neutral-500">
-          {replay.user_id.slice(0, 12)}...
-        </div> */}
         <div className="text-xs text-neutral-600 dark:text-neutral-400">{startTime.toRelative()}</div>
         {duration && (
           <div className="flex items-center gap-1 text-neutral-600 dark:text-neutral-400 text-xs">

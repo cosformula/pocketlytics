@@ -10,6 +10,9 @@ export interface SessionReplayEvent {
 export interface SessionReplayMetadata {
   session_id: string;
   user_id: string;
+  identified_user_id: string;
+  is_identified: boolean;
+  traits: Record<string, unknown> | null;
   start_time: Date;
   end_time?: Date;
   duration_ms?: number;

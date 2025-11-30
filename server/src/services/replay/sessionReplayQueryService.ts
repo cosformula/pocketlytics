@@ -32,7 +32,7 @@ export class SessionReplayQueryService {
     const queryParams: any = { siteId, limit, offset };
 
     if (userId) {
-      whereConditions.push(`user_id = {userId:String}`);
+      whereConditions.push(`(user_id = {userId:String} OR identified_user_id = {userId:String})`);
       queryParams.userId = userId;
     }
 
@@ -70,9 +70,11 @@ export class SessionReplayQueryService {
     }
 
     const query = `
-      SELECT 
+      SELECT
         session_id,
         user_id,
+        identified_user_id,
+        if(identified_user_id != '', true, false) AS is_identified,
         start_time,
         end_time,
         duration_ms,
