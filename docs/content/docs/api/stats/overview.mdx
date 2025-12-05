@@ -18,7 +18,7 @@ See the [API Reference](/docs/api/stats/reference) for authentication, common pa
   </a>
   <a href="#get-overview-time-series" className="flex items-center gap-3 p-3 rounded-lg bg-fd-secondary/50 hover:bg-fd-secondary transition-colors no-underline">
     <span className="px-2 py-1 text-xs font-bold rounded bg-green-500/20 text-green-600 dark:text-green-400">GET</span>
-    <code className="text-sm">/api/overview/:site/bucketed</code>
+    <code className="text-sm">/api/overview-bucketed/:site</code>
   </a>
   <a href="#get-metric" className="flex items-center gap-3 p-3 rounded-lg bg-fd-secondary/50 hover:bg-fd-secondary transition-colors no-underline">
     <span className="px-2 py-1 text-xs font-bold rounded bg-green-500/20 text-green-600 dark:text-green-400">GET</span>
@@ -26,7 +26,7 @@ See the [API Reference](/docs/api/stats/reference) for authentication, common pa
   </a>
   <a href="#get-live-visitors" className="flex items-center gap-3 p-3 rounded-lg bg-fd-secondary/50 hover:bg-fd-secondary transition-colors no-underline">
     <span className="px-2 py-1 text-xs font-bold rounded bg-green-500/20 text-green-600 dark:text-green-400">GET</span>
-    <code className="text-sm">/api/live-usercount/:site</code>
+    <code className="text-sm">/api/live-user-count/:site</code>
   </a>
 </div>
 
@@ -160,7 +160,7 @@ data = response.json()
 <div>
 
 ```
-GET /api/overview/:site/bucketed
+GET /api/overview-bucketed/:site
 ```
 
 Returns time-series analytics data broken down by configurable time buckets. Useful for charting trends over time.
@@ -246,14 +246,14 @@ Accepts all [Common Parameters](/docs/api/stats/reference#common-parameters) plu
 <Tabs items={['cURL', 'JavaScript', 'Python']}>
   <Tab value="cURL">
 ```bash title="Request"
-curl -X GET "https://api.rybbit.io/api/overview/123/bucketed?bucket=day&start_date=2024-01-01&end_date=2024-01-07&time_zone=America/New_York" \
+curl -X GET "https://api.rybbit.io/api/overview-bucketed/123?bucket=day&start_date=2024-01-01&end_date=2024-01-07&time_zone=America/New_York" \
   -H "Authorization: Bearer your_api_key_here"
 ```
   </Tab>
   <Tab value="JavaScript">
 ```javascript title="Request"
 const response = await fetch(
-  'https://api.rybbit.io/api/overview/123/bucketed?bucket=day&start_date=2024-01-01&end_date=2024-01-07&time_zone=America/New_York',
+  'https://api.rybbit.io/api/overview-bucketed/123?bucket=day&start_date=2024-01-01&end_date=2024-01-07&time_zone=America/New_York',
   {
     headers: {
       'Authorization': 'Bearer your_api_key_here'
@@ -269,7 +269,7 @@ const data = await response.json();
 import requests
 
 response = requests.get(
-    'https://api.rybbit.io/api/overview/123/bucketed',
+    'https://api.rybbit.io/api/overview-bucketed/123',
     params={
         'bucket': 'day',
         'start_date': '2024-01-01',
@@ -505,7 +505,7 @@ data = response.json()
 <div>
 
 ```
-GET /api/live-usercount/:site
+GET /api/live-user-count/:site
 ```
 
 Returns the count of unique active sessions within the specified time window. Useful for displaying real-time visitor counts.
@@ -561,14 +561,14 @@ Returns the count of unique active sessions within the specified time window. Us
 <Tabs items={['cURL', 'JavaScript', 'Python']}>
   <Tab value="cURL">
 ```bash title="Request"
-curl -X GET "https://api.rybbit.io/api/live-usercount/123?minutes=5" \
+curl -X GET "https://api.rybbit.io/api/live-user-count/123?minutes=5" \
   -H "Authorization: Bearer your_api_key_here"
 ```
   </Tab>
   <Tab value="JavaScript">
 ```javascript title="Request"
 const response = await fetch(
-  'https://api.rybbit.io/api/live-usercount/123?minutes=5',
+  'https://api.rybbit.io/api/live-user-count/123?minutes=5',
   {
     headers: {
       'Authorization': 'Bearer your_api_key_here'
@@ -585,7 +585,7 @@ console.log(`Live visitors: ${count}`);
 import requests
 
 response = requests.get(
-    'https://api.rybbit.io/api/live-usercount/123',
+    'https://api.rybbit.io/api/live-user-count/123',
     params={'minutes': 5},
     headers={
         'Authorization': 'Bearer your_api_key_here'
@@ -609,7 +609,7 @@ print(f"Live visitors: {data['count']}")
 ```javascript title="Real-time Widget"
 async function updateLiveCount() {
   const response = await fetch(
-    'https://api.rybbit.io/api/live-usercount/123?minutes=5',
+    'https://api.rybbit.io/api/live-user-count/123?minutes=5',
     {
       headers: {
         'Authorization': 'Bearer your_api_key'
