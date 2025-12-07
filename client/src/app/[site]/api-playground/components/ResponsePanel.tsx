@@ -1,20 +1,19 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { CodeSnippet } from "@/components/CodeSnippet";
-import { usePlaygroundStore } from "../hooks/usePlaygroundStore";
-import { CodeExamples } from "./CodeExamples";
-import { CodeGenConfig } from "../utils/codeGenerators";
-import { Copy, Loader2, Play, CheckCircle, XCircle } from "lucide-react";
-import { useMemo, useState } from "react";
-import { useParams } from "next/navigation";
-import { BACKEND_URL } from "@/lib/const";
 import { authedFetch } from "@/api/utils";
+import { CodeSnippet } from "@/components/CodeSnippet";
+import { Button } from "@/components/ui/button";
+import { BACKEND_URL } from "@/lib/const";
+import { Loader2, Play, XCircle } from "lucide-react";
+import { useParams } from "next/navigation";
+import { useMemo } from "react";
+import { usePlaygroundStore } from "../hooks/usePlaygroundStore";
+import { CodeGenConfig } from "../utils/codeGenerators";
+import { CodeExamples } from "./CodeExamples";
 
 export function ResponsePanel() {
   const params = useParams();
   const siteId = params.site as string;
-  const [copied, setCopied] = useState(false);
 
   const {
     selectedEndpoint,
@@ -58,8 +57,8 @@ export function ResponsePanel() {
 
       // Convert filters to API format inline
       const apiFilters = filters
-        .filter((f) => f.value.trim() !== "")
-        .map((f) => ({
+        .filter(f => f.value.trim() !== "")
+        .map(f => ({
           parameter: f.parameter,
           type: f.operator,
           value: [f.value],
@@ -91,26 +90,13 @@ export function ResponsePanel() {
     // Build query string
     const queryString = Object.entries(qp)
       .filter(([, v]) => v !== undefined && v !== null && v !== "")
-      .map(
-        ([k, v]) =>
-          `${encodeURIComponent(k)}=${encodeURIComponent(String(v))}`
-      )
+      .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(String(v))}`)
       .join("&");
 
     const url = `${BACKEND_URL}${path}${queryString ? `?${queryString}` : ""}`;
 
     return { fullUrl: url, queryParams: qp, parsedBody: body };
-  }, [
-    selectedEndpoint,
-    siteId,
-    startDate,
-    endDate,
-    timeZone,
-    filters,
-    endpointParams,
-    pathParams,
-    requestBody,
-  ]);
+  }, [selectedEndpoint, siteId, startDate, endDate, timeZone, filters, endpointParams, pathParams, requestBody]);
 
   // Code generation config
   const codeConfig: CodeGenConfig = useMemo(() => {
@@ -202,56 +188,18 @@ export function ResponsePanel() {
     }
   };
 
-  // Copy URL
-  const handleCopyUrl = () => {
-    navigator.clipboard.writeText(fullUrl);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
   if (!selectedEndpoint) {
     return (
       <div className="h-full flex items-center justify-center text-neutral-500 dark:text-neutral-400 p-4">
-        <p className="text-sm text-center">
-          Select an endpoint to see the request URL and code examples
-        </p>
+        <p className="text-sm text-center">Select an endpoint to see the request URL and code examples</p>
       </div>
     );
   }
 
   return (
     <div className="h-full overflow-y-auto overflow-x-hidden p-4 space-y-4 min-w-0">
-      {/* Request URL */}
-      <div className="space-y-2 min-w-0">
-        <div className="flex items-center justify-between">
-          <h3 className="text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
-            Request URL
-          </h3>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleCopyUrl}
-            className="h-6 px-2 text-xs shrink-0"
-          >
-            {copied ? (
-              <CheckCircle className="h-3 w-3 mr-1" />
-            ) : (
-              <Copy className="h-3 w-3 mr-1" />
-            )}
-            {copied ? "Copied" : "Copy"}
-          </Button>
-        </div>
-        <div className="p-2 bg-neutral-100 dark:bg-neutral-800 rounded text-xs font-mono break-all overflow-x-auto max-w-full">
-          <span className="break-all">{fullUrl}</span>
-        </div>
-      </div>
-
       {/* Execute Button */}
-      <Button
-        onClick={handleExecute}
-        disabled={isLoading}
-        className="w-full"
-      >
+      <Button onClick={handleExecute} disabled={isLoading} className="w-full">
         {isLoading ? (
           <>
             <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -266,12 +214,8 @@ export function ResponsePanel() {
       </Button>
 
       {/* Code Examples */}
-      <div className="space-y-2">
-        <h3 className="text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
-          Code Examples
-        </h3>
-        <CodeExamples config={codeConfig} />
-      </div>
+
+      <CodeExamples config={codeConfig} />
 
       {/* Response */}
       <div className="space-y-2">
@@ -280,9 +224,7 @@ export function ResponsePanel() {
             Response
           </h3>
           {responseTime !== null && (
-            <span className="text-xs text-neutral-500 dark:text-neutral-400">
-              {responseTime}ms
-            </span>
+            <span className="text-xs text-neutral-500 dark:text-neutral-400">{responseTime}ms</span>
           )}
         </div>
 
@@ -290,17 +232,12 @@ export function ResponsePanel() {
           <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded">
             <div className="flex items-start gap-2">
               <XCircle className="h-4 w-4 text-red-500 mt-0.5 shrink-0" />
-              <p className="text-sm text-red-700 dark:text-red-300">
-                {responseError}
-              </p>
+              <p className="text-sm text-red-700 dark:text-red-300">{responseError}</p>
             </div>
           </div>
         ) : response ? (
           <div className="max-h-[400px] overflow-auto rounded-lg">
-            <CodeSnippet
-              code={JSON.stringify(response, null, 2)}
-              language="json"
-            />
+            <CodeSnippet code={JSON.stringify(response, null, 2)} language="json" />
           </div>
         ) : (
           <div className="p-3 bg-neutral-100 dark:bg-neutral-800 rounded text-xs text-neutral-500 dark:text-neutral-400">

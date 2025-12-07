@@ -272,6 +272,7 @@ export const endpointCategories: EndpointCategory[] = [
         name: "Get Performance by Dimension",
         description: "Returns performance breakdown by dimension",
         hasCommonParams: true,
+        requiredParams: ["dimension"],
         specificParams: ["dimension", "page", "limit", "sort_by", "sort_order"],
       },
     ],
@@ -366,9 +367,7 @@ export const endpointCategories: EndpointCategory[] = [
 ];
 
 // Flatten all endpoints for easy lookup
-export const allEndpoints: EndpointConfig[] = endpointCategories.flatMap(
-  (cat) => cat.endpoints
-);
+export const allEndpoints: EndpointConfig[] = endpointCategories.flatMap(cat => cat.endpoints);
 
 // Parameter metadata for dynamic form generation
 export const parameterMetadata: Record<

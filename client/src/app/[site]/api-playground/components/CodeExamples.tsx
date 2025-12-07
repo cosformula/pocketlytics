@@ -28,8 +28,8 @@ export const CodeExamples = memo(function CodeExamples({ config }: CodeExamplesP
             className={cn(
               "px-2 py-1 text-xs rounded transition-colors",
               selectedLang === lang
-                ? "bg-neutral-200 dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100"
-                : "text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                ? "bg-neutral-100 dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100"
+                : "text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-800"
             )}
           >
             {lang}

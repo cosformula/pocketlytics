@@ -13,7 +13,7 @@ export function ApiPlayground() {
       </div>
 
       {/* Center Column - Parameter Controls */}
-      <div className="w-[450px] shrink-0 border-neutral-200 dark:border-neutral-800">
+      <div className="w-[600px] shrink-0 border-neutral-200 dark:border-neutral-800">
         <ParameterControls />
       </div>
 

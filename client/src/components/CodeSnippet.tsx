@@ -13,7 +13,8 @@ import rust from "react-syntax-highlighter/dist/esm/languages/hljs/rust";
 import java from "react-syntax-highlighter/dist/esm/languages/hljs/java";
 import csharp from "react-syntax-highlighter/dist/esm/languages/hljs/csharp";
 import json from "react-syntax-highlighter/dist/esm/languages/hljs/json";
-import { atomOneDark } from "react-syntax-highlighter/dist/esm/styles/hljs";
+import { vs2015, vs } from "react-syntax-highlighter/dist/esm/styles/hljs";
+import { useTheme } from "next-themes";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -43,6 +44,8 @@ export const CodeSnippet = React.memo(function CodeSnippet({
   className,
 }: CodeSnippetProps) {
   const [hasCopied, setHasCopied] = React.useState(false);
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
 
   const copyToClipboard = React.useCallback(async () => {
     await navigator.clipboard.writeText(code);
@@ -51,13 +54,13 @@ export const CodeSnippet = React.memo(function CodeSnippet({
   }, [code]);
 
   return (
-    <div className={cn("relative", className)}>
+    <div className={cn("relative border border-neutral-150 dark:border-neutral-800 rounded-md", className)}>
       {showLanguageLabel && language && (
         <div className="absolute left-3 top-2 text-xs text-neutral-400 z-10">{language}</div>
       )}
       <SyntaxHighlighter
         language={language || "text"}
-        style={atomOneDark}
+        style={isDark ? vs2015 : vs}
         customStyle={{
           margin: 0,
           borderRadius: "4px",
