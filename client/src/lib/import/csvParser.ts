@@ -42,6 +42,35 @@ interface SimpleAnalyticsEvent {
   uuid: string;
 }
 
+interface MatomoEvent {
+  idVisit: string;
+  visitorId: string;
+  firstActionTimestamp: string;
+  referrerUrl: string;
+  referrerType: string;
+  referrerTypeName: string;
+  browser: string;
+  browserVersion: string;
+  operatingSystem: string;
+  operatingSystemVersion: string;
+  deviceType: string;
+  languageCode: string;
+  country: string;
+  countryCode: string;
+  region: string;
+  regionCode: string;
+  city: string;
+  latitude: string;
+  longitude: string;
+  resolution: string;
+  campaignName: string;
+  campaignSource: string;
+  campaignMedium: string;
+  campaignContent: string;
+  campaignKeyword: string;
+  [key: string]: string; // Allow dynamic actionDetails_N_* fields
+}
+
 export class CsvParser {
   private cancelled: boolean = false;
   private readonly siteId: number;
@@ -97,12 +126,23 @@ export class CsvParser {
             if (validEvents.length > 0) {
               await this.uploadChunk(validEvents, false);
             }
-          } else {
+          } else if (this.platform === "simple_analytics") {
             const validEvents: SimpleAnalyticsEvent[] = [];
             for (const row of results.data) {
               const event = this.transformRow(row);
               if (event && this.isDateInRange((event as SimpleAnalyticsEvent).added_iso)) {
                 validEvents.push(event as SimpleAnalyticsEvent);
+              }
+            }
+            if (validEvents.length > 0) {
+              await this.uploadChunk(validEvents, false);
+            }
+          } else if (this.platform === "matomo") {
+            const validEvents: MatomoEvent[] = [];
+            for (const row of results.data) {
+              const event = this.transformRow(row);
+              if (event && this.isDateInRange((event as MatomoEvent).firstActionTimestamp, true)) {
+                validEvents.push(event as MatomoEvent);
               }
             }
             if (validEvents.length > 0) {
@@ -132,12 +172,19 @@ export class CsvParser {
     });
   }
 
-  private isDateInRange(dateStr: string): boolean {
-    // Handle both formats: "yyyy-MM-dd HH:mm:ss" (Umami) and ISO (Simple Analytics)
-    let createdAt = DateTime.fromFormat(dateStr, "yyyy-MM-dd HH:mm:ss", { zone: "utc" });
-    if (!createdAt.isValid) {
-      createdAt = DateTime.fromISO(dateStr, { zone: "utc" });
+  private isDateInRange(dateStr: string, isUnixTimestamp: boolean = false): boolean {
+    // Handle Unix timestamp (Matomo), "yyyy-MM-dd HH:mm:ss" (Umami), and ISO (Simple Analytics)
+    let createdAt: DateTime;
+
+    if (isUnixTimestamp) {
+      createdAt = DateTime.fromSeconds(parseInt(dateStr, 10), { zone: "utc" });
+    } else {
+      createdAt = DateTime.fromFormat(dateStr, "yyyy-MM-dd HH:mm:ss", { zone: "utc" });
+      if (!createdAt.isValid) {
+        createdAt = DateTime.fromISO(dateStr, { zone: "utc" });
+      }
     }
+
     if (!createdAt.isValid) {
       return false;
     }
@@ -153,7 +200,7 @@ export class CsvParser {
     return true;
   }
 
-  private transformRow(row: unknown): UmamiEvent | SimpleAnalyticsEvent | null {
+  private transformRow(row: unknown): UmamiEvent | SimpleAnalyticsEvent | MatomoEvent | null {
     const rawEvent = row as Record<string, string>;
 
     if (this.platform === "umami") {
@@ -184,7 +231,7 @@ export class CsvParser {
       }
 
       return umamiEvent;
-    } else {
+    } else if (this.platform === "simple_analytics") {
       const simpleAnalyticsEvent: SimpleAnalyticsEvent = {
         added_iso: rawEvent.added_iso,
         country_code: rawEvent.country_code,
@@ -207,10 +254,57 @@ export class CsvParser {
       }
 
       return simpleAnalyticsEvent;
+    } else if (this.platform === "matomo") {
+      // For Matomo, pass through all fields including dynamic actionDetails_N_* columns
+      const matomoEvent: MatomoEvent = {
+        idVisit: rawEvent.idVisit || "",
+        visitorId: rawEvent.visitorId || "",
+        firstActionTimestamp: rawEvent.firstActionTimestamp || "",
+        referrerUrl: rawEvent.referrerUrl || "",
+        referrerType: rawEvent.referrerType || "",
+        referrerTypeName: rawEvent.referrerTypeName || "",
+        browser: rawEvent.browser || "",
+        browserVersion: rawEvent.browserVersion || "",
+        operatingSystem: rawEvent.operatingSystem || "",
+        operatingSystemVersion: rawEvent.operatingSystemVersion || "",
+        deviceType: rawEvent.deviceType || "",
+        languageCode: rawEvent.languageCode || "",
+        country: rawEvent.country || "",
+        countryCode: rawEvent.countryCode || "",
+        region: rawEvent.region || "",
+        regionCode: rawEvent.regionCode || "",
+        city: rawEvent.city || "",
+        latitude: rawEvent.latitude || "",
+        longitude: rawEvent.longitude || "",
+        resolution: rawEvent.resolution || "",
+        campaignName: rawEvent.campaignName || "",
+        campaignSource: rawEvent.campaignSource || "",
+        campaignMedium: rawEvent.campaignMedium || "",
+        campaignContent: rawEvent.campaignContent || "",
+        campaignKeyword: rawEvent.campaignKeyword || "",
+      };
+
+      // Add all other fields (including actionDetails_N_* fields)
+      for (const [key, value] of Object.entries(rawEvent)) {
+        if (!(key in matomoEvent)) {
+          matomoEvent[key] = value || "";
+        }
+      }
+
+      if (!matomoEvent.firstActionTimestamp || !matomoEvent.idVisit) {
+        return null;
+      }
+
+      return matomoEvent;
     }
+
+    return null;
   }
 
-  private async uploadChunk(events: UmamiEvent[] | SimpleAnalyticsEvent[], isLastBatch: boolean): Promise<void> {
+  private async uploadChunk(
+    events: UmamiEvent[] | SimpleAnalyticsEvent[] | MatomoEvent[],
+    isLastBatch: boolean
+  ): Promise<void> {
     // Skip empty chunks unless it's the last one (needed for finalization)
     if (events.length === 0 && !isLastBatch) {
       return;

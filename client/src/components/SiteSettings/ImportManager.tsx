@@ -65,6 +65,7 @@ function formatPlatformName(platform: ImportPlatform): string {
   const platformNames: Record<ImportPlatform, string> = {
     umami: "Umami",
     simple_analytics: "Simple Analytics",
+    matomo: "Matomo",
   };
   return platformNames[platform];
 }
@@ -221,6 +222,7 @@ export function ImportManager({ siteId, disabled }: ImportManagerProps) {
                   <SelectContent>
                     <SelectItem value="umami">Umami</SelectItem>
                     <SelectItem value="simple_analytics">Simple Analytics</SelectItem>
+                    <SelectItem value="matomo">Matomo</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
