@@ -84,7 +84,7 @@ export function MainSection() {
       <Card className="overflow-visible">
         {(isFetching || isPreviousFetching) && <CardLoader />}
         <CardContent className="p-2 md:p-4 py-3 w-full">
-          <div className="flex flex-col gap-2 px-2 md:px-0 relative">
+          <div className="flex gap-2 justify-between items-center px-2 md:px-0 relative">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <Link
@@ -97,12 +97,12 @@ export function MainSection() {
               </div>
             </div>
             <span className="text-sm text-neutral-700 dark:text-neutral-200">{SELECTED_STAT_MAP[selectedStat]}</span>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center">
               {selectedStat === "users" && (
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <div className="flex items-center text-xs text-muted-foreground">
                   <Tooltip>
                     <TooltipTrigger>
-                      <Button variant="default" size="smIcon" onClick={() => setShowUsersSplit(!showUsersSplit)}>
+                      <Button variant="ghost" size="smIcon" onClick={() => setShowUsersSplit(!showUsersSplit)}>
                         {showUsersSplit ? <Users /> : <User />}
                       </Button>
                     </TooltipTrigger>
@@ -113,7 +113,9 @@ export function MainSection() {
                 </div>
               )}
               <ExportButton />
-              <BucketSelection />
+              <div className="pl-1">
+                <BucketSelection />
+              </div>
             </div>
           </div>
 
