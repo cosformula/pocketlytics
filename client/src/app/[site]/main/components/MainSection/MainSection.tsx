@@ -14,6 +14,8 @@ import { ExportButton } from "../ExportButton";
 import { Chart } from "./Chart";
 import { Overview } from "./Overview";
 import { PreviousChart } from "./PreviousChart";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../../../../../components/ui/tooltip";
+import { Button } from "../../../../../components/ui/button";
 
 const SELECTED_STAT_MAP = {
   pageviews: "Pageviews",
@@ -93,29 +95,23 @@ export function MainSection() {
                   rybbit.com
                 </Link>
               </div>
-              <span className="absolute left-1/2 -translate-x-1/2 text-sm text-neutral-700 dark:text-neutral-200">
-                {SELECTED_STAT_MAP[selectedStat]}
-              </span>
-              <div className="flex items-center gap-2 md:justify-end">
-                {selectedStat === "users" && (
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <Button variant="default" size="smIcon" onClick={() => setShowUsersSplit(!showUsersSplit)}>
-                          {showUsersSplit ? <Users /> : <User />}
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>{showUsersSplit ? "Hide new vs returning users" : "Show new vs returning users"}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </div>
-                )}
-                <BucketSelection />
-              </div>
             </div>
             <span className="text-sm text-neutral-700 dark:text-neutral-200">{SELECTED_STAT_MAP[selectedStat]}</span>
             <div className="flex items-center gap-2">
+              {selectedStat === "users" && (
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Button variant="default" size="smIcon" onClick={() => setShowUsersSplit(!showUsersSplit)}>
+                        {showUsersSplit ? <Users /> : <User />}
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{showUsersSplit ? "Hide new vs returning users" : "Show new vs returning users"}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+              )}
               <ExportButton />
               <BucketSelection />
             </div>
