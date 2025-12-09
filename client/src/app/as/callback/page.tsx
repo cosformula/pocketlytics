@@ -379,7 +379,7 @@ export default function AppSumoSignupPage() {
                   value={orgName}
                   onChange={e => handleOrgNameChange(e.target.value)}
                   required
-                  className="h-10 transition-all bg-neutral-800/50 border-neutral-700"
+                  className="h-10 transition-all bg-neutral-100 dark:bg-neutral-800/50 border-neutral-200 dark:border-neutral-700"
                 />
               </div>
 
@@ -409,7 +409,7 @@ export default function AppSumoSignupPage() {
                   placeholder="example.com or sub.example.com"
                   value={domain}
                   onChange={e => setDomain(e.target.value.toLowerCase())}
-                  className="h-10 transition-all bg-neutral-800/50 border-neutral-700"
+                  className="h-10 transition-all bg-neutral-100 dark:bg-neutral-800/50 border-neutral-200 dark:border-neutral-700"
                 />
                 <p className="text-xs text-muted-foreground">Enter the domain of the website you want to track</p>
               </div>
@@ -444,9 +444,9 @@ export default function AppSumoSignupPage() {
   // Show loading state while initializing
   if (isInitializing) {
     return (
-      <div className="flex justify-center items-center h-dvh w-full p-4">
+      <div className="flex justify-center items-center h-dvh w-full p-4 bg-background">
         <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
+          <Loader2 className="h-8 w-8 animate-spin text-emerald-600 dark:text-emerald-500" />
           <p className="text-muted-foreground">Loading...</p>
         </div>
       </div>
@@ -454,31 +454,31 @@ export default function AppSumoSignupPage() {
   }
 
   return (
-    <div className="flex justify-center items-center h-dvh w-full p-4 ">
-      <div className="flex flex-col items-center bg-background relative">
+    <div className="flex justify-center items-center h-dvh w-full p-4 bg-background">
+      <div className="flex flex-col items-center relative">
         {/* Suspense boundary for the URL parameter handler */}
         <Suspense fallback={null}>
           <AppSumoCodeHandler onSetCode={setAppsumoCode} onSetStep={setCurrentStep} />
         </Suspense>
 
         {/* Background gradients similar to docs page */}
-        <div className="absolute top-0 left-0 w-[550px] h-[550px] bg-emerald-500/40 rounded-full blur-[80px] opacity-40"></div>
-        <div className="absolute top-20 left-20 w-[400px] h-[400px] bg-emerald-600/30 rounded-full blur-[70px] opacity-30"></div>
+        <div className="absolute top-0 left-0 w-[550px] h-[550px] bg-emerald-500/40 rounded-full blur-[80px] opacity-20 dark:opacity-40"></div>
+        <div className="absolute top-20 left-20 w-[400px] h-[400px] bg-emerald-600/30 rounded-full blur-[70px] opacity-15 dark:opacity-30"></div>
 
-        <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-blue-500/40 rounded-full blur-[80px] opacity-30"></div>
-        <div className="absolute bottom-40 right-20 w-[350px] h-[350px] bg-indigo-500/30 rounded-full blur-[75px] opacity-30"></div>
+        <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-blue-500/40 rounded-full blur-[80px] opacity-15 dark:opacity-30"></div>
+        <div className="absolute bottom-40 right-20 w-[350px] h-[350px] bg-indigo-500/30 rounded-full blur-[75px] opacity-15 dark:opacity-30"></div>
 
-        <div className="absolute top-1/4 right-0 w-[320px] h-[320px] bg-purple-500/40 rounded-full blur-[70px] opacity-20"></div>
+        <div className="absolute top-1/4 right-0 w-[320px] h-[320px] bg-purple-500/40 rounded-full blur-[70px] opacity-10 dark:opacity-20"></div>
 
         {/* Logo and title above the card */}
         <div className="relative z-10 mb-6 text-center">
           <a href="https://rybbit.com" target="_blank" className="inline-block mb-2">
             <RybbitTextLogo />
           </a>
-          <h1 className="text-lg text-neutral-300">AppSumo License Activation</h1>
+          <h1 className="text-lg text-neutral-600 dark:text-neutral-300">AppSumo License Activation</h1>
         </div>
 
-        <Card className="w-full md:w-[500px] p-0 overflow-hidden shadow-2xl border-neutral-700/50 backdrop-blur-sm bg-neutral-800/20 z-10 p-8">
+        <Card className="w-full md:w-[500px] p-0 overflow-hidden shadow-2xl border-neutral-200 dark:border-neutral-700/50 backdrop-blur-sm bg-white/80 dark:bg-neutral-800/20 z-10 p-8">
           {/* Horizontal step indicator */}
           <div className="flex items-center w-full mb-4">
             {[1, 2, 3].map((step, index) => (
@@ -487,10 +487,10 @@ export default function AppSumoSignupPage() {
                   className={cn(
                     "flex items-center justify-center w-10 h-10 rounded-full text-sm font-semibold transition-all duration-300",
                     currentStep === step
-                      ? "bg-emerald-600 text-primary-foreground"
+                      ? "bg-emerald-600 text-white shadow-lg shadow-emerald-600/30"
                       : currentStep > step
-                        ? "bg-emerald-600/20 text-emerald-400 border-2 border-emerald-600/40"
-                        : "bg-muted-foreground/20 text-muted-foreground border-2 border-muted-foreground/40"
+                        ? "bg-emerald-600 text-white"
+                        : "bg-neutral-200 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400"
                   )}
                 >
                   {currentStep > step ? <Check className="h-5 w-5" /> : step}
@@ -499,7 +499,7 @@ export default function AppSumoSignupPage() {
                   <div
                     className={cn(
                       "flex-1 h-0.5 transition-all duration-300",
-                      currentStep > step ? "bg-emerald-600" : "bg-muted-foreground/40"
+                      currentStep > step ? "bg-emerald-600" : "bg-neutral-200 dark:bg-neutral-800"
                     )}
                   />
                 )}
