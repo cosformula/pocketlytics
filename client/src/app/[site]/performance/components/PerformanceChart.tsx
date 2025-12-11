@@ -195,15 +195,13 @@ export function PerformanceChart() {
       <CardContent className="p-2 md:p-4 py-3 w-full">
         <div className="flex items-center justify-between px-2 md:px-0">
           <div className="flex items-center space-x-4">
-            {!isWhiteLabel && (
-              <Link
-                href={session.data ? "/" : "https://rybbit.com"}
-                className={cn("text-lg font-semibold flex items-center gap-1.5 opacity-75", tilt_wrap.className)}
-              >
-                <RybbitLogo width={20} height={20} />
-                rybbit.com
-              </Link>
-            )}
+            <Link
+              href={session.data ? "/" : "https://rybbit.com"}
+              className={cn("text-lg font-semibold flex items-center gap-1.5 opacity-75", tilt_wrap.className)}
+            >
+              <RybbitLogo width={20} height={20} />
+              rybbit
+            </Link>
           </div>
           <div className="flex items-center space-x-4">
             <span className="text-sm text-neutral-600 dark:text-neutral-200">

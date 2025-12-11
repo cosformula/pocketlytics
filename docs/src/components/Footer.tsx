@@ -206,6 +206,11 @@ export function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/dpa" className="text-neutral-400 hover:text-white transition-colors">
+                  DPA
+                </Link>
+              </li>
+              <li>
                 <a href="mailto:hello@rybbit.com" className="text-neutral-400 hover:text-white transition-colors">
                   Support
                 </a>

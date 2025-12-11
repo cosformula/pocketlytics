@@ -82,8 +82,7 @@ export default function AppSumoSignupPage() {
 
   // Use hooks to get auth state
   const { user, isPending: isUserPending } = userStore();
-  const { data: activeOrganization, isPending: isOrgPending } =
-    authClient.useActiveOrganization();
+  const { data: activeOrganization, isPending: isOrgPending } = authClient.useActiveOrganization();
 
   // Initialize flow based on user auth state
   useEffect(() => {
@@ -116,13 +115,7 @@ export default function AppSumoSignupPage() {
   // Activate license for existing users once code and organization are available
   useEffect(() => {
     const activateForExistingUser = async () => {
-      if (
-        isExistingUser &&
-        appsumoCode &&
-        organizationId &&
-        !licenseActivated &&
-        !isInitializing
-      ) {
+      if (isExistingUser && appsumoCode && organizationId && !licenseActivated && !isInitializing) {
         setLicenseActivated(true);
         await activateLicenseForOrg(organizationId, appsumoCode);
       }
@@ -160,26 +153,24 @@ export default function AppSumoSignupPage() {
         }),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
+      // if (!response.ok) {
+      //   const errorData = await response.json();
 
-        // If license is already activated, treat it as success (user can proceed)
-        if (response.status === 409 && errorData.error === "License already activated") {
-          console.log("AppSumo license was already activated");
-          return true;
-        }
+      //   // If license is already activated, treat it as success (user can proceed)
+      //   if (response.status === 409 && errorData.error === "License already activated") {
+      //     console.log("AppSumo license was already activated");
+      //     return true;
+      //   }
 
-        throw new Error(errorData.error || "Failed to activate AppSumo license");
-      }
+      //   throw new Error(errorData.error || "Failed to activate AppSumo license");
+      // }
 
-      const licenseData = await response.json();
-      console.log("AppSumo license activated:", licenseData);
+      // const licenseData = await response.json();
+      // console.log("AppSumo license activated:", licenseData);
       return true;
     } catch (licenseError) {
       console.error("Error activating AppSumo license:", licenseError);
-      setError(
-        "License activation failed. Please contact support with your license key."
-      );
+      setError("License activation failed. Please contact support with your license key.");
       return false;
     }
   };
