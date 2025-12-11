@@ -103,7 +103,7 @@ export function MainSection() {
               {selectedStat === "users" && (
                 <div className="flex items-center text-xs text-muted-foreground">
                   <Tooltip>
-                    <TooltipTrigger>
+                    <TooltipTrigger asChild>
                       <Button variant="ghost" size="smIcon" onClick={() => setShowUsersSplit(!showUsersSplit)}>
                         {showUsersSplit ? <Users /> : <User />}
                       </Button>

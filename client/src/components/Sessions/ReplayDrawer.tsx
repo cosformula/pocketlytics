@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Drawer, DrawerContent } from "@/components/ui/drawer";
+import { Drawer, DrawerContent, DrawerTitle } from "@/components/ui/drawer";
 import { ReplayPlayer } from "@/components/replay/player/ReplayPlayer";
 import { useReplayStore } from "@/components/replay/replayStore";
 import { ReplayBreadcrumbs } from "@/components/replay/ReplayBreadcrumbs";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
 interface ReplayDrawerProps {
   sessionId: string;
@@ -67,6 +68,9 @@ export function ReplayDrawer({ sessionId, open, onOpenChange }: ReplayDrawerProp
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
+      <VisuallyHidden>
+        <DrawerTitle>Session Replay</DrawerTitle>
+      </VisuallyHidden>
       <DrawerContent className="h-[90vh]">
         <div className="flex gap-2 p-2 h-[97%]">
           {/* Player */}
