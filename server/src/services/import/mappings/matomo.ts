@@ -168,8 +168,9 @@ export class MatomoImportMapper {
       country: z.string().max(100),
       countryCode: z
         .string()
-        .regex(/^[A-Z]{2}$/)
-        .or(z.literal("")),
+        .regex(/^[A-Za-z]{2}$/)
+        .or(z.literal(""))
+        .transform(code => code.toUpperCase()),
       region: z.string().max(100),
       regionCode: z.string().max(10),
       city: z.string().max(100),
