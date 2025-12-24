@@ -265,28 +265,35 @@ server.addHook("onRequest", async (request, reply) => {
     return;
   }
 
+  // Skip analytics route processing for site management endpoints
+  // These routes use /api/sites/:id/... pattern but are NOT analytics routes
+  const isSiteManagementRoute =
+    /^\/api\/sites\/[^\/]+\/(config|private-link-config|excluded-ips|excluded-countries|imports)/.test(processedUrl);
+
   // Check if it's an analytics route and get site ID (now including the prepended /api)
-  if (ANALYTICS_ROUTES.some(route => processedUrl.startsWith(route))) {
+  if (!isSiteManagementRoute && ANALYTICS_ROUTES.some(route => processedUrl.startsWith(route))) {
     const siteId = extractSiteId(processedUrl);
 
     if (siteId) {
       // Convert string ID to numeric ID if needed
       let resolvedSiteId = siteId;
-      const numericSiteId = await resolveNumericSiteId(siteId);
-      if (numericSiteId) {
-        // Rewrite the URL with the numeric ID
-        const newUrl = replacePathSiteId(processedUrl, numericSiteId);
-        request.raw.url = newUrl;
-        processedUrl = newUrl;
-        resolvedSiteId = String(numericSiteId);
-        // Also update the parsed params since Fastify has already parsed them
-        const params = request.params as Record<string, string>;
-        if (params && "site" in params) {
-          params.site = resolvedSiteId;
+      if (String(siteId).length > 4) {
+        const numericSiteId = await resolveNumericSiteId(siteId);
+        if (numericSiteId) {
+          // Rewrite the URL with the numeric ID
+          const newUrl = replacePathSiteId(processedUrl, numericSiteId);
+          request.raw.url = newUrl;
+          processedUrl = newUrl;
+          resolvedSiteId = String(numericSiteId);
+          // Also update the parsed params since Fastify has already parsed them
+          const params = request.params as Record<string, string>;
+          if (params && "site" in params) {
+            params.site = resolvedSiteId;
+          }
+        } else {
+          // String ID not found in database
+          return reply.status(404).send({ error: "Site not found" });
         }
-      } else {
-        // String ID not found in database
-        return reply.status(404).send({ error: "Site not found" });
       }
 
       // Check all access methods: direct access, public site, or valid private key
