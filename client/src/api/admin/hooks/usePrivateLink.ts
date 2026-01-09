@@ -5,7 +5,6 @@ import {
   revokePrivateLinkKey,
 } from "../endpoints";
 
-// Get API config
 export const useGetPrivateLinkConfig = (siteId: number) => {
   return useQuery({
     queryKey: ["privateLinkConfig", siteId],
@@ -17,7 +16,6 @@ export const useGetPrivateLinkConfig = (siteId: number) => {
   });
 };
 
-// Generate private link key
 export const useGeneratePrivateLinkKey = () => {
   const queryClient = useQueryClient();
 
@@ -32,7 +30,6 @@ export const useGeneratePrivateLinkKey = () => {
   });
 };
 
-// Revoke private link key
 export const useRevokePrivateLinkKey = () => {
   const queryClient = useQueryClient();
 

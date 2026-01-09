@@ -234,7 +234,6 @@ export function UsersTable({
         </TableBody>
       </Table>
 
-      {/* Add to Organization Dialog */}
       {selectedUser && (
         <AddToOrganizationDialog
           userEmail={selectedUser.email}
@@ -244,7 +243,6 @@ export function UsersTable({
         />
       )}
 
-      {/* Remove from Organization Confirmation */}
       <AlertDialog open={showRemoveConfirmDialog} onOpenChange={setShowRemoveConfirmDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>

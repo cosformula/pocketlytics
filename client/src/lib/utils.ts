@@ -75,14 +75,12 @@ const languageNamesInEnglish = new Intl.DisplayNames(["en"], {
 
 export const getLanguageName = (languageCode: string) => {
   try {
-    // Handle codes like "en-US" that have both language and region
     if (languageCode.includes("-")) {
       const [language, region] = languageCode.split("-");
       const languageName = languageNamesInEnglish.of(language);
       const regionName = regionNamesInEnglish.of(region);
       return `${languageName} (${regionName})`;
     }
-    // Just a language code
     return languageNamesInEnglish.of(languageCode);
   } catch (error) {
     return languageCode;
@@ -94,16 +92,9 @@ export function normalizeDomain(domain: string): string {
 
   let normalized = domain.trim();
 
-  // Remove protocol (http:// or https://)
   normalized = normalized.replace(/^https?:\/\//, "");
-
-  // Remove www. prefix
   normalized = normalized.replace(/^www\./, "");
-
-  // Remove trailing slash and any path
   normalized = normalized.split("/")[0];
-
-  // Remove trailing dots
   normalized = normalized.replace(/\.+$/, "");
 
   return normalized;

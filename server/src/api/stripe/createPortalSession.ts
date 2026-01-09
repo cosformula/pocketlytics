@@ -26,7 +26,6 @@ export async function createPortalSession(request: FastifyRequest<{ Body: Portal
   }
 
   try {
-    // 1. Verify user has permission to manage billing for this organization
     const memberResult = await db
       .select({
         role: member.role,
@@ -41,7 +40,6 @@ export async function createPortalSession(request: FastifyRequest<{ Body: Portal
       });
     }
 
-    // 2. Find the organization and its Stripe customer ID
     const orgResult = await db
       .select({
         stripeCustomerId: organization.stripeCustomerId,
@@ -56,16 +54,13 @@ export async function createPortalSession(request: FastifyRequest<{ Body: Portal
       return reply.status(404).send({ error: "Organization or Stripe customer ID not found" });
     }
 
-    // 3. Create a Stripe Billing Portal Session, with optional direct flow
     const sessionConfig: Stripe.BillingPortal.SessionCreateParams = {
       customer: org.stripeCustomerId,
-      return_url: returnUrl, // The user will be redirected here after managing their billing
+      return_url: returnUrl,
     };
 
-    // If a specific flow is requested, add it to the configuration
     if (flowType) {
       if (flowType === "subscription_update") {
-        // For subscription_update flow, we need to fetch the subscription ID first
         const subscriptions = await (stripe as Stripe).subscriptions.list({
           customer: org.stripeCustomerId,
           status: "active",
@@ -85,7 +80,6 @@ export async function createPortalSession(request: FastifyRequest<{ Body: Portal
           },
         };
       } else if (flowType === "subscription_cancel") {
-        // For subscription_cancel flow, we need to fetch the subscription ID first
         const subscriptions = await (stripe as Stripe).subscriptions.list({
           customer: org.stripeCustomerId,
           status: "active",
@@ -113,7 +107,6 @@ export async function createPortalSession(request: FastifyRequest<{ Body: Portal
 
     const portalSession = await (stripe as Stripe).billingPortal.sessions.create(sessionConfig);
 
-    // 4. Return the Billing Portal Session URL
     return reply.send({ portalUrl: portalSession.url });
   } catch (error: any) {
     console.error("Stripe Portal Session Error:", error);

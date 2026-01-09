@@ -134,5 +134,4 @@ class PageviewQueue {
   }
 }
 
-// Create singleton instance
 export const pageviewQueue = new PageviewQueue();

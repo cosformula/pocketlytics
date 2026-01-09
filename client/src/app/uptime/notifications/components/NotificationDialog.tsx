@@ -255,7 +255,6 @@ export function NotificationDialog() {
             </div>
           )}
 
-          {/* Monitor Selection */}
           <div className="space-y-2">
             <Label>Monitors</Label>
             <MultiSelect

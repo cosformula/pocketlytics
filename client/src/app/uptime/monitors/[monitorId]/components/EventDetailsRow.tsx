@@ -12,14 +12,12 @@ export function EventDetailsRow({ event }: EventDetailsRowProps) {
   return (
     <div className="bg-neutral-900 border-t border-neutral-800 p-6">
       <div className="space-y-6">
-        {/* Timing Waterfall */}
         {event.monitor_type === "http" && (
           <div className="mb-6">
             <TimingWaterfall event={event} />
           </div>
         )}
 
-        {/* Error Message */}
         {event.error_message && (
           <div>
             <h4 className="text-sm font-medium text-red-500 mb-2">Error Message</h4>
@@ -29,7 +27,6 @@ export function EventDetailsRow({ event }: EventDetailsRowProps) {
           </div>
         )}
 
-        {/* Headers Table */}
         {event.response_headers && Object.keys(event.response_headers).length > 0 && (
           <div>
             <h4 className="text-sm font-medium mb-2">Response Headers</h4>

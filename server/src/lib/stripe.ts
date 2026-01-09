@@ -7,6 +7,6 @@ const secretKey = process.env.STRIPE_SECRET_KEY;
 
 export const stripe = secretKey
   ? new Stripe(secretKey, {
-      typescript: true, // Enable TypeScript support
+      typescript: true,
     })
   : null;

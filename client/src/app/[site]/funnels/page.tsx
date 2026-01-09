@@ -21,7 +21,6 @@ const FunnelRowSkeleton = () => (
     <div className="flex items-center justify-between py-2 px-5 animate-pulse">
       <div className="flex items-center grow">
         <div className="mt-1 text-xs flex flex-col gap-3 w-full">
-          {/* Funnel name and steps skeleton */}
           <div className="flex flex-wrap gap-1 items-center">
             <div className="h-5 bg-neutral-100 dark:bg-neutral-800 rounded w-32 mb-1"></div>
             <div className="flex items-center">

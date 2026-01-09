@@ -3,7 +3,6 @@ import { FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod";
 import { siteConfig } from "../../lib/siteConfig.js";
 
-// Schema for updating API configuration
 const updatePrivateLinkConfigSchema = z.object({
   action: z.enum(["generate_private_link_key", "revoke_private_link_key"]),
 });
@@ -17,7 +16,6 @@ export async function updateSitePrivateLinkConfig(request: FastifyRequest, reply
       return reply.status(400).send({ success: false, error: "Invalid site ID" });
     }
 
-    // Validate request body
     const validationResult = updatePrivateLinkConfigSchema.safeParse(request.body);
     if (!validationResult.success) {
       return reply.status(400).send({
@@ -42,7 +40,6 @@ export async function updateSitePrivateLinkConfig(request: FastifyRequest, reply
         break;
     }
 
-    // Update the site config cache
     if (action === "generate_private_link_key" || action === "revoke_private_link_key") {
       siteConfig.updateConfig(parsedSiteId, { privateLinkKey: updateData.privateLinkKey });
     }

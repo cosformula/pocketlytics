@@ -69,14 +69,10 @@ export async function getSession(req: FastifyRequest<GetSessionRequest>, res: Fa
   const offset = req.query.offset ? parseInt(req.query.offset) : 0;
   const minutes = req.query.minutes ? parseInt(req.query.minutes) : undefined;
 
-  // Add time filter if minutes is provided
   const timeFilter = minutes ? `timestamp > now() - interval ${minutes} minute` : "";
-
-  // Add the WHERE clause connector if timeFilter exists
   const timeFilterWithConnector = timeFilter ? `AND ${timeFilter}` : "";
 
   try {
-    // 1. First query: Get session data derived from events
     const sessionQuery = `
 SELECT
     session_id,
@@ -111,7 +107,6 @@ GROUP BY session_id
 LIMIT 1
     `;
 
-    // 2. Query to get total count of pageviews
     const countQuery = `
 SELECT
     COUNT(*) as total
@@ -123,7 +118,6 @@ WHERE
     ${timeFilterWithConnector}
     `;
 
-    // 3. Query to get paginated pageviews
     const eventsQuery = `
 SELECT
     timestamp,
@@ -146,7 +140,6 @@ LIMIT {limit:Int32}
 OFFSET {offset:Int32}
     `;
 
-    // Execute queries in parallel
     const [sessionResultSettled, countResultSettled, eventsResultSettled] = await Promise.allSettled([
       clickhouse.query({
         query: sessionQuery,
@@ -176,7 +169,6 @@ OFFSET {offset:Int32}
       }),
     ]);
 
-    // Check if queries were successful
     if (sessionResultSettled.status === "rejected") {
       throw sessionResultSettled.reason;
     }
@@ -199,7 +191,6 @@ OFFSET {offset:Int32}
       return res.status(404).send({ error: "Session not found" });
     }
 
-    // Combine results
     const response: SessionPageviewsAndEvents = {
       session: sessionData[0],
       events: eventsData,

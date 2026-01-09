@@ -72,7 +72,6 @@ export function ReplayPlayerTopbar() {
   return (
     <div className="border border-neutral-100 dark:border-neutral-800 bg-white dark:bg-neutral-900 px-2 py-2 rounded-t-lg overflow-hidden">
       <div className="flex items-center justify-between min-w-0">
-        {/* Left side: Page path with external link */}
         <Link
           className="text-xs text-neutral-700 dark:text-neutral-300 truncate flex-1 min-w-0 flex items-center hover:underline"
           href={pageUrl}
@@ -82,7 +81,6 @@ export function ReplayPlayerTopbar() {
           {getDisplayPath(pageUrl)}
         </Link>
 
-        {/* Right side: Screen dimensions */}
         <div className="flex items-center gap-2 text-xs text-neutral-600 dark:text-neutral-400 shrink-0 ml-2">
           <CountryFlagTooltipIcon
             country={metadata.country}

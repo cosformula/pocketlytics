@@ -119,7 +119,6 @@ export async function getOverrideSubscription(organizationId: string): Promise<O
       return null;
     }
 
-    // Check if it's an AppSumo tier override (e.g., "appsumo-1", "appsumo-2", "appsumo-3")
     const appsumoMatch = org.planOverride.match(/^appsumo-([123])$/);
     if (appsumoMatch) {
       const tier = appsumoMatch[1] as keyof typeof APPSUMO_TIER_LIMITS;
@@ -129,7 +128,7 @@ export async function getOverrideSubscription(organizationId: string): Promise<O
         source: "override",
         planName: org.planOverride,
         eventLimit,
-        replayLimit: 0, // AppSumo doesn't include replays
+        replayLimit: 0,
         periodStart: getStartOfMonth(),
         status: "active",
         interval: "lifetime",
@@ -138,7 +137,6 @@ export async function getOverrideSubscription(organizationId: string): Promise<O
       };
     }
 
-    // Look up plan details from the plan name (Stripe plans)
     const planDetails = getStripePrices().find((plan: StripePlan) => plan.name === org.planOverride);
 
     if (!planDetails) {
@@ -193,12 +191,10 @@ export async function getStripeSubscription(stripeCustomerId: string | null): Pr
       return null;
     }
 
-    // Find corresponding plan details from constants
     const planDetails = getStripePrices().find((plan: StripePlan) => plan.priceId === priceId);
 
     if (!planDetails) {
       console.error("Plan details not found for price ID:", priceId);
-      // Return basic info even without plan details
       return {
         source: "stripe",
         subscriptionId: subscription.id,
@@ -215,11 +211,9 @@ export async function getStripeSubscription(stripeCustomerId: string | null): Pr
       };
     }
 
-    // Determine period start
     const currentMonthStart = DateTime.now().startOf("month");
     const subscriptionStartDate = DateTime.fromSeconds(subscriptionItem.current_period_start);
 
-    // If subscription started within current month, use that date; otherwise use month start
     const periodStart =
       subscriptionStartDate >= currentMonthStart ? (subscriptionStartDate.toISODate() as string) : getStartOfMonth();
 
@@ -252,19 +246,16 @@ export async function getBestSubscription(
   organizationId: string,
   stripeCustomerId: string | null
 ): Promise<SubscriptionInfo> {
-  // Check override first - always wins
   const overrideSub = await getOverrideSubscription(organizationId);
   if (overrideSub) {
     return overrideSub;
   }
 
-  // Get both subscription types
   const [appsumoSub, stripeSub] = await Promise.all([
     getAppSumoSubscription(organizationId),
     getStripeSubscription(stripeCustomerId),
   ]);
 
-  // If we have both, return the one with higher event limit
   if (appsumoSub && stripeSub) {
     const bestSub = appsumoSub.eventLimit >= stripeSub.eventLimit ? appsumoSub : stripeSub;
     logger.info(
@@ -273,11 +264,9 @@ export async function getBestSubscription(
     return bestSub;
   }
 
-  // Return whichever one exists
   if (appsumoSub) return appsumoSub;
   if (stripeSub) return stripeSub;
 
-  // Default to free tier
   return {
     source: "free",
     eventLimit: DEFAULT_EVENT_LIMIT,

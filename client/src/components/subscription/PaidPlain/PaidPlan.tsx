@@ -19,10 +19,7 @@ export function PaidPlan() {
 
   const { data: activeOrg } = authClient.useActiveOrganization();
 
-  // Get the active organization ID
   const organizationId = activeOrg?.id;
-
-  // Get last 30 days of data for the chart
   const endDate = DateTime.now().toISODate();
   const startDate = DateTime.now().minus({ days: 30 }).toISODate();
 

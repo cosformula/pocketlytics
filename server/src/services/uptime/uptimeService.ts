@@ -129,5 +129,4 @@ class UptimeService {
   }
 }
 
-// Export singleton instance
 export const uptimeService = new UptimeService();

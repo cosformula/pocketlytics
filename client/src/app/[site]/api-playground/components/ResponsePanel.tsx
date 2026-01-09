@@ -111,10 +111,8 @@ export function ResponsePanel() {
 
   return (
     <div className="h-full overflow-y-auto overflow-x-hidden p-4 space-y-4 min-w-0">
-      {/* Code Examples */}
       <CodeExamples config={codeConfig} />
 
-      {/* Response */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <h3 className="text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">

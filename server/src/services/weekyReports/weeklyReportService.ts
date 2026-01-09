@@ -456,5 +456,4 @@ class WeeklyReportService {
   }
 }
 
-// Create a singleton instance
 export const weeklyReportService = new WeeklyReportService();

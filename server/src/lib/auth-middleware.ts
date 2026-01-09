@@ -45,7 +45,6 @@ export const requireAuth: AuthMiddleware = async (request, reply) => {
     return;
   }
 
-  // API key provides access but doesn't populate request.user
   const apiKeyResult = await checkApiKey(request, {});
   if (apiKeyResult.valid) {
     return;
@@ -75,13 +74,11 @@ export const requireSiteAccess: AuthMiddleware = async (request, reply) => {
     return reply.status(400).send({ error: "Site ID required" });
   }
 
-  // Check API key first (doesn't populate request.user)
   const apiKeyResult = await checkApiKey(request, { siteId });
   if (apiKeyResult.valid) {
     return;
   }
 
-  // Check session-based access
   const hasAccess = await getUserHasAccessToSite(request, siteId);
   if (!hasAccess) {
     return reply.status(403).send({ error: "Forbidden" });
@@ -100,13 +97,11 @@ export const requireSiteAdminAccess: AuthMiddleware = async (request, reply) => 
     return reply.status(400).send({ error: "Site ID required" });
   }
 
-  // Check API key with admin/owner role first (doesn't populate request.user)
   const apiKeyResult = await checkApiKey(request, { siteId });
   if (apiKeyResult.valid && (apiKeyResult.role === "admin" || apiKeyResult.role === "owner")) {
     return;
   }
 
-  // Check session-based admin access
   const hasAdminAccess = await getUserHasAdminAccessToSite(request, siteId);
   if (!hasAdminAccess) {
     return reply.status(403).send({ error: "Forbidden" });
@@ -178,19 +173,16 @@ export const requireOrgAdminFromParams: AuthMiddleware = async (request, reply) 
     return reply.status(400).send({ error: "Organization ID required in path" });
   }
 
-  // Check API key first - must have admin/owner role
   const apiKeyResult = await checkApiKey(request, { organizationId });
   if (apiKeyResult.valid && (apiKeyResult.role === "admin" || apiKeyResult.role === "owner")) {
     return;
   }
 
-  // Check session-based access - must be admin/owner of org
   const session = await getSessionFromReq(request);
   if (!session?.user?.id) {
     return reply.status(401).send({ error: "Unauthorized" });
   }
 
-  // Check org membership and role
   const member = await db.query.member.findFirst({
     where: (member, { and, eq }) => and(eq(member.userId, session.user.id), eq(member.organizationId, organizationId)),
   });

@@ -15,7 +15,6 @@ export async function getSitePrivateLinkConfig(
       return reply.status(400).send({ success: false, error: "Invalid site ID" });
     }
 
-    // Get site data
     const site = await db
       .select({
         privateLinkKey: sites.privateLinkKey,

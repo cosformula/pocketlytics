@@ -14,7 +14,6 @@ export const hour12 = resolved.hourCycle === "h12";
 // Detect user's timezone (not exported but used internally)
 export const timeZone = Intl.DateTimeFormat(userLocale).resolvedOptions().timeZone;
 
-// Set default locale for Luxon globally
 Settings.defaultLocale = userLocale;
 
 /**
@@ -219,7 +218,6 @@ export const timezones = [
   { value: "Pacific/Auckland", label: "GMT+12 Pacific/Auckland" },
 ];
 
-// Get timezone label for display
 export const getTimezoneLabel = (value: string): string => {
   if (value === "system") {
     return `System (${timeZone})`;

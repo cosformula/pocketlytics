@@ -203,7 +203,6 @@ export default function RetentionPage() {
   return (
     <DisabledOverlay message="Retention" featurePath="retention">
       <div className="p-2 md:p-4 max-w-[1300px] mx-auto flex flex-col gap-3">
-        {/* Single Card containing both chart and grid */}
         <FilterControls />
         <Card className="overflow-visible">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -230,7 +229,6 @@ export default function RetentionPage() {
                       gridTemplateColumns: `minmax(120px, auto) repeat(${data.maxPeriods + 1}, minmax(80px, auto))`,
                     }}
                   >
-                    {/* Header Row */}
                     <div className="p-2 text-sm font-semibold bg-white dark:bg-neutral-900 text-neutral-600 dark:text-neutral-100 text-center sticky left-0 z-10 border-b border-r border-neutral-50 dark:border-neutral-700">
                       Cohort
                     </div>
@@ -243,10 +241,8 @@ export default function RetentionPage() {
                       </div>
                     ))}
 
-                    {/* Data Rows */}
                     {cohortKeys.map(cohortPeriod => (
                       <Fragment key={cohortPeriod}>
-                        {/* Cohort Info Cell */}
                         <div className="py-2 px-2 bg-white dark:bg-neutral-900 text-sm sticky left-0 z-10 border-r border-neutral-50 dark:border-neutral-800">
                           <div className="whitespace-nowrap text-neutral-700 dark:text-neutral-100">
                             {formatDate(cohortPeriod)}
@@ -255,7 +251,6 @@ export default function RetentionPage() {
                             {data.cohorts[cohortPeriod].size.toLocaleString()} users
                           </div>
                         </div>
-                        {/* Retention Cells */}
                         {data.cohorts[cohortPeriod].percentages.map((percentage: number | null, index: number) => {
                           const { backgroundColor, textColor } = getRetentionColor(percentage, isDark);
                           return (

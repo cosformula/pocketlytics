@@ -7,7 +7,6 @@ interface TrialUsageStatsProps {
   projectedMonthlyUsage: number;
 }
 
-// Calculate days elapsed since a date
 export function daysElapsed(startDate: string): number {
   const start = new Date(startDate);
   const now = new Date();
@@ -15,7 +14,6 @@ export function daysElapsed(startDate: string): number {
   return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 }
 
-// Extrapolate monthly usage based on current usage and days elapsed
 export function extrapolateMonthlyUsage(eventCount: number, daysElapsed: number): number {
   if (daysElapsed <= 0) return eventCount;
   const dailyRate = eventCount / daysElapsed;

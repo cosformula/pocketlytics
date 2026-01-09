@@ -28,7 +28,6 @@ export async function updateSubscription(
   }
 
   try {
-    // 1. Verify user has permission to manage billing for this organization
     const memberResult = await db
       .select({
         role: member.role,
@@ -43,7 +42,6 @@ export async function updateSubscription(
       });
     }
 
-    // 2. Find the organization and its Stripe customer ID
     const orgResult = await db
       .select({
         stripeCustomerId: organization.stripeCustomerId,
@@ -58,7 +56,6 @@ export async function updateSubscription(
       return reply.status(404).send({ error: "Organization or Stripe customer ID not found" });
     }
 
-    // 3. Get the active subscription
     const subscriptions = await (stripe as Stripe).subscriptions.list({
       customer: org.stripeCustomerId,
       status: "active",
@@ -72,15 +69,12 @@ export async function updateSubscription(
     const subscription = subscriptions.data[0];
     const subscriptionItem = subscription.items.data[0];
 
-    // 4. Validate the new price exists
     try {
       await (stripe as Stripe).prices.retrieve(newPriceId);
     } catch (error) {
       return reply.status(400).send({ error: "Invalid price ID" });
     }
 
-    // 5. Update the subscription with the new price
-    // Using always_invoice to charge immediately for the proration
     const updatedSubscription = await (stripe as Stripe).subscriptions.update(subscription.id, {
       items: [
         {
@@ -88,14 +82,12 @@ export async function updateSubscription(
           price: newPriceId,
         },
       ],
-      proration_behavior: "always_invoice", // Immediately invoice the proration amount
+      proration_behavior: "always_invoice",
     });
 
-    // Get the updated subscription details
     const updatedSubscriptionDetails = await (stripe as Stripe).subscriptions.retrieve(updatedSubscription.id);
     const updatedItem = updatedSubscriptionDetails.items.data[0];
 
-    // 6. Return success response
     return reply.send({
       success: true,
       subscription: {

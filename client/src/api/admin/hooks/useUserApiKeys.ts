@@ -8,7 +8,6 @@ import {
   CreateApiKeyRequest,
 } from "../endpoints";
 
-// List all API keys for the current user
 export const useListApiKeys = () => {
   return useQuery<ApiKey[]>({
     queryKey: ["userApiKeys"],
@@ -19,7 +18,6 @@ export const useListApiKeys = () => {
   });
 };
 
-// Create a new API key
 export const useCreateApiKey = () => {
   const queryClient = useQueryClient();
 
@@ -33,13 +31,11 @@ export const useCreateApiKey = () => {
       }
     },
     onSuccess: () => {
-      // Invalidate the list to refresh
       queryClient.invalidateQueries({ queryKey: ["userApiKeys"] });
     },
   });
 };
 
-// Delete an API key
 export const useDeleteApiKey = () => {
   const queryClient = useQueryClient();
 
@@ -53,7 +49,6 @@ export const useDeleteApiKey = () => {
       }
     },
     onSuccess: () => {
-      // Invalidate the list to refresh
       queryClient.invalidateQueries({ queryKey: ["userApiKeys"] });
     },
   });

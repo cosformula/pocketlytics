@@ -39,7 +39,7 @@ export async function getIsUserAdmin(req: FastifyRequest) {
 const sitesAccessCache = new NodeCache({
   stdTTL: 15,
   checkperiod: 30,
-  useClones: false, // Don't clone objects for better performance with promises
+  useClones: false,
 });
 
 export async function getSitesUserHasAccessTo(req: FastifyRequest, adminOnly = false) {
@@ -51,16 +51,13 @@ export async function getSitesUserHasAccessTo(req: FastifyRequest, adminOnly = f
     return [];
   }
 
-  // Create cache key
   const cacheKey = `${userId}:${adminOnly}`;
 
-  // Check if we have a cached promise
   const cached = sitesAccessCache.get<Promise<any[]>>(cacheKey);
   if (cached) {
     return cached;
   }
 
-  // Create new promise and cache it
   const promise = (async () => {
     try {
       const [isAdmin, memberRecords] = await Promise.all([
@@ -85,40 +82,27 @@ export async function getSitesUserHasAccessTo(req: FastifyRequest, adminOnly = f
         return [];
       }
 
-      // Separate members by access type
-      // 1. Admin/owner members - full access to their orgs
-      // 2. Unrestricted members - full access to their orgs
-      // 3. Restricted members - only access to specific sites via member_site_access
       const fullAccessOrgIds: string[] = [];
       const restrictedMemberIds: string[] = [];
 
       for (const record of memberRecords) {
-        // If adminOnly is true, skip members with "member" role
         if (adminOnly && record.role === "member") {
           continue;
         }
 
-        // Admin/owner roles always have full access
         if (record.role === "admin" || record.role === "owner") {
           fullAccessOrgIds.push(record.organizationId);
-        }
-        // Member role with hasRestrictedSiteAccess = true - only specific sites
-        else if (record.role === "member" && record.hasRestrictedSiteAccess) {
+        } else if (record.role === "member" && record.hasRestrictedSiteAccess) {
           restrictedMemberIds.push(record.id);
-        }
-        // Member role with hasRestrictedSiteAccess = false - full org access
-        else {
+        } else {
           fullAccessOrgIds.push(record.organizationId);
         }
       }
 
-      // Fetch sites in parallel
       const [orgSites, restrictedSites] = await Promise.all([
-        // Get all sites from orgs with full access
         fullAccessOrgIds.length > 0
           ? db.select().from(sites).where(inArray(sites.organizationId, fullAccessOrgIds))
           : Promise.resolve([]),
-        // Get specific sites for restricted members
         restrictedMemberIds.length > 0
           ? (async () => {
               const siteAccess = await db
@@ -132,7 +116,6 @@ export async function getSitesUserHasAccessTo(req: FastifyRequest, adminOnly = f
           : Promise.resolve([]),
       ]);
 
-      // Combine and dedupe by siteId
       const siteMap = new Map<number, (typeof orgSites)[0]>();
       for (const site of orgSites) {
         siteMap.set(site.siteId, site);
@@ -146,27 +129,22 @@ export async function getSitesUserHasAccessTo(req: FastifyRequest, adminOnly = f
       return Array.from(siteMap.values());
     } catch (error) {
       console.error("Error getting sites user has access to:", error);
-      // Remove from cache on error so it can be retried
       sitesAccessCache.del(cacheKey);
       return [];
     }
   })();
 
-  // Cache the promise
   sitesAccessCache.set(cacheKey, promise);
 
   return promise;
 }
 
-// Cache invalidation helper - call this when member site access changes
 export function invalidateSitesAccessCache(userId: string) {
   sitesAccessCache.del(`${userId}:true`);
   sitesAccessCache.del(`${userId}:false`);
 }
 
 export async function checkApiKey(req: FastifyRequest, options: { organizationId?: string; siteId?: string | number }) {
-  // Check if a valid API key was provided
-  // Priority: 1. Authorization: Bearer header (recommended), 2. Query parameter (testing only)
   const authHeader = req.headers["authorization"];
   const bearerToken =
     authHeader && typeof authHeader === "string" && authHeader.startsWith("Bearer ") ? authHeader.substring(7) : null;
@@ -176,20 +154,16 @@ export async function checkApiKey(req: FastifyRequest, options: { organizationId
 
   if (apiKey && typeof apiKey === "string") {
     try {
-      // Verify the API key using Better Auth
       const result = await auth.api.verifyApiKey({
         body: { key: apiKey },
       });
 
       if (result.valid && result.key) {
-        // Get the userId from the API key
         const apiKeyUserId = result.key.userId;
 
-        // Determine the organization ID - either directly provided or looked up from site
         let organizationId = options.organizationId;
 
         if (!organizationId && options.siteId) {
-          // Get the site's organization
           const siteRecords = await db
             .select({
               organizationId: sites.organizationId,
@@ -204,7 +178,6 @@ export async function checkApiKey(req: FastifyRequest, options: { organizationId
         }
 
         if (organizationId) {
-          // Check if the API key's user is a member of the organization
           const userMembership = await db
             .select()
             .from(member)
@@ -219,20 +192,17 @@ export async function checkApiKey(req: FastifyRequest, options: { organizationId
       }
     } catch (error) {
       logger.error(error, "Error verifying API key");
-      // Continue to return false if API key verification fails
     }
   }
   return { valid: false, role: null };
 }
 
 export async function getUserIdFromRequest(req: FastifyRequest): Promise<string | null> {
-  // First, check for session-based auth
   const session = await getSessionFromReq(req);
   if (session?.user?.id) {
     return session.user.id;
   }
 
-  // Fall back to API key auth
   const authHeader = req.headers["authorization"];
   const bearerToken =
     authHeader && typeof authHeader === "string" && authHeader.startsWith("Bearer ") ? authHeader.substring(7) : null;
@@ -255,22 +225,18 @@ export async function getUserIdFromRequest(req: FastifyRequest): Promise<string 
   return null;
 }
 
-// for routes that are potentially public
 export async function getUserHasAccessToSitePublic(req: FastifyRequest, siteId: string | number) {
   const [userSites, config] = await Promise.all([getSitesUserHasAccessTo(req), siteConfig.getConfig(siteId)]);
 
-  // Check if user has direct access to the site
   const hasDirectAccess = userSites.some(site => site.siteId === Number(siteId));
   if (hasDirectAccess) {
     return true;
   }
 
-  // Check if site is public
   if (config?.public) {
     return true;
   }
 
-  // Check if a valid private key was provided in the header
   const privateKey = req.headers["x-private-key"];
   if (privateKey && typeof privateKey === "string" && config?.privateLinkKey === privateKey) {
     return true;
@@ -301,7 +267,6 @@ export async function getUserIsInOrg(req: FastifyRequest, organizationId: string
     return false;
   }
 
-  // Check if user is a member of this organization
   const userMembership = await db.query.member.findFirst({
     where: and(eq(member.userId, session.user.id), eq(member.organizationId, organizationId)),
   });

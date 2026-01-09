@@ -86,7 +86,6 @@ export function PageListItem({ pageData, isLoading = false }: PageListItemProps)
     <Card className="w-full mb-3" onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)}>
       <CardContent className="p-3">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center w-full gap-4">
-          {/* Left side: Page title/path with thumbnail */}
           <div className="flex gap-3 flex-1 min-w-0">
             {thumbnailUrl && !isLoadingMetadata && (
               <div className="hidden sm:block shrink-0 h-12 w-16 relative rounded-md overflow-hidden border border-neutral-100 dark:border-neutral-800">
@@ -119,9 +118,7 @@ export function PageListItem({ pageData, isLoading = false }: PageListItemProps)
             </div>
           </div>
 
-          {/* Right side: Sparkline chart and session count */}
           <div className="flex items-center gap-0 w-full md:w-auto">
-            {/* Sparkline chart */}
             <div className="h-12 w-40">
               <PageSparklineChart
                 data={pageTrafficData}
@@ -131,7 +128,6 @@ export function PageListItem({ pageData, isLoading = false }: PageListItemProps)
               />
             </div>
 
-            {/* Session count and duration */}
             <div className="text-right min-w-[120px]">
               <div>
                 <span className="text-base font-semibold">{pageData.count.toLocaleString()}</span>

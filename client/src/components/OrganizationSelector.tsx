@@ -8,10 +8,8 @@ export function OrganizationSelector() {
   const { data: organizations, isLoading: isLoadingOrganizations } = useUserOrganizations();
   const { data: activeOrganization, isPending } = authClient.useActiveOrganization();
 
-  // Local state to handle the delay when switching organizations
   const [selectedOrgId, setSelectedOrgId] = useState<string | null>(null);
 
-  // Update local state when activeOrganization changes
   useEffect(() => {
     if (activeOrganization?.id) {
       setSelectedOrgId(activeOrganization.id);
@@ -19,9 +17,7 @@ export function OrganizationSelector() {
   }, [activeOrganization?.id]);
 
   const handleValueChange = (organizationId: string) => {
-    // Update local state immediately for responsive UI
     setSelectedOrgId(organizationId);
-    // Then update the actual active organization
     authClient.organization.setActive({
       organizationId,
     });
@@ -37,7 +33,6 @@ export function OrganizationSelector() {
     );
   }
 
-  // Show placeholder when loading or no active organization
   if (isPending || !activeOrganization) {
     return (
       <Select disabled>

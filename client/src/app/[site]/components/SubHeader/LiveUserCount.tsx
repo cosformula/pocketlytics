@@ -96,7 +96,6 @@ export function LiveUserCount() {
                 {sessions.map((session, index) => (
                   <SessionCard key={`${session.session_id}-${index}`} session={session} />
                 ))}
-                {/* Infinite scroll sentinel */}
                 <div ref={ref} className="space-y-3">
                   {isFetchingNextPage && <SessionCardSkeleton count={3} />}
                 </div>

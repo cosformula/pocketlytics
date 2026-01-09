@@ -131,7 +131,6 @@ function SiteSelectorContent({ onSiteSelect }: { onSiteSelect: () => void }) {
             ))}
       </div>
 
-      {/* Add Site Section */}
       <div className="mt-2">
         <AddSite
           trigger={

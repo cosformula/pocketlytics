@@ -43,10 +43,8 @@ export function ReplayPlayerOverlay({ onPlayPause, isPlaying }: ReplayPlayerOver
 
   return (
     <>
-      {/* Clickable overlay for play/pause */}
       <div className="absolute inset-0 cursor-pointer" onClick={handlePlayPauseWithOverlay} />
 
-      {/* Play/Pause Overlay Animation */}
       {showPlayPauseOverlay && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <div className="bg-black/60 rounded-full p-6 animate-in fade-in zoom-in-50 duration-200">

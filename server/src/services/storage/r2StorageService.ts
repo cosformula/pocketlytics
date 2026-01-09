@@ -203,5 +203,4 @@ class R2StorageService {
   }
 }
 
-// Singleton instance
 export const r2Storage = new R2StorageService();

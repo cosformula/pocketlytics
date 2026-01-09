@@ -17,7 +17,6 @@ interface AdvancedTabProps {
 export function AdvancedTab({ form, monitorType }: AdvancedTabProps) {
   return (
     <div className="space-y-4">
-      {/* Monitor Name */}
       <FormField
         control={form.control}
         name="name"

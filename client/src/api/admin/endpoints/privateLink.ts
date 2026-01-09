@@ -8,7 +8,6 @@ export interface UpdatePrivateLinkConfigResponse {
   privateLinkKey: string | null;
 }
 
-// Get private link config
 export function getPrivateLinkConfig(siteId: number) {
   return authedFetch<{
     success: boolean;
@@ -16,7 +15,6 @@ export function getPrivateLinkConfig(siteId: number) {
   }>(`/sites/${siteId}/private-link-config`);
 }
 
-// Generate private link key
 export function generatePrivateLinkKey(siteId: number) {
   return authedFetch<{
     success: boolean;
@@ -31,7 +29,6 @@ export function generatePrivateLinkKey(siteId: number) {
   );
 }
 
-// Revoke private link key
 export function revokePrivateLinkKey(siteId: number) {
   return authedFetch<{
     success: boolean;

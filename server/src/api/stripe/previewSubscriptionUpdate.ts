@@ -28,7 +28,6 @@ export async function previewSubscriptionUpdate(
   }
 
   try {
-    // 1. Verify user has permission to manage billing for this organization
     const memberResult = await db
       .select({
         role: member.role,
@@ -43,7 +42,6 @@ export async function previewSubscriptionUpdate(
       });
     }
 
-    // 2. Find the organization and its Stripe customer ID
     const orgResult = await db
       .select({
         stripeCustomerId: organization.stripeCustomerId,
@@ -58,7 +56,6 @@ export async function previewSubscriptionUpdate(
       return reply.status(404).send({ error: "Organization or Stripe customer ID not found" });
     }
 
-    // 3. Get the active subscription
     const subscriptions = await stripe!.subscriptions.list({
       customer: org.stripeCustomerId,
       status: "active",
@@ -73,13 +70,11 @@ export async function previewSubscriptionUpdate(
     const currentItem = subscription.items.data[0];
     const currentPeriodEnd = currentItem.current_period_end;
 
-    // 4. Get price details for both current and new prices
     const [currentPrice, newPrice] = await Promise.all([
       stripe!.prices.retrieve(currentItem.price.id),
       stripe!.prices.retrieve(newPriceId),
     ]);
 
-    // 5. Create a preview of the upcoming invoice with proration
     const upcomingInvoice = await (stripe as Stripe).invoices.createPreview({
       customer: org.stripeCustomerId,
       subscription: subscription.id,
@@ -94,9 +89,7 @@ export async function previewSubscriptionUpdate(
       },
     });
 
-    // 6. Calculate proration details
     const prorationItems = upcomingInvoice.lines.data.filter(item => {
-      // Proration flag is nested in parent.subscription_item_details
       return item.parent?.subscription_item_details?.proration === true;
     });
 
@@ -113,7 +106,6 @@ export async function previewSubscriptionUpdate(
 
     const immediateCharge = upcomingInvoice.amount_due;
 
-    // 7. Return preview information
     return reply.send({
       success: true,
       preview: {
@@ -128,7 +120,7 @@ export async function previewSubscriptionUpdate(
           interval: newPrice.recurring?.interval || "month",
         },
         proration: {
-          credit: proratedCredit / 100, // Convert from cents to dollars
+          credit: proratedCredit / 100,
           charge: proratedCharge / 100,
           immediatePayment: immediateCharge / 100,
           nextBillingDate: currentPeriodEnd ? new Date(currentPeriodEnd * 1000).toISOString() : null,

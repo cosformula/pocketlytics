@@ -6,15 +6,12 @@ import { logger } from "../../lib/logger/logger.js";
 
 export const initPostgres = async () => {
   try {
-    // Find the oldest user by createdAt timestamp
     const oldestUser = await db.select().from(user).orderBy(asc(user.createdAt)).limit(1);
 
     if (oldestUser.length > 0) {
-      // Update the oldest user's role to admin
       await db.update(user).set({ role: "admin" }).where(eq(user.id, oldestUser[0].id));
     }
 
-    // Initialize AppSumo tables in cloud environments only
     if (IS_CLOUD) {
       await initializeAppSumoTables();
     }
@@ -30,10 +27,8 @@ export const initPostgres = async () => {
 async function initializeAppSumoTables() {
   logger.info("Initializing AppSumo tables...");
   try {
-    // Create 'appsumo' schema for AppSumo tables
     await db.execute(sql`CREATE SCHEMA IF NOT EXISTS appsumo`);
 
-    // Create appsumo.licenses table
     await db.execute(sql`
       CREATE TABLE IF NOT EXISTS appsumo.licenses (
         id SERIAL PRIMARY KEY NOT NULL,
@@ -49,7 +44,6 @@ async function initializeAppSumoTables() {
       )
     `);
 
-    // Create appsumo.webhook_events table for audit trail
     await db.execute(sql`
       CREATE TABLE IF NOT EXISTS appsumo.webhook_events (
         id SERIAL PRIMARY KEY NOT NULL,

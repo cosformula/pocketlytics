@@ -29,7 +29,6 @@ const HTTP_METHODS = ["GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS", "PATCH"
 export function GeneralTab({ form, monitor, isEdit, monitorType }: GeneralTabProps) {
   return (
     <div className="space-y-4">
-      {/* Monitor Type */}
       {!isEdit ? (
         <FormField
           control={form.control}
@@ -61,7 +60,6 @@ export function GeneralTab({ form, monitor, isEdit, monitorType }: GeneralTabPro
         </div>
       )}
 
-      {/* HTTP Configuration */}
       {monitorType === "http" && (
         <>
           <FormField
@@ -126,7 +124,6 @@ export function GeneralTab({ form, monitor, isEdit, monitorType }: GeneralTabPro
         </>
       )}
 
-      {/* TCP Configuration */}
       {monitorType === "tcp" && (
         <div className="grid grid-cols-2 gap-4">
           <FormField
@@ -164,7 +161,6 @@ export function GeneralTab({ form, monitor, isEdit, monitorType }: GeneralTabPro
         </div>
       )}
 
-      {/* Check Interval */}
       <FormField
         control={form.control}
         name="intervalSeconds"
@@ -194,7 +190,6 @@ export function GeneralTab({ form, monitor, isEdit, monitorType }: GeneralTabPro
         )}
       />
 
-      {/* Enabled Switch */}
       <FormField
         control={form.control}
         name="enabled"

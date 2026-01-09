@@ -90,7 +90,6 @@ export function ReplayCard({ replay }: { replay: SessionReplayListItem }) {
         setSessionId(replay.session_id);
       }}
     >
-      {/* User info row */}
       <div className="flex items-center gap-1.5 mb-1.5">
         <Avatar
           size={16}
@@ -183,18 +182,15 @@ export function ReplayCard({ replay }: { replay: SessionReplayListItem }) {
 export function ReplayCardSkeleton() {
   return (
     <div className="border-b border-neutral-100 dark:border-neutral-800 p-3 hover:bg-neutral-50 dark:hover:bg-neutral-800/80 transition-colors">
-      {/* Time and duration row */}
       <div className="flex items-center gap-2 mb-1">
         <Skeleton className="h-3 w-16" />
         <Skeleton className="h-3 w-12" />
       </div>
 
-      {/* URL row */}
       <div className="mb-2">
         <Skeleton className="h-3 w-40" />
       </div>
 
-      {/* Icons and event count row */}
       <div className="flex items-center gap-2">
         <Skeleton className="h-4 w-4 rounded" />
         <Skeleton className="h-4 w-4 rounded" />

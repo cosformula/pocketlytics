@@ -33,7 +33,6 @@ export async function getSessionReplays(
       filters: filters || "",
     });
 
-    // The replays from ClickHouse use snake_case and enrichWithTraits expects that format
     const replaysWithTraits = await enrichWithTraits(
       replays as unknown as Array<{ identified_user_id: string }>,
       siteId

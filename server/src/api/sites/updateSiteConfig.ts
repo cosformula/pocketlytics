@@ -49,7 +49,6 @@ export async function updateSiteConfig(
   reply: FastifyReply
 ) {
   try {
-    // Get siteId from path params
     const siteId = parseInt(request.params.siteId, 10);
     if (isNaN(siteId) || siteId <= 0) {
       return reply.status(400).send({
@@ -58,7 +57,6 @@ export async function updateSiteConfig(
       });
     }
 
-    // Validate request body
     const validationResult = updateSiteConfigSchema.safeParse(request.body);
     if (!validationResult.success) {
       return reply.status(400).send({
@@ -70,7 +68,6 @@ export async function updateSiteConfig(
 
     const updateData = validationResult.data;
 
-    // Check if site exists
     const site = await db.query.sites.findFirst({
       where: eq(sites.siteId, siteId),
     });
@@ -79,7 +76,6 @@ export async function updateSiteConfig(
       return reply.status(404).send({ error: "Site not found" });
     }
 
-    // Additional validation for excluded IPs if provided
     if (updateData.excludedIPs) {
       const validationErrors: string[] = [];
       for (const ip of updateData.excludedIPs) {
@@ -98,10 +94,8 @@ export async function updateSiteConfig(
       }
     }
 
-    // Build the update object - only include fields that were provided
     const dbUpdateData: any = {};
 
-    // Map the fields that exist in both request and database
     const directMappings = [
       "public",
       "saltUserIds",
@@ -125,7 +119,6 @@ export async function updateSiteConfig(
       }
     }
 
-    // Only proceed if there are fields to update
     if (Object.keys(dbUpdateData).length === 0) {
       return reply.status(400).send({
         success: false,
@@ -133,16 +126,12 @@ export async function updateSiteConfig(
       });
     }
 
-    // Add updatedAt timestamp
     dbUpdateData.updatedAt = new Date().toISOString();
 
-    // Update the database
     await db.update(sites).set(dbUpdateData).where(eq(sites.siteId, siteId));
 
-    // Update the site config cache
     await siteConfig.updateConfig(siteId, updateData);
 
-    // Get the updated configuration to return
     const updatedConfig = await siteConfig.getConfig(siteId);
 
     return reply.status(200).send({
@@ -153,7 +142,6 @@ export async function updateSiteConfig(
   } catch (error) {
     console.error("Error updating site configuration:", error);
 
-    // Check for unique constraint violation on domain
     if (String(error).includes("duplicate key value violates unique constraint")) {
       return reply.status(409).send({
         success: false,

@@ -54,7 +54,6 @@ export async function getUserInfo(
   const numericSiteId = Number(siteId);
 
   try {
-    // Run ClickHouse query and Postgres queries in parallel
     const [queryResult, profileResult, aliasesResult] = await Promise.all([
       clickhouse.query({
         query: `
@@ -123,13 +122,11 @@ export async function getUserInfo(
         },
         format: "JSONEachRow",
       }),
-      // Get user profile traits from Postgres
       db
         .select()
         .from(userProfiles)
         .where(and(eq(userProfiles.siteId, numericSiteId), eq(userProfiles.userId, userId)))
         .limit(1),
-      // Get linked devices (all anonymous IDs for this user) from Postgres
       db
         .select({
           anonymous_id: userAliases.anonymousId,
@@ -141,7 +138,6 @@ export async function getUserInfo(
 
     const data = await processResults<UserPageviewData>(queryResult);
 
-    // If no data found for user
     if (data.length === 0) {
       return res.status(404).send({
         error: "User not found",

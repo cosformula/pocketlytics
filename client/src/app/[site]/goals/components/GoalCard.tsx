@@ -74,7 +74,6 @@ export default function GoalCard({ goal, siteId }: GoalCardProps) {
           className="px-4 py-3 flex items-center mb-1 cursor-pointer hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors"
           onClick={toggleExpansion}
         >
-          {/* Left section - Title and type */}
           <div className="flex-1 pr-4">
             <h3 className="font-medium text-base flex items-center gap-2">
               {goal.goalType === "path" ? (
@@ -116,7 +115,6 @@ export default function GoalCard({ goal, siteId }: GoalCardProps) {
             </div>
           </div>
 
-          {/* Center section - Stats */}
           <div className="flex-1 flex justify-center">
             <div className="grid grid-cols-2 gap-4">
               <div className="text-center">
@@ -130,7 +128,6 @@ export default function GoalCard({ goal, siteId }: GoalCardProps) {
             </div>
           </div>
 
-          {/* Right section - Actions */}
           <div className="flex shrink-0 gap-1 pl-4">
             <div onClick={e => e.stopPropagation()}>
               <GoalFormModal
@@ -200,7 +197,6 @@ export default function GoalCard({ goal, siteId }: GoalCardProps) {
           ></div>
         </div>
 
-        {/* Expanded Sessions Section */}
         {isExpanded && (
           <div className="border-t border-neutral-100 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900/50 p-4">
             <h4 className="text-sm font-medium text-neutral-700 dark:text-neutral-200 mb-3">Converted Sessions</h4>
@@ -217,7 +213,6 @@ export default function GoalCard({ goal, siteId }: GoalCardProps) {
         )}
       </div>
 
-      {/* Delete Confirmation Dialog */}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>

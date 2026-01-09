@@ -167,10 +167,8 @@ export function Weekdays() {
         </div>
         <div className="flex mt-1 p-2">
           <div className="w-12">
-            {/* Empty top-left cell */}
             <div className="h-5"></div>
 
-            {/* Time labels - only display every other hour */}
             {Array(24)
               .fill(0)
               .map((_, hour) => (
@@ -184,7 +182,6 @@ export function Weekdays() {
           </div>
 
           <div className="flex-1">
-            {/* Day labels */}
             <div className="flex h-5">
               {shortDayNames.map((day, i) => (
                 <div key={i} className="flex-1 text-center text-xs text-neutral-600 dark:text-neutral-400">
@@ -193,7 +190,6 @@ export function Weekdays() {
               ))}
             </div>
 
-            {/* Heatmap grid */}
             {Array(24)
               .fill(0)
               .map((_, hour) => (

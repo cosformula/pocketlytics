@@ -25,7 +25,6 @@ export async function deleteSessionReplay(
       return reply.status(404).send({ error: "Session replay not found" });
     }
 
-    // Delete the session replay
     await sessionReplayQueryService.deleteSessionReplay(numericSiteId, sessionId);
 
     return reply.status(200).send({ success: true });

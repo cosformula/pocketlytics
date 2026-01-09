@@ -36,10 +36,8 @@ import { CountryFlag } from "../components/shared/icons/CountryFlag";
 import { OperatingSystem } from "../components/shared/icons/OperatingSystem";
 import { SubHeader } from "../components/SubHeader/SubHeader";
 
-// Set up column helper
 const columnHelper = createColumnHelper<UsersResponse>();
 
-// Create a reusable sort header component
 const SortHeader = ({ column, children }: any) => {
   const isSorted = column.getIsSorted();
 
@@ -68,7 +66,6 @@ export default function UsersPage() {
 
   const { site } = useParams();
 
-  // State for server-side operations
   const [pagination, setPagination] = useState({
     pageIndex: 0,
     pageSize: 50,
@@ -76,14 +73,10 @@ export default function UsersPage() {
   const [sorting, setSorting] = useState<SortingState>([{ id: "last_seen", desc: true }]);
   const [identifiedOnly, setIdentifiedOnly] = useState(false);
 
-  // Convert page index to 1-based for the API
   const page = pagination.pageIndex + 1;
-
-  // Get the first sorting column
   const sortBy = sorting.length > 0 ? sorting[0].id : "last_seen";
   const sortOrder = sorting.length > 0 && !sorting[0].desc ? "asc" : "desc";
 
-  // Fetch data
   const { data, isLoading, isError } = useGetUsers({
     page,
     pageSize: pagination.pageSize,
@@ -92,7 +85,6 @@ export default function UsersPage() {
     identifiedOnly,
   });
 
-  // Format relative time with special handling for times less than 1 minute
   const formatRelativeTime = (dateStr: string) => {
     const date = DateTime.fromSQL(dateStr, { zone: "utc" }).setZone(getTimezone());
     const diff = Math.abs(date.diffNow(["minutes"]).minutes);
@@ -373,7 +365,6 @@ export default function UsersPage() {
             </table>
           </div>
 
-          {/* Pagination */}
           <div className="border-t border-neutral-100 dark:border-neutral-800">
             <div className="px-4 py-3">
               <Pagination

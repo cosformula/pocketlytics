@@ -164,7 +164,6 @@ export function ParameterControls() {
 
   return (
     <div className="h-full overflow-y-auto p-4 space-y-6">
-      {/* Header */}
       <div className="space-y-3">
         <div>
           <h2 className="text-sm font-semibold text-neutral-900 dark:text-neutral-100 mb-1">{selectedEndpoint.name}</h2>
@@ -173,21 +172,17 @@ export function ParameterControls() {
           )}
         </div>
 
-        {/* Method + Path + Try it button */}
         <div className="flex items-center gap-2 p-1 border border-neutral-100 rounded-[8px] dark:border-neutral-800">
           <div className="flex items-center gap-2 border border-neutral-100 dark:border-neutral-800 rounded-[6px] p-1 flex-1">
-            {/* Method Badge */}
             <span className={`shrink-0 px-1.5 py-1 text-xs font-bold rounded ${methodColors[selectedEndpoint.method]}`}>
               {selectedEndpoint.method}
             </span>
 
-            {/* Path */}
             <div className="flex-1 min-w-0 text-sm text-neutral-900 dark:text-neutral-100 font-mono truncate">
               {formatPath(selectedEndpoint.path)}
             </div>
           </div>
 
-          {/* Try it button */}
           <button
             onClick={handleExecute}
             disabled={isLoading}
@@ -205,7 +200,6 @@ export function ParameterControls() {
         </div>
       </div>
 
-      {/* Path Parameters */}
       {selectedEndpoint.pathParams && selectedEndpoint.pathParams.length > 0 && (
         <div className="space-y-3">
           <h3 className="text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
@@ -231,7 +225,6 @@ export function ParameterControls() {
         </div>
       )}
 
-      {/* Common Parameters */}
       {selectedEndpoint.hasCommonParams && (
         <div className="space-y-3">
           <h3 className="text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
@@ -257,7 +250,6 @@ export function ParameterControls() {
         </div>
       )}
 
-      {/* Endpoint-Specific Parameters */}
       {selectedEndpoint.specificParams && selectedEndpoint.specificParams.length > 0 && (
         <div className="space-y-3">
           <h3 className="text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
@@ -325,7 +317,6 @@ export function ParameterControls() {
         </div>
       )}
 
-      {/* Request Body */}
       {selectedEndpoint.hasRequestBody && <RequestBodyEditor />}
     </div>
   );

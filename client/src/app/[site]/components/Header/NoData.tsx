@@ -86,7 +86,6 @@ export function NoData() {
               </a>{" "}
               for more information.
             </span>
-            {/* Framework Guide Cards */}
             <div className="">
               <h2 className="text-sm font-medium mb-4">Platform Guides</h2>
               <div className="flex flex-wrap gap-2">

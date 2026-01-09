@@ -43,10 +43,8 @@ export function CreateOrganizationDialog({ open, onOpenChange, onSuccess, trigge
     }
   };
 
-  // Create organization mutation
   const createOrgMutation = useMutation({
     mutationFn: async ({ name, slug }: { name: string; slug: string }) => {
-      // Create organization
       const { data, error } = await authClient.organization.create({
         name,
         slug,
@@ -62,7 +60,6 @@ export function CreateOrganizationDialog({ open, onOpenChange, onSuccess, trigge
         throw new Error("No organization ID returned");
       }
 
-      // Set as active organization
       await authClient.organization.setActive({
         organizationId: data.id,
       });

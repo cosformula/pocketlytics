@@ -30,7 +30,6 @@ export async function createCheckoutSession(
   }
 
   try {
-    // 1. Verify user has permission to manage billing for this organization
     const memberResult = await db
       .select({
         role: member.role,
@@ -45,7 +44,6 @@ export async function createCheckoutSession(
       });
     }
 
-    // 2. Get user and organization details
     const [userResult, orgResult] = await Promise.all([
       db
         .select({
@@ -75,23 +73,20 @@ export async function createCheckoutSession(
 
     let stripeCustomerId = org.stripeCustomerId;
 
-    // 3. If the organization doesn't have a Stripe Customer ID, create one
     if (!stripeCustomerId) {
       const customer = await (stripe as Stripe).customers.create({
         email: user.email,
         name: org.name,
         metadata: {
           organizationId: org.id,
-          createdByUserId: userId, // For audit trail
+          createdByUserId: userId,
         },
       });
       stripeCustomerId = customer.id;
 
-      // 4. Update the organization with the new Stripe Customer ID
       await db.update(organization).set({ stripeCustomerId }).where(eq(organization.id, organizationId));
     }
 
-    // 5. Create a Stripe Checkout Session
     const session = await (stripe as Stripe).checkout.sessions.create({
       payment_method_types: ["card"],
       mode: "subscription",
@@ -104,21 +99,16 @@ export async function createCheckoutSession(
       ],
       success_url: successUrl,
       cancel_url: cancelUrl,
-      // Store organization ID in metadata for webhook processing
       metadata: {
         organizationId: organizationId,
       },
-      // Allow promotion codes
       allow_promotion_codes: true,
-      // Enable automatic tax calculation if configured in Stripe Tax settings
       automatic_tax: { enabled: true },
-      // Configure customer address collection for tax calculation
       customer_update: {
         address: "auto",
       },
     });
 
-    // 6. Return the Checkout Session URL
     return reply.send({ checkoutUrl: session.url });
   } catch (error: any) {
     console.error("Stripe Checkout Session Error:", error);

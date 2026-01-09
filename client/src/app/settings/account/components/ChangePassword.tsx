@@ -199,7 +199,6 @@ export function ChangePassword() {
               )}
             </div>
 
-            {/* Password strength indicator */}
             {newPassword && (
               <>
                 <div className="flex space-x-1 mt-1.5">

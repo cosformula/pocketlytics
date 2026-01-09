@@ -9,19 +9,15 @@ import { useRouter } from "next/navigation";
 
 export function useAdminUsers() {
   const router = useRouter();
-  // Table state
   const [sorting, setSorting] = useState<SortingState>([{ id: "createdAt", desc: true }]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 50 });
   const [globalFilter, setGlobalFilter] = useState("");
 
-  // Function to fetch users
   const fetchUsers = async () => {
-    // Default sort configuration from sorting state
     const sortBy = sorting.length > 0 ? sorting[0].id : "createdAt";
     const sortDirection = sorting.length > 0 ? (sorting[0].desc ? "desc" : "asc") : "desc";
 
-    // Apply filters if any
     let emailFilter = "";
     let roleFilter = "";
 
@@ -53,7 +49,6 @@ export function useAdminUsers() {
       },
     });
 
-    // Safely extract data
     const users = response.data?.users || [];
     const total = response.data?.total || 0;
 
@@ -63,7 +58,6 @@ export function useAdminUsers() {
     };
   };
 
-  // Fetch data with React Query
   const { data, isLoading, isError, refetch } = useQuery<{
     users: AdminUser[];
     total: number;
@@ -72,14 +66,12 @@ export function useAdminUsers() {
     queryFn: fetchUsers,
   });
 
-  // Handle impersonation
   const handleImpersonate = async (userId: string) => {
     try {
       await authClient.admin.impersonateUser({
         userId,
       });
       router.push("/");
-      // Redirect to home after impersonation
       return true;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Unknown error occurred";
@@ -88,7 +80,6 @@ export function useAdminUsers() {
     }
   };
 
-  // Handle stop impersonation
   const handleStopImpersonating = async () => {
     try {
       await authClient.admin.stopImpersonating();
@@ -101,15 +92,10 @@ export function useAdminUsers() {
   };
 
   return {
-    // Data
     users: data?.users || [],
     total: data?.total || 0,
-
-    // Loading state
     isLoading,
     isError,
-
-    // Table state
     sorting,
     setSorting,
     columnFilters,
@@ -118,8 +104,6 @@ export function useAdminUsers() {
     setPagination,
     globalFilter,
     setGlobalFilter,
-
-    // Actions
     refetch,
     handleImpersonate,
     handleStopImpersonating,

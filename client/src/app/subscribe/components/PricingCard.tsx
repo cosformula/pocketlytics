@@ -33,21 +33,17 @@ export function PricingCard({ isLoggedIn }: { isLoggedIn: boolean }) {
 
   const eventLimit = EVENT_TIERS[eventLimitIndex];
 
-  // Handle subscription for a specific plan type
   async function handleSubscribe(planType: "standard" | "pro"): Promise<void> {
-    // Handle custom tier by redirecting to email contact
     if (eventLimit === "Custom") {
       window.location.href = "https://www.rybbit.com/contact";
       return;
     }
 
-    // Check if user is logged in directly
     if (!isLoggedIn) {
       toast.error("Please log in to subscribe.");
       return;
     }
 
-    // Check if user has an active organization
     if (!activeOrg) {
       toast.error("Please select an organization to subscribe.");
       return;
@@ -99,12 +95,10 @@ export function PricingCard({ isLoggedIn }: { isLoggedIn: boolean }) {
     }
   }
 
-  // Handle slider changes
   function handleSliderChange(value: number[]): void {
     setEventLimitIndex(value[0]);
   }
 
-  // Get pricing information for both plans
   const standardMonthlyPrice = findPriceForTier(eventLimit, "month", "standard")?.price || 0;
   const standardAnnualPrice = findPriceForTier(eventLimit, "year", "standard")?.price || 0;
   const proMonthlyPrice = findPriceForTier(eventLimit, "month", "pro")?.price || 0;
@@ -113,7 +107,6 @@ export function PricingCard({ isLoggedIn }: { isLoggedIn: boolean }) {
 
   return (
     <div className="max-w-6xl mx-auto">
-      {/* Shared controls section */}
       <div className="max-w-xl mx-auto mb-8">
         <div className="flex justify-between mb-6 items-center">
           <div>
@@ -123,7 +116,6 @@ export function PricingCard({ isLoggedIn }: { isLoggedIn: boolean }) {
             </div>
           </div>
           <div className="flex flex-col items-end">
-            {/* Billing toggle */}
             <div className="flex mb-2 text-sm">
               <button
                 onClick={() => setIsAnnual(false)}
@@ -152,7 +144,6 @@ export function PricingCard({ isLoggedIn }: { isLoggedIn: boolean }) {
           </div>
         </div>
 
-        {/* Slider */}
         <Slider
           defaultValue={[0]}
           max={EVENT_TIERS.length - 1}
@@ -174,9 +165,7 @@ export function PricingCard({ isLoggedIn }: { isLoggedIn: boolean }) {
         </div>
       </div>
 
-      {/* Cards section */}
       <div className="grid min-[1100px]:grid-cols-4 min-[600px]:grid-cols-2 min-[400px]:grid-cols-1 gap-6 max-w-6xl mx-auto mb-16">
-        {/* Free Plan Card */}
         <div className="bg-neutral-100/30 dark:bg-neutral-800/15 rounded-xl border border-neutral-150 dark:border-neutral-800/60 overflow-hidden text-neutral-600 dark:text-neutral-300 shadow:lg">
           <div className="p-6">
             <div className="mb-4">
@@ -184,7 +173,6 @@ export function PricingCard({ isLoggedIn }: { isLoggedIn: boolean }) {
               <p className="text-sm text-neutral-600 dark:text-neutral-400 h-10">Perfect for hobby projects</p>
             </div>
 
-            {/* Price display */}
             <div className="mb-6">
               <div>
                 <span className="text-3xl font-bold">{DEFAULT_EVENT_LIMIT.toLocaleString()}</span>
@@ -192,7 +180,6 @@ export function PricingCard({ isLoggedIn }: { isLoggedIn: boolean }) {
               </div>
             </div>
 
-            {/* Current plan button */}
             <button
               onClick={() => (siteId ? router.push(`/${siteId}`) : {})}
               disabled={!siteId}
@@ -201,12 +188,10 @@ export function PricingCard({ isLoggedIn }: { isLoggedIn: boolean }) {
               {siteId ? "Continue free" : "Current plan"}
             </button>
 
-            {/* Features */}
             <FeaturesList features={FREE_FEATURES} />
           </div>
         </div>
 
-        {/* Standard Plan Card */}
         <div className="bg-white dark:bg-neutral-800/50 rounded-xl border border-neutral-150 dark:border-neutral-800/90 overflow-hidden text-neutral-900 dark:text-neutral-100 shadow-lg">
           <div className="p-6">
             <div className="mb-4">
@@ -216,7 +201,6 @@ export function PricingCard({ isLoggedIn }: { isLoggedIn: boolean }) {
               </p>
             </div>
 
-            {/* Price display */}
             <div className="mb-6">
               {isCustomTier ? (
                 <div className="text-3xl font-bold">Custom</div>
@@ -230,7 +214,6 @@ export function PricingCard({ isLoggedIn }: { isLoggedIn: boolean }) {
               )}
             </div>
 
-            {/* Subscribe button */}
             <button
               onClick={() => handleSubscribe("standard")}
               className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-5 py-3 rounded-xl shadow-lg shadow-emerald-900/20 transform hover:-translate-y-0.5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50 disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
@@ -239,12 +222,10 @@ export function PricingCard({ isLoggedIn }: { isLoggedIn: boolean }) {
               {isLoading ? "Processing..." : isCustomTier ? "Contact us" : "Get started"}
             </button>
 
-            {/* Features */}
             <FeaturesList features={STANDARD_FEATURES} />
           </div>
         </div>
 
-        {/* Pro Plan Card */}
         <div className="bg-white dark:bg-neutral-800 rounded-xl border-2 border-emerald-500 overflow-hidden text-neutral-900 dark:text-neutral-100 shadow-lg">
           <div className="p-6">
             <div className="mb-4">
@@ -259,7 +240,6 @@ export function PricingCard({ isLoggedIn }: { isLoggedIn: boolean }) {
               </p>
             </div>
 
-            {/* Price display */}
             <div className="mb-6">
               {isCustomTier ? (
                 <div className="text-3xl font-bold">Custom</div>
@@ -273,7 +253,6 @@ export function PricingCard({ isLoggedIn }: { isLoggedIn: boolean }) {
               )}
             </div>
 
-            {/* Subscribe button */}
             <button
               onClick={() => handleSubscribe("pro")}
               className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-5 py-3 rounded-xl shadow-lg shadow-emerald-900/20 transform hover:-translate-y-0.5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50 disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
@@ -282,12 +261,10 @@ export function PricingCard({ isLoggedIn }: { isLoggedIn: boolean }) {
               {isLoading ? "Processing..." : isCustomTier ? "Contact us" : "Get started"}
             </button>
 
-            {/* Features */}
             <FeaturesList features={PRO_FEATURES} />
           </div>
         </div>
 
-        {/* Enterprise Plan Card */}
         <div className="bg-white dark:bg-neutral-800/50 rounded-xl border border-neutral-150 dark:border-neutral-800/90 overflow-hidden text-neutral-900 dark:text-neutral-100 shadow-lg">
           <div className="p-6">
             <div className="mb-4">
@@ -297,19 +274,16 @@ export function PricingCard({ isLoggedIn }: { isLoggedIn: boolean }) {
               </p>
             </div>
 
-            {/* Price display */}
             <div className="mb-6">
               <div className="text-3xl font-bold">Custom</div>
             </div>
 
-            {/* Contact button */}
             <a href="https://www.rybbit.com/contact" className="w-full block">
               <button className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-5 py-3 rounded-xl shadow-lg shadow-emerald-900/20 transform hover:-translate-y-0.5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50 cursor-pointer">
                 Contact us
               </button>
             </a>
 
-            {/* Features */}
             <FeaturesList features={ENTERPRISE_FEATURES} />
           </div>
         </div>

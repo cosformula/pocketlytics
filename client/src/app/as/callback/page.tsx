@@ -461,7 +461,6 @@ export default function AppSumoSignupPage() {
 
         <div className="absolute top-1/4 right-0 w-[320px] h-[320px] bg-purple-500/40 rounded-full blur-[70px] opacity-10 dark:opacity-20"></div>
 
-        {/* Logo and title above the card */}
         <div className="relative z-10 mb-6 text-center">
           <a href="https://rybbit.com" target="_blank" className="inline-block mb-2">
             <RybbitTextLogo />
@@ -470,7 +469,6 @@ export default function AppSumoSignupPage() {
         </div>
 
         <Card className="w-full md:w-[500px] p-0 overflow-hidden shadow-2xl border-neutral-200 dark:border-neutral-700/50 backdrop-blur-sm bg-white/80 dark:bg-neutral-800/20 z-10 p-8">
-          {/* Horizontal step indicator */}
           <div className="flex items-center w-full mb-4">
             {[1, 2, 3].map((step, index) => (
               <React.Fragment key={step}>
@@ -498,7 +496,6 @@ export default function AppSumoSignupPage() {
             ))}
           </div>
 
-          {/* Content area */}
           <div className="flex flex-col gap-4">
             {renderStepContent()}
             <AuthError error={error} />

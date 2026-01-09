@@ -15,7 +15,6 @@ export async function deleteGoal(
   const { goalId } = request.params;
 
   try {
-    // Get the goal to check the site ID
     const goalToDelete = await db.query.goals.findFirst({
       where: eq(goals.goalId, parseInt(goalId, 10)),
     });
@@ -24,14 +23,12 @@ export async function deleteGoal(
       return reply.status(404).send({ error: "Goal not found" });
     }
 
-    // Check user access to the site
     const userHasAccessToSite = await getUserHasAccessToSite(request, goalToDelete.siteId.toString());
 
     if (!userHasAccessToSite) {
       return reply.status(403).send({ error: "Forbidden" });
     }
 
-    // Delete the goal
     const result = await db
       .delete(goals)
       .where(eq(goals.goalId, parseInt(goalId, 10)))

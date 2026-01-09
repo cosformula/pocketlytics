@@ -158,7 +158,7 @@ const server = Fastify({
                   singleLine: true,
                   translateTime: "HH:MM:ss",
                   ignore: "pid,hostname,name",
-                  destination: 1, // stdout
+                  destination: 1,
                 },
               },
             ],
@@ -173,7 +173,7 @@ const server = Fastify({
                 ignore: "pid,hostname,name",
               },
             }
-          : undefined, // Production without Axiom - plain JSON to stdout
+          : undefined,
     serializers: {
       req(request) {
         return {
@@ -192,7 +192,7 @@ const server = Fastify({
   },
   maxParamLength: 1500,
   trustProxy: true,
-  bodyLimit: 10 * 1024 * 1024, // 10MB limit for session replay data
+  bodyLimit: 10 * 1024 * 1024,
 });
 
 server.register(cors, {

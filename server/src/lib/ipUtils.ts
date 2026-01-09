@@ -18,7 +18,6 @@ export function validateIPPattern(pattern: string): { valid: boolean; error?: st
       return { valid: true };
     }
 
-    // Single IP
     if (!trimmedPattern.includes("/") && !trimmedPattern.includes("-")) {
       try {
         new Address4(trimmedPattern);
@@ -33,7 +32,6 @@ export function validateIPPattern(pattern: string): { valid: boolean; error?: st
       }
     }
 
-    // CIDR notation
     if (trimmedPattern.includes("/")) {
       try {
         new Address4(trimmedPattern);
@@ -85,13 +83,11 @@ export function validateIPPattern(pattern: string): { valid: boolean; error?: st
  */
 export function matchesCIDR(ipAddress: string, cidr: string): boolean {
   try {
-    // Try IPv4 first
     try {
       const ipv4 = new Address4(ipAddress);
       const cidrv4 = new Address4(cidr);
       return ipv4.isInSubnet(cidrv4);
     } catch {
-      // Try IPv6
       const ipv6 = new Address6(ipAddress);
       const cidrv6 = new Address6(cidr);
       return ipv6.isInSubnet(cidrv6);
@@ -114,14 +110,13 @@ export function matchesRange(ipAddress: string, range: string): boolean {
   try {
     const [startIP, endIP] = range.split("-").map(ip => ip.trim());
 
-    // Try IPv4 first
     try {
       const ip = new Address4(ipAddress);
       const start = new Address4(startIP);
       const end = new Address4(endIP);
 
-      // Convert to 32-bit integers for comparison
-      const ipInt = ip.toArray().reduce((acc, octet) => (acc << 8) + octet, 0) >>> 0; // Use unsigned right shift
+      const ipInt = ip.toArray().reduce((acc, octet) => (acc << 8) + octet, 0) >>> 0;
+
       const startInt = start.toArray().reduce((acc, octet) => (acc << 8) + octet, 0) >>> 0;
       const endInt = end.toArray().reduce((acc, octet) => (acc << 8) + octet, 0) >>> 0;
 

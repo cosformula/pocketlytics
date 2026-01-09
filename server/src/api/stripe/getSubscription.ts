@@ -15,7 +15,6 @@ function getStartOfNextMonth() {
 }
 
 export async function getSubscriptionInner(organizationId: string) {
-  // 1. Find the organization and their Stripe Customer ID
   const orgResult = await db
     .select({
       stripeCustomerId: organization.stripeCustomerId,
@@ -33,10 +32,8 @@ export async function getSubscriptionInner(organizationId: string) {
     return null;
   }
 
-  // Get the best subscription (highest event limit from AppSumo or Stripe)
   const subscription = await getBestSubscription(organizationId, org.stripeCustomerId);
 
-  // Format response based on subscription source
   if (subscription.source === "override") {
     return {
       id: null,
@@ -84,7 +81,6 @@ export async function getSubscriptionInner(organizationId: string) {
     };
   }
 
-  // Free tier
   return {
     id: null,
     planName: subscription.planName,
@@ -121,7 +117,6 @@ export async function getSubscription(
     return reply.send(responseData);
   } catch (error: any) {
     console.error("Get Subscription Error:", error);
-    // Handle specific Stripe errors if necessary
     if (error instanceof Stripe.errors.StripeError) {
       return reply.status(error.statusCode || 500).send({ error: error.message });
     } else {

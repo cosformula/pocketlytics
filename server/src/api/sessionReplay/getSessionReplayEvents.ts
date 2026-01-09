@@ -15,10 +15,8 @@ export async function getSessionReplayEvents(
     const sessionReplayService = new SessionReplayQueryService();
     const replayData = await sessionReplayService.getSessionReplayEvents(siteId, sessionId);
 
-    // The metadata from ClickHouse uses snake_case
     const metadata = replayData.metadata as any;
 
-    // Enrich metadata with user traits
     const metadataWithIdentification = {
       ...metadata,
       identified_user_id: metadata.identified_user_id || "",

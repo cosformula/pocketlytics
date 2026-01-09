@@ -15,7 +15,6 @@ export async function deleteFunnel(
   const { funnelId } = request.params;
 
   try {
-    // First get the funnel to check ownership
     const funnel = await db.query.funnels.findFirst({
       where: eq(funnelsTable.reportId, parseInt(funnelId)),
     });
@@ -28,13 +27,11 @@ export async function deleteFunnel(
       return reply.status(400).send({ error: "Invalid funnel: missing site ID" });
     }
 
-    // Check user access to site
     const userHasAccessToSite = await getUserHasAccessToSite(request, funnel.siteId.toString());
     if (!userHasAccessToSite) {
       return reply.status(403).send({ error: "Forbidden" });
     }
 
-    // Delete the funnel
     await db.delete(funnelsTable).where(eq(funnelsTable.reportId, parseInt(funnelId)));
 
     return reply.status(200).send({ success: true });

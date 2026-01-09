@@ -57,11 +57,8 @@ export function EventLogItem({ event }: EventLogItemProps) {
   return (
     <div className="mb-3 rounded-lg bg-neutral-50 dark:bg-neutral-850/50 border border-neutral-100 dark:border-neutral-800 overflow-hidden p-3 hover:bg-neutral-100 dark:hover:bg-neutral-800/70 transition-all duration-200">
       <div className="flex flex-col space-y-2">
-        {/* Single row with event type, name/path, device info, and timestamp */}
         <div className="flex items-center gap-2 text-sm text-neutral-900 dark:text-neutral-100">
-          {/* Left side content */}
           <div className="flex items-center gap-2 grow min-w-0">
-            {/* Event type icon */}
             <div className="shrink-0">
               {isPageview ? (
                 <PageviewIcon />
@@ -72,7 +69,6 @@ export function EventLogItem({ event }: EventLogItemProps) {
               )}
             </div>
 
-            {/* Event name or path */}
             <div className="min-w-0 max-w-[40%]">
               {isPageview ? (
                 <Link href={fullPath} target="_blank" rel="noopener noreferrer">
@@ -96,7 +92,6 @@ export function EventLogItem({ event }: EventLogItemProps) {
               )}
             </div>
 
-            {/* Device info */}
             <div className="shrink-0 flex space-x-1 items-center">
               {event.country && (
                 <Tooltip>
@@ -142,7 +137,6 @@ export function EventLogItem({ event }: EventLogItemProps) {
               </Tooltip>
             </div>
 
-            {/* User ID */}
             <Link href={`/${site}/user/${encodeURIComponent(event.user_id)}`} className="shrink-0">
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -157,13 +151,11 @@ export function EventLogItem({ event }: EventLogItemProps) {
             </Link>
           </div>
 
-          {/* Timestamp (right-aligned) */}
           <div className="text-sm shrink-0 text-neutral-500 dark:text-neutral-400 ml-auto">
             {eventTime.toRelative()}
           </div>
         </div>
 
-        {/* Bottom row with event properties */}
         {Object.keys(eventProperties).length > 0 && (
           <div className="flex flex-wrap gap-1 mt-1 ml-6">
             {Object.entries(eventProperties).map(([key, value]) => (
@@ -204,9 +196,7 @@ export const EventLogItemSkeleton = memo(() => {
   return (
     <div className="mb-3 rounded-lg bg-neutral-50 dark:bg-neutral-850/50 border border-neutral-100 dark:border-neutral-800 overflow-hidden p-3">
       <div className="flex flex-col space-y-2">
-        {/* Single row skeleton */}
         <div className="flex items-center gap-2">
-          {/* Left side content */}
           <div className="flex items-center gap-2 grow">
             <div className="h-4 w-4 bg-neutral-200 dark:bg-neutral-800 rounded-sm animate-pulse shrink-0"></div>
             <div className="h-4 w-40 bg-neutral-200 dark:bg-neutral-800 rounded animate-pulse shrink-0"></div>
@@ -219,11 +209,9 @@ export const EventLogItemSkeleton = memo(() => {
             <div className="h-4 w-16 bg-neutral-200 dark:bg-neutral-800 rounded animate-pulse shrink-0"></div>
           </div>
 
-          {/* Timestamp (right-aligned) */}
           <div className="h-4 w-24 bg-neutral-200 dark:bg-neutral-800 rounded animate-pulse shrink-0 ml-auto"></div>
         </div>
 
-        {/* Bottom row skeleton (properties) - show randomly */}
         {Math.random() > 0.5 && (
           <div className="flex flex-wrap gap-1 mt-1 ml-6">
             {Array.from({ length: Math.floor(Math.random() * 4) + 1 }).map((_, i) => (

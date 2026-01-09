@@ -62,7 +62,6 @@ export function EventLog() {
           <EventLogItem key={`${event.timestamp}-${index}`} event={event} />
         ))}
 
-        {/* Infinite scroll sentinel */}
         <div ref={ref} className="py-2">
           {isFetchingNextPage && (
             Array.from({ length: 3 }).map((_, index) => (
@@ -71,7 +70,6 @@ export function EventLog() {
           )}
         </div>
       </div>
-      {/* Pagination info */}
       {data?.pages[0]?.pagination && (
         <div className="text-center text-xs text-neutral-500 dark:text-neutral-400 pt-2">
           Showing {allEvents.length} of {formatter(data.pages[0].pagination.total)} events

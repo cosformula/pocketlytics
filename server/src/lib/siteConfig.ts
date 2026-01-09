@@ -4,7 +4,6 @@ import { sites } from "../db/postgres/schema.js";
 import { matchesCIDR, matchesRange } from "./ipUtils.js";
 import { logger } from "./logger/logger.js";
 
-// Site configuration interface
 export interface SiteConfigData {
   id: string | null;
   siteId: number;
@@ -129,7 +128,6 @@ class SiteConfig {
         .set(config)
         .where(isNumeric ? eq(sites.siteId, Number(siteIdOrId)) : eq(sites.id, String(siteIdOrId)));
 
-      // Invalidate cache after update
       this.cache.delete(String(siteIdOrId));
     } catch (error) {
       logger.error(error as Error, `Error updating site configuration for ${siteIdOrId}`);
@@ -165,7 +163,6 @@ class SiteConfig {
 
       await db.delete(sites).where(isNumeric ? eq(sites.siteId, Number(siteIdOrId)) : eq(sites.id, String(siteIdOrId)));
 
-      // Invalidate cache after deletion
       this.cache.delete(String(siteIdOrId));
     } catch (error) {
       logger.error(error as Error, `Error removing site ${siteIdOrId}`);
@@ -206,7 +203,6 @@ class SiteConfig {
       return false;
     }
 
-    // Convert to uppercase for case-insensitive comparison
     const normalizedCountry = countryIso.toUpperCase();
     return excludedCountries.some(country => country.toUpperCase() === normalizedCountry);
   }
@@ -222,17 +218,14 @@ class SiteConfig {
     try {
       const trimmedPattern = pattern.trim();
 
-      // Single IP match
       if (!trimmedPattern.includes("/") && !trimmedPattern.includes("-")) {
         return ipAddress === trimmedPattern;
       }
 
-      // CIDR notation
       if (trimmedPattern.includes("/")) {
         return matchesCIDR(ipAddress, trimmedPattern);
       }
 
-      // Range notation
       if (trimmedPattern.includes("-")) {
         return matchesRange(ipAddress, trimmedPattern);
       }
@@ -245,5 +238,4 @@ class SiteConfig {
   }
 }
 
-// Singleton instance
 export const siteConfig = new SiteConfig();

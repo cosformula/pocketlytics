@@ -137,7 +137,6 @@ export function PlanDialog({ open, onOpenChange, currentPlanName, hasActiveSubsc
             <DialogTitle>Choose Your Plan</DialogTitle>
           </DialogHeader>
 
-          {/* Billing toggle */}
           <div className="flex justify-center mb-0">
             <div className="flex gap-3 text-sm">
               <button

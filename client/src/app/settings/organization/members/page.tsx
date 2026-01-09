@@ -247,7 +247,6 @@ function Organization({
             </TableBody>
           </Table>
 
-          {/* Member Site Access Dialog */}
           <MemberSiteAccessDialog
             member={selectedMemberForAccess}
             open={!!selectedMemberForAccess}

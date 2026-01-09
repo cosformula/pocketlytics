@@ -28,19 +28,13 @@ interface MonitorsTableProps {
   onMonitorClick?: (monitor: UptimeMonitor) => void;
 }
 
-// Define the fuzzy filter function
 const fuzzyFilter: FilterFn<UptimeMonitor> = (row, columnId, value, addMeta) => {
   const search = value.toLowerCase();
   const monitor = row.original;
 
-  // Search in name (if it exists)
   if (monitor.name && monitor.name.toLowerCase().includes(search)) return true;
-
-  // Search in URL/host
   if (monitor.monitorType === "http" && monitor.httpConfig?.url?.toLowerCase().includes(search)) return true;
   if (monitor.monitorType === "tcp" && monitor.tcpConfig?.host?.toLowerCase().includes(search)) return true;
-
-  // Search in type
   if (monitor.monitorType.toLowerCase().includes(search)) return true;
 
   return false;
@@ -282,7 +276,6 @@ export function MonitorsTable({ onMonitorClick }: MonitorsTableProps) {
         </Table>
       </div>
 
-      {/* Pagination */}
       {!isLoading && monitors.length > 0 && (
         <Pagination
           table={table}

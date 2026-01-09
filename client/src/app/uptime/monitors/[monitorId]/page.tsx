@@ -75,15 +75,15 @@ const MonitorHeader = ({ monitor, isLoadingMonitor }: { monitor?: UptimeMonitor;
     return (
       <div className="flex flex-col gap-1">
         <div className="flex items-center gap-3">
-          <Skeleton className="h-7 w-64" /> {/* Monitor name */}
-          <Skeleton className="h-4 w-4 rounded-full" /> {/* Status orb */}
+          <Skeleton className="h-7 w-64" />
+          <Skeleton className="h-4 w-4 rounded-full" />
         </div>
         <div className="flex items-center gap-2 mt-1">
-          <Skeleton className="h-4 w-4" /> {/* Status text */}
+          <Skeleton className="h-4 w-4" />
           <span className="text-neutral-500">•</span>
-          <Skeleton className="h-4 w-40" /> {/* URL/host */}
+          <Skeleton className="h-4 w-40" />
           <span className="text-neutral-500">•</span>
-          <Skeleton className="h-4 w-28" /> {/* Interval */}
+          <Skeleton className="h-4 w-28" />
         </div>
       </div>
     );
@@ -143,7 +143,6 @@ export default function MonitorDetailPage() {
   return (
     <>
       <div className="space-y-4">
-        {/* Header */}
         <Button
           variant="ghost"
           size="sm"
@@ -159,7 +158,6 @@ export default function MonitorDetailPage() {
         </div>
         <FilterBar monitor={monitor} isLoading={isLoadingMonitor} />
 
-        {/* Stats Grid */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           <StatCard label="Uptime" value={formatPercentage(stats?.stats.uptimePercentage)} isLoading={isLoadingStats} />
           <StatCard
@@ -173,7 +171,6 @@ export default function MonitorDetailPage() {
           <StatCard label="P99" value={formatResponseTime(stats?.stats.responseTime.p99)} isLoading={isLoadingStats} />
         </div>
 
-        {/* Response Time Chart */}
         <MonitorResponseTimeChart monitor={monitor} monitorId={monitorId} isLoading={isLoadingMonitor} />
         <EventsTable monitor={monitor} monitorId={monitorId} />
       </div>

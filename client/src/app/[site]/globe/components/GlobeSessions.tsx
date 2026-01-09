@@ -188,7 +188,6 @@ export function GlobeSessions() {
           )}
           {isFetchingNextPage && <SessionCardSkeleton />}
         </div>
-        {/* Load more button */}
         {hasNextPage && expanded && !isLoading && (
           <Button onClick={() => fetchNextPage()} className="w-full" variant="ghost" size="sm">
             Load more

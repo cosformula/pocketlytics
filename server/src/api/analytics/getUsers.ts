@@ -52,12 +52,10 @@ export async function getUsers(req: FastifyRequest<GetUsersRequest>, res: Fastif
   const pageSizeNum = parseInt(pageSize, 10);
   const offset = (pageNum - 1) * pageSizeNum;
 
-  // Validate sort parameters
   const validSortFields = ["first_seen", "last_seen", "pageviews", "sessions", "events"];
   const actualSortBy = validSortFields.includes(sortBy) ? sortBy : "last_seen";
   const actualSortOrder = sortOrder === "asc" ? "ASC" : "DESC";
 
-  // Generate filter statement and time statement
   const timeStatement = getTimeStatement(req.query);
   const filterStatement = getFilterStatement(filters, Number(site), timeStatement);
 
@@ -103,7 +101,6 @@ ORDER BY ${actualSortBy} ${actualSortOrder}
 LIMIT {limit:Int32} OFFSET {offset:Int32}
   `;
 
-  // Query to get total count
   const countQuery = filterIdentified
     ? `
 SELECT count(*) AS total_count
@@ -128,7 +125,6 @@ WHERE
   `;
 
   try {
-    // Execute both queries in parallel
     const [result, countResult] = await Promise.all([
       clickhouse.query({
         query,
@@ -152,7 +148,6 @@ WHERE
     const countData = await processResults<{ total_count: number }>(countResult);
     const totalCount = countData[0]?.total_count || 0;
 
-    // Enrich with traits from Postgres
     const dataWithTraits = await enrichWithTraits(data, Number(site));
 
     return res.send({

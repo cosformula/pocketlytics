@@ -1,6 +1,5 @@
 import { authedFetch } from "../../utils";
 
-// TypeScript interfaces for API keys
 export interface ApiKey {
   id: string;
   name: string | null;
@@ -28,12 +27,10 @@ export interface CreateApiKeyRequest {
   expiresIn?: number;
 }
 
-// List all API keys for the current user
 export function listApiKeys() {
   return authedFetch<ApiKey[]>("/user/api-keys");
 }
 
-// Create a new API key
 export function createApiKey(data: CreateApiKeyRequest) {
   return authedFetch<ApiKeyWithKey>("/user/api-keys", undefined, {
     method: "POST",
@@ -41,7 +38,6 @@ export function createApiKey(data: CreateApiKeyRequest) {
   });
 }
 
-// Delete an API key
 export function deleteApiKey(keyId: string) {
   return authedFetch<{ success: boolean }>(`/user/api-keys/${keyId}`, undefined, {
     method: "DELETE",

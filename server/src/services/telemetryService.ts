@@ -163,5 +163,4 @@ class TelemetryService {
   }
 }
 
-// Create a singleton instance
 export const telemetryService = new TelemetryService();

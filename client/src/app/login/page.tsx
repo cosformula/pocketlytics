@@ -73,9 +73,7 @@ export default function Page() {
 
   return (
     <div className="flex h-dvh w-full">
-      {/* Left panel - login form */}
       <div className="w-full lg:w-[550px] flex flex-col p-6 lg:p-10">
-        {/* Logo at top left */}
         <div className="mb-8">
           <a href="https://rybbit.com" target="_blank" className="inline-block">
             <RybbitTextLogo />

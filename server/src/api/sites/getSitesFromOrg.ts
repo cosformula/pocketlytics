@@ -20,7 +20,6 @@ export async function getSitesFromOrg(
 
     const userId = req.user?.id;
 
-    // Run all database queries concurrently
     const [memberCheck, allSitesData, orgInfo] = await Promise.all([
       userId
         ? db
@@ -33,12 +32,10 @@ export async function getSitesFromOrg(
       db.select().from(organization).where(eq(organization.id, organizationId)).limit(1),
     ]);
 
-    // Filter sites based on member's access restrictions
     let sitesData = allSitesData;
     const memberRecord = memberCheck[0];
 
     if (memberRecord?.role === "member" && memberRecord.hasRestrictedSiteAccess) {
-      // Get the sites this member has access to
       const accessibleSites = await db
         .select({ siteId: memberSiteAccess.siteId })
         .from(memberSiteAccess)
@@ -48,7 +45,6 @@ export async function getSitesFromOrg(
       sitesData = allSitesData.filter(site => accessibleSiteIds.has(site.siteId));
     }
 
-    // Query session counts for the sites
     const sessionCountMap = new Map<number, number>();
 
     if (sitesData.length > 0) {
@@ -77,13 +73,11 @@ export async function getSitesFromOrg(
       }
     }
 
-    // Get subscription info
     let subscription = null;
     let monthlyEventCount = 0;
     let eventLimit = DEFAULT_EVENT_LIMIT;
 
     if (!IS_CLOUD) {
-      // Self-hosted version has unlimited events
       eventLimit = Infinity;
     } else {
       subscription = await getSubscriptionInner(organizationId);
@@ -91,14 +85,12 @@ export async function getSitesFromOrg(
       eventLimit = subscription?.eventLimit || DEFAULT_EVENT_LIMIT;
     }
 
-    // Enhance sites data with session counts and subscription info
     const enhancedSitesData = sitesData.map(site => ({
       ...site,
       sessionsLast24Hours: sessionCountMap.get(site.siteId) || 0,
       isOwner: memberRecord?.role !== "member",
     }));
 
-    // Sort by sessions descending
     enhancedSitesData.sort((a, b) => b.sessionsLast24Hours - a.sessionsLast24Hours);
 
     return res.status(200).send({

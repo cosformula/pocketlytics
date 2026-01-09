@@ -6,7 +6,6 @@ const logger = createServiceLogger("twilio");
 
 let twilioClient: ReturnType<typeof twilio> | undefined;
 
-// Initialize Twilio client only if we have the necessary credentials
 if (IS_CLOUD && process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN) {
   twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 }

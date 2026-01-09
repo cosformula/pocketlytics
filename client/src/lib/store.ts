@@ -4,7 +4,6 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { Time } from "../components/DateSelector/types";
 
-// Get system timezone
 const getSystemTimezone = () =>
   typeof window !== "undefined" ? Intl.DateTimeFormat().resolvedOptions().timeZone : "UTC";
 
@@ -124,13 +123,11 @@ export const useStore = create<Store>()(
     (set, get) => ({
       site: "",
       setSite: site => {
-        // Get current URL search params to check for stored state
         let urlParams: URLSearchParams | null = null;
         if (typeof window !== "undefined") {
           urlParams = new URLSearchParams(globalThis.location.search);
         }
 
-        // Check if we have state stored in the URL
         const hasTimeInUrl = urlParams?.has("timeMode");
         const hasBucketInUrl = urlParams?.has("bucket");
         const hasStatInUrl = urlParams?.has("stat");

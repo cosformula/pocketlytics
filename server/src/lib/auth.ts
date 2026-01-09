@@ -182,13 +182,11 @@ export const auth = betterAuth({
           // Role changes should only go through the admin setRole endpoint
           if (userUpdate && typeof userUpdate === "object") {
             if ("role" in userUpdate) {
-              // Remove role from the update data
               const { role: _, ...dataWithoutRole } = userUpdate;
               return {
                 data: dataWithoutRole,
               };
             }
-            // Always return the data, even if role wasn't present
             return {
               data: userUpdate,
             };
@@ -213,7 +211,6 @@ export const auth = betterAuth({
           const invitationId = body?.invitationId;
 
           if (invitationId) {
-            // Query the invitation to get site access settings and org/email info
             const invitationRecord = await db
               .select({
                 organizationId: invitation.organizationId,
@@ -234,7 +231,6 @@ export const auth = betterAuth({
 
                 if (userRecord.length > 0) {
                   await db.transaction(async tx => {
-                    // Find the member by organizationId + userId
                     const memberRecord = await tx
                       .select({ id: member.id })
                       .from(member)
@@ -244,10 +240,8 @@ export const auth = betterAuth({
                     if (memberRecord.length > 0) {
                       const memberId = memberRecord[0].id;
 
-                      // Update member with hasRestrictedSiteAccess
                       await tx.update(member).set({ hasRestrictedSiteAccess: true }).where(eq(member.id, memberId));
 
-                      // Insert site access entries
                       const siteIdArray = (siteIds || []) as number[];
                       if (siteIdArray.length > 0) {
                         await tx.insert(memberSiteAccess).values(

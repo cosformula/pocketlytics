@@ -19,7 +19,6 @@ export const CodeExamples = memo(function CodeExamples({ config }: CodeExamplesP
 
   return (
     <div className="space-y-2">
-      {/* Language tabs */}
       <div className="flex flex-wrap gap-1">
         {languageOrder.map(lang => (
           <button
@@ -36,8 +35,6 @@ export const CodeExamples = memo(function CodeExamples({ config }: CodeExamplesP
           </button>
         ))}
       </div>
-
-      {/* Code display */}
       <CodeSnippet code={code} language={language} />
     </div>
   );

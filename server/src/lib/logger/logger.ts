@@ -7,14 +7,12 @@ const isProduction = process.env.NODE_ENV === "production";
 const hasAxiom = !!(process.env.AXIOM_DATASET && process.env.AXIOM_TOKEN);
 
 export const createLogger = (name: string): FastifyBaseLogger => {
-  // Production with Axiom - send to both Axiom and stdout
   if (isProduction && hasAxiom && IS_CLOUD) {
     return pino({
       name,
       level: process.env.LOG_LEVEL || "info",
       transport: {
         targets: [
-          // Send to Axiom
           {
             target: "@axiomhq/pino",
             level: process.env.LOG_LEVEL || "info",
@@ -23,7 +21,6 @@ export const createLogger = (name: string): FastifyBaseLogger => {
               token: process.env.AXIOM_TOKEN,
             },
           },
-          // Pretty print to stdout for Docker logs
           {
             target: "pino-pretty",
             level: process.env.LOG_LEVEL || "info",
@@ -32,7 +29,7 @@ export const createLogger = (name: string): FastifyBaseLogger => {
               singleLine: true,
               translateTime: "HH:MM:ss",
               ignore: "pid,hostname,name",
-              destination: 1, // stdout
+              destination: 1,
             },
           },
         ],
@@ -40,7 +37,6 @@ export const createLogger = (name: string): FastifyBaseLogger => {
     }) as FastifyBaseLogger;
   }
 
-  // Development mode with pretty printing
   if (isDevelopment) {
     return pino({
       name,
@@ -57,7 +53,6 @@ export const createLogger = (name: string): FastifyBaseLogger => {
     }) as FastifyBaseLogger;
   }
 
-  // Production without Axiom - plain JSON to stdout
   return pino({
     name,
     level: process.env.LOG_LEVEL || "info",

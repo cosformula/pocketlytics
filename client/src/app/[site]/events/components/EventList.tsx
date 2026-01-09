@@ -127,7 +127,6 @@ export function EventList({ events, isLoading, size = "small" }: EventListProps)
 
         return (
           <div key={event.eventName} className="flex flex-col">
-            {/* Event Row */}
             <div
               className={cn(
                 "relative flex items-center cursor-pointer hover:bg-neutral-150/50  dark:hover:bg-neutral-850 group px-2 rounded-md",
@@ -181,7 +180,6 @@ export function EventList({ events, isLoading, size = "small" }: EventListProps)
               </div>
             </div>
 
-            {/* Properties Section (Expanded) */}
             {isExpanded && (
               <div className="ml-4 mt-2 mb-4 border-l-2 border-neutral-100 dark:border-neutral-800 pl-4">
                 <EventProperties

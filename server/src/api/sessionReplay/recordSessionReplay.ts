@@ -34,8 +34,8 @@ export async function recordSessionReplay(
   reply: FastifyReply
 ) {
   try {
-    // Get the site configuration to get the numeric siteId
-    const { siteId, excludedIPs, excludedCountries, sessionReplay } = (await siteConfig.getConfig(request.params.siteId)) ?? {};
+    const { siteId, excludedIPs, excludedCountries, sessionReplay } =
+      (await siteConfig.getConfig(request.params.siteId)) ?? {};
 
     if (!sessionReplay) {
       logger.info(`[SessionReplay] Skipping event for site ${siteId} - session replay not enabled`);
@@ -46,7 +46,6 @@ export async function recordSessionReplay(
       throw new Error(`Site not found: ${request.params.siteId}`);
     }
 
-    // Check if the site has exceeded its monthly limit
     if (usageService.isSiteOverLimit(Number(siteId))) {
       logger.info(`[SessionReplay] Skipping event for site ${siteId} - over monthly limit`);
       return reply.status(200).send("Site over monthly limit, event not tracked");
@@ -83,7 +82,6 @@ export async function recordSessionReplay(
       }
     }
 
-    // Extract request metadata for tracking
     const userAgent = request.headers["user-agent"] || "";
     const ipAddress = getIpAddress(request);
     const origin = request.headers.origin || "";

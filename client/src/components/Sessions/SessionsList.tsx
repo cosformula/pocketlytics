@@ -43,7 +43,6 @@ export function SessionsList({
 
   return (
     <div className="space-y-3">
-      {/* Pagination controls */}
       <div className="flex items-center justify-between gap-2">
         {setIdentifiedOnly && (
           <div className="flex items-center justify-end gap-2">
@@ -64,7 +63,6 @@ export function SessionsList({
         </div>
       </div>
 
-      {/* Session cards */}
       {isLoading ? (
         <SessionCardSkeleton userId={userId} count={pageSize} />
       ) : (

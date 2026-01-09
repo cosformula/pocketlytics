@@ -391,9 +391,7 @@ function SignupPageContent() {
 
   return (
     <div className="flex h-dvh w-full">
-      {/* Left panel - signup form */}
       <div className="w-full lg:w-[550px] flex flex-col p-6 lg:p-10">
-        {/* Logo at top left */}
         <div className="mb-8">
           <a href="https://rybbit.com" target="_blank" className="inline-block">
             <RybbitTextLogo />
@@ -403,7 +401,6 @@ function SignupPageContent() {
         <div className="flex-1 flex flex-col justify-center w-full max-w-[550px] mx-auto">
           <h1 className="text-lg text-neutral-600 dark:text-neutral-300 mb-6">Get started with Rybbit</h1>
 
-          {/* Horizontal step indicator */}
           <div className="flex items-center w-full mb-8">
             {[
               { step: 1, label: "Account" },
@@ -447,7 +444,6 @@ function SignupPageContent() {
             ))}
           </div>
 
-          {/* Content area */}
           <div className="flex flex-col gap-4">
             {renderStepContent()}
             <AuthError error={error} />

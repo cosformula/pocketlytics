@@ -52,7 +52,6 @@ function PageviewItem({
 
   return (
     <div className="flex mb-3">
-      {/* Timeline circle with number */}
       <div className="relative shrink-0">
         {!isLast && (
           <div
@@ -62,7 +61,6 @@ function PageviewItem({
             }}
           />
         )}
-        {/* Connecting line */}
         <div
           className={cn(
             "flex items-center justify-center w-8 h-8 rounded-full border",
@@ -232,15 +230,12 @@ const SessionDetailsTimelineSkeleton = memo(({ itemCount }: { itemCount: number 
 
   return (
     <div className="py-4">
-      {/* Tabs skeleton */}
       <div className="flex gap-2 mb-6">
         <Skeleton className="h-8 w-24 rounded-md" />
         <Skeleton className="h-8 w-24 rounded-md" />
       </div>
 
-      {/* Timeline tab skeleton */}
       <div className="mb-4">
-        {/* Timeline items skeleton */}
         {Array.from({ length: Math.min(itemCount, 100) }).map((_, i) => (
           <div key={i} className="flex mb-3">
             <Skeleton className="h-8 w-8 rounded-full" />

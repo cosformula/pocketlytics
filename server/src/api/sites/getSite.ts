@@ -14,7 +14,6 @@ export async function getSite(request: FastifyRequest<GetSiteParams>, reply: Fas
   const { siteId } = request.params;
 
   try {
-    // Get site info
     const site = await db.query.sites.findFirst({
       where: eq(sites.siteId, Number(siteId)),
     });
@@ -23,7 +22,6 @@ export async function getSite(request: FastifyRequest<GetSiteParams>, reply: Fas
       return reply.status(404).send({ error: "Site not found" });
     }
 
-    // Check if user has admin access
     const isOwner = await getUserHasAdminAccessToSite(request, site.siteId);
 
     return reply.status(200).send({

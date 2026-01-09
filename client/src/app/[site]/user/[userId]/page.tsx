@@ -65,7 +65,6 @@ export default function UserPage() {
 
   return (
     <div className="p-2 md:p-4 max-w-[1200px] mx-auto">
-      {/* Header */}
       <div className="flex items-center gap-2 mb-4">
         <MobileSidebar />
         <Breadcrumb>
@@ -111,9 +110,7 @@ export default function UserPage() {
         </div>
       </div>
 
-      {/* Main two-column layout */}
       <div className="flex flex-col lg:flex-row gap-4">
-        {/* Left Sidebar */}
         <UserSidebar
           data={data}
           isLoading={isLoading}
@@ -121,7 +118,6 @@ export default function UserPage() {
           getRegionName={getRegionName}
         />
 
-        {/* Right Content - Sessions */}
         <div className="flex-1 min-w-0 space-y-4">
           <UserTopPages userId={userId} />
           <SessionsList

@@ -8,13 +8,8 @@ export const DISABLE_TELEMETRY = process.env.DISABLE_TELEMETRY === "true";
 export const SECRET = process.env.BETTER_AUTH_SECRET;
 export const MAPBOX_TOKEN = process.env.MAPBOX_TOKEN;
 
-// Trial constants (commented out as we're replacing with free tier)
-// export const TRIAL_DURATION_DAYS = 14;
-// export const TRIAL_EVENT_LIMIT = 100000;
-
 export const DEFAULT_EVENT_LIMIT = 3_000;
 
-// AppSumo tier limits (lifetime plans with standard features, no replays)
 export const APPSUMO_TIER_LIMITS = {
   "1": 20_000,
   "2": 100_000,
@@ -24,7 +19,6 @@ export const APPSUMO_TIER_LIMITS = {
   "6": 2_000_000,
 } as const;
 
-// Define a type for the plan objects
 export interface StripePlan {
   priceId: string;
   name: string;
@@ -36,7 +30,6 @@ export interface StripePlan {
 }
 
 const STRIPE_PRICES: StripePlan[] = [
-  // Standard tiers
   {
     priceId: "price_1RKuxUDFVprnAny2xyyWvXNr",
     name: "standard100k",
@@ -181,7 +174,6 @@ const STRIPE_PRICES: StripePlan[] = [
       replays: 2_000_000,
     },
   },
-  // Pro tiers
   {
     priceId: "price_1S8szIDFVprnAny2Hg7cxG5b",
     name: "pro100k",

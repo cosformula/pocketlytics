@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { authClient } from "@/lib/auth";
 
-// Add stopImpersonating to Window interface
 declare global {
   interface Window {
     stopImpersonating: () => Promise<boolean>;

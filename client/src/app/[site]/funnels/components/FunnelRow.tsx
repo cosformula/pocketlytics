@@ -62,11 +62,9 @@ export function FunnelRow({ funnel, index }: FunnelRowProps) {
 
   return (
     <Card className="mb-4 overflow-hidden">
-      {/* Header row (always visible) */}
       <div className="flex items-center justify-between py-2 px-5">
         <div className="flex items-center grow cursor-pointer transition-colors" onClick={handleExpand}>
           <div className="mt-1 text-xs text-neutral-500 dark:text-neutral-400 flex flex-col gap-3">
-            {/* Steps visualization */}
             <div className="flex flex-wrap gap-1">
               <h3 className="font-medium text-neutral-900 dark:text-neutral-100 text-base mr-2">{funnel.name}</h3>
               {funnel.steps.map((step, index) => (
@@ -113,7 +111,6 @@ export function FunnelRow({ funnel, index }: FunnelRowProps) {
 
         <div className="flex items-center gap-4">
           <div className="flex">
-            {/* Edit button */}
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
@@ -130,7 +127,6 @@ export function FunnelRow({ funnel, index }: FunnelRowProps) {
               <TooltipContent>Edit Funnel</TooltipContent>
             </Tooltip>
 
-            {/* Clone button */}
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
@@ -147,7 +143,6 @@ export function FunnelRow({ funnel, index }: FunnelRowProps) {
               <TooltipContent>Clone Funnel</TooltipContent>
             </Tooltip>
 
-            {/* Delete button */}
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
@@ -171,7 +166,6 @@ export function FunnelRow({ funnel, index }: FunnelRowProps) {
         </div>
       </div>
 
-      {/* Expandable content */}
       {expanded && (
         <div className="border-t border-neutral-100 dark:border-neutral-800">
           <div className="p-4">
@@ -190,7 +184,6 @@ export function FunnelRow({ funnel, index }: FunnelRowProps) {
         </div>
       )}
 
-      {/* Delete Confirmation Modal */}
       <ConfirmationModal
         title="Delete Funnel"
         description={`Are you sure you want to delete "${funnel.name}"? This action cannot be undone.`}
@@ -203,12 +196,10 @@ export function FunnelRow({ funnel, index }: FunnelRowProps) {
         }}
       />
 
-      {/* Edit Funnel Modal */}
       {isEditModalOpen && (
         <EditFunnelDialog funnel={funnel} isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} />
       )}
 
-      {/* Clone Funnel Modal */}
       {isCloneModalOpen && (
         <EditFunnelDialog
           funnel={funnel}

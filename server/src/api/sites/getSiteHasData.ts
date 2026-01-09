@@ -5,7 +5,6 @@ export async function getSiteHasData(request: FastifyRequest<{ Params: { siteId:
   const { siteId } = request.params;
 
   try {
-    // Check if site has data using original method
     const pageviewsData: { count: number }[] = await clickhouse
       .query({
         query: `SELECT count(*) as count FROM events WHERE site_id = {siteId:Int32}`,

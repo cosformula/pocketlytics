@@ -179,7 +179,6 @@ export function AddSite({ trigger, disabled }: { trigger?: React.ReactNode; disa
                 placeholder="example.com or sub.example.com"
               />
             </div>
-            {/* Public Analytics Setting */}
             <div className="flex items-center justify-between">
               <div>
                 <Label htmlFor="isPublic" className="text-sm font-medium">
@@ -192,7 +191,6 @@ export function AddSite({ trigger, disabled }: { trigger?: React.ReactNode; disa
               <Switch id="isPublic" checked={isPublic} onCheckedChange={setIsPublic} />
             </div>
 
-            {/* User ID Salting Setting */}
             <div className="flex items-center justify-between">
               <div>
                 <Label htmlFor="saltUserIds" className="text-sm font-medium">

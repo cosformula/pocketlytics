@@ -179,14 +179,12 @@ export function FunnelForm({
   return (
     <>
       <div className="grid grid-cols-[600px_3fr] gap-6">
-        {/* Left side: Funnel configuration form */}
         <div className="space-y-4">
           <div>
             <label className="text-sm font-medium mb-1 block">Funnel Name</label>
             <Input value={name} onChange={e => setName(e.target.value)} placeholder="Enter funnel name" />
           </div>
 
-          {/* Funnel Steps in a boxed container */}
           <Card className="border border-neutral-200 dark:border-neutral-800">
             <CardHeader className="p-3 flex flex-row justify-between items-center">
               <CardTitle className="text-base">Funnel Steps</CardTitle>
@@ -247,7 +245,6 @@ export function FunnelForm({
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
-                      {/* Property filtering for event steps */}
                       {step.type === "event" && (
                         <div className="mt-2 space-y-2">
                           <div className="flex items-center space-x-2">

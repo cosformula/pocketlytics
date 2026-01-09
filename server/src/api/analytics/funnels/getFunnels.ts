@@ -14,14 +14,12 @@ export async function getFunnels(
   const { siteId } = request.params;
 
   try {
-    // Fetch all funnels for the site
     const funnelRecords = await db
       .select()
       .from(funnelsTable)
       .where(eq(funnelsTable.siteId, Number(siteId)))
       .orderBy(funnelsTable.createdAt);
 
-    // Transform the records to a more frontend-friendly structure
     const funnels = funnelRecords.map(record => {
       const data = record.data as any;
       return {
@@ -31,7 +29,6 @@ export async function getFunnels(
         configuration: data.configuration || {},
         createdAt: record.createdAt,
         updatedAt: record.updatedAt,
-        // Include any additional analytics data that might be stored
         conversionRate: data.lastResult?.conversionRate || null,
         totalVisitors: data.lastResult?.totalVisitors || null,
       };

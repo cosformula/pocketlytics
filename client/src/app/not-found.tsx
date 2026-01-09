@@ -13,7 +13,6 @@ export default function NotFound() {
   return (
     <StandardPage>
       <div className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-8">
-        {/* 404 Icon and Number */}
         <div className="space-y-4">
           <div className="flex items-center justify-center">
             <BarChart3 className="h-24 w-24 text-neutral-400" />
@@ -21,7 +20,6 @@ export default function NotFound() {
           <h1 className="text-6xl font-bold text-neutral-900 dark:text-neutral-100">404</h1>
         </div>
 
-        {/* Error Message */}
         <div className="space-y-2 max-w-md">
           <h2 className="text-2xl font-semibold text-neutral-800 dark:text-neutral-200">Page Not Found</h2>
           <p className="text-neutral-600 dark:text-neutral-400 leading-relaxed">
@@ -29,7 +27,6 @@ export default function NotFound() {
           </p>
         </div>
 
-        {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 pt-4">
           <Button asChild variant="default" size="lg">
             <Link href="/" className="flex items-center gap-2">
@@ -46,7 +43,6 @@ export default function NotFound() {
           </Button>
         </div>
 
-        {/* Help Links */}
         <div className="pt-8 space-y-2">
           <p className="text-sm text-neutral-500 dark:text-neutral-400">Need help? Check out our resources:</p>
           <div className="flex flex-wrap justify-center gap-4 text-sm">

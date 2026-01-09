@@ -64,12 +64,10 @@ export function EventProperties({ properties, isLoading, selectedEvent, size = "
 
         return (
           <div key={key} className={cn("flex flex-col gap-1", size === "small" ? "text-xs" : "text-sm")}>
-            {/* Property Key Header */}
             <div className="font-semibold  text-primary py-1 border-b border-neutral-100 dark:border-neutral-800">
               {key}
             </div>
 
-            {/* Property Values */}
             <div className="pl-4 flex flex-col gap-2">
               {values.map(property => {
                 const totalCount = properties
@@ -140,12 +138,10 @@ const EventPropertiesSkeleton = memo(({ size = "small" }: { size?: "small" | "la
     <div className={cn("flex flex-col gap-4 overflow-y-auto pr-2", size === "small" ? "max-h-[30vh]" : "max-h-[60vh]")}>
       {Array.from({ length: groupCount }).map((_, groupIndex) => (
         <div key={groupIndex} className={cn("flex flex-col gap-1", size === "small" ? "text-xs" : "text-sm")}>
-          {/* Property Key Header Skeleton */}
           <div className="font-semibold py-1 border-b border-neutral-100 dark:border-neutral-800">
             <div className="h-4 bg-neutral-200 dark:bg-neutral-800 rounded animate-pulse w-24"></div>
           </div>
 
-          {/* Property Values Skeleton */}
           <div className="pl-4 flex flex-col gap-2">
             {Array.from({ length: propertyCounts[groupIndex] }).map((_, propIndex) => {
               const valueWidths = generateWidths(propertyCounts[groupIndex]);

@@ -60,7 +60,6 @@ function ErrorEventItem({ errorEvent }: { errorEvent: ErrorEvent }) {
 
   return (
     <div className="border border-neutral-100 dark:border-neutral-800 rounded-lg p-4 bg-neutral-50 dark:bg-neutral-900/50">
-      {/* Header with timestamp and basic info */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-4">
           <span className="text-sm text-neutral-700 dark:text-neutral-200">
@@ -124,7 +123,6 @@ function ErrorEventItem({ errorEvent }: { errorEvent: ErrorEvent }) {
           </Link>
         </div>
         <div className="flex items-center gap-2">
-          {/* Session ID */}
           <Tooltip>
             <TooltipTrigger asChild>
               <Badge variant="outline" className="text-xs">
@@ -135,7 +133,6 @@ function ErrorEventItem({ errorEvent }: { errorEvent: ErrorEvent }) {
             <TooltipContent>Session ID: {errorEvent.session_id}</TooltipContent>
           </Tooltip>
 
-          {/* User ID if available */}
           {errorEvent.user_id && (
             <Tooltip>
               <TooltipTrigger asChild>
@@ -152,7 +149,6 @@ function ErrorEventItem({ errorEvent }: { errorEvent: ErrorEvent }) {
         </div>
       </div>
 
-      {/* Error message */}
       <div className="mb-3">
         <div className="flex items-start gap-2 text-red-400">
           <TriangleAlert className="w-4 h-4 mt-0.5 shrink-0" />
@@ -165,14 +161,12 @@ function ErrorEventItem({ errorEvent }: { errorEvent: ErrorEvent }) {
         </div>
       </div>
 
-      {/* Stack trace if available */}
       {errorEvent.stack && (
         <div className="mt-3 pt-3 border-t border-neutral-200 dark:border-neutral-700">
           <div className="flex items-start gap-2">
             <Code className="w-4 h-4 text-neutral-900 dark:text-neutral-100 mt-0.5 shrink-0" />
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-neutral-900 dark:text-neutral-100 mb-1">Stack Trace:</p>
-              {/* File and line info */}
               {(errorEvent.fileName || errorEvent.lineNumber) && (
                 <div className="mb-2">
                   <div className="flex-1 min-w-0">
@@ -233,45 +227,42 @@ export function ErrorDetails({ errorMessage }: ErrorDetailsProps) {
               key={index}
               className="border border-neutral-100 dark:border-neutral-800 rounded-lg p-4 bg-neutral-50 dark:bg-neutral-900/50"
             >
-              {/* Header with timestamp and icons */}
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-4">
-                  <Skeleton className="h-4 w-20" /> {/* Timestamp */}
+                  <Skeleton className="h-4 w-20" />
                   <div className="flex items-center gap-2">
-                    <Skeleton className="h-4 w-4 rounded" /> {/* Country flag */}
-                    <Skeleton className="h-4 w-4 rounded" /> {/* Browser icon */}
-                    <Skeleton className="h-4 w-4 rounded" /> {/* OS icon */}
-                    <Skeleton className="h-4 w-4 rounded" /> {/* Device icon */}
+                    <Skeleton className="h-4 w-4 rounded" />
+                    <Skeleton className="h-4 w-4 rounded" />
+                    <Skeleton className="h-4 w-4 rounded" />
+                    <Skeleton className="h-4 w-4 rounded" />
                   </div>
-                  <Skeleton className="h-4 w-48" /> {/* URL */}
+                  <Skeleton className="h-4 w-48" />
                 </div>
                 <div className="flex items-center gap-2">
-                  <Skeleton className="h-5 w-16 rounded-full" /> {/* Session badge */}
-                  <Skeleton className="h-5 w-16 rounded-full" /> {/* User badge */}
+                  <Skeleton className="h-5 w-16 rounded-full" />
+                  <Skeleton className="h-5 w-16 rounded-full" />
                 </div>
               </div>
 
-              {/* Error message section */}
               <div className="mb-3">
                 <div className="flex items-start gap-2">
-                  <Skeleton className="h-4 w-4 mt-0.5" /> {/* Error icon */}
+                  <Skeleton className="h-4 w-4 mt-0.5" />
                   <div className="flex-1 min-w-0">
-                    <Skeleton className="h-4 w-12 mb-1" /> {/* "Error" label */}
-                    <Skeleton className="h-4 w-full mb-1" /> {/* Error message line 1 */}
-                    <Skeleton className="h-4 w-3/4" /> {/* Error message line 2 */}
+                    <Skeleton className="h-4 w-12 mb-1" />
+                    <Skeleton className="h-4 w-full mb-1" />
+                    <Skeleton className="h-4 w-3/4" />
                   </div>
                 </div>
               </div>
 
-              {/* Stack trace section (randomly show/hide) */}
               {Math.random() > 0.5 && (
                 <div className="mt-3 pt-3 border-t border-neutral-200 dark:border-neutral-700">
                   <div className="flex items-start gap-2">
-                    <Skeleton className="h-4 w-4 mt-0.5" /> {/* Code icon */}
+                    <Skeleton className="h-4 w-4 mt-0.5" />
                     <div className="flex-1 min-w-0">
-                      <Skeleton className="h-4 w-20 mb-1" /> {/* "Stack Trace:" label */}
-                      <Skeleton className="h-4 w-64 mb-2" /> {/* File name and line */}
-                      <Skeleton className="h-16 w-full rounded" /> {/* Stack trace code block */}
+                      <Skeleton className="h-4 w-20 mb-1" />
+                      <Skeleton className="h-4 w-64 mb-2" />
+                      <Skeleton className="h-16 w-full rounded" />
                     </div>
                   </div>
                 </div>

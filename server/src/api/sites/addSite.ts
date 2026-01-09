@@ -21,7 +21,6 @@ export async function addSite(
   const { organizationId } = request.params;
   const { domain, name, public: isPublic, saltUserIds, blockBots } = request.body;
 
-  // Validate domain format using regex
   const domainRegex = /^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
   if (!domainRegex.test(domain)) {
     return reply.status(400).send({
@@ -30,13 +29,9 @@ export async function addSite(
   }
 
   try {
-    // Auth and org admin check handled by requireOrgAdminFromBody middleware
     const userId = request.user?.id;
-
-    // Generate a random 12-character hex ID
     const id = randomBytes(6).toString("hex");
 
-    // Create the new site
     const newSite = await db
       .insert(sites)
       .values({

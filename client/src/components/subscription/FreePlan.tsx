@@ -15,10 +15,7 @@ export function FreePlan() {
   const { data: activeOrg } = authClient.useActiveOrganization();
   const router = useRouter();
 
-  // Get the active organization ID
   const organizationId = activeOrg?.id;
-
-  // Get last 30 days of data for the chart
   const endDate = DateTime.now().toISODate();
   const startDate = DateTime.now().minus({ days: 30 }).toISODate();
 
@@ -26,8 +23,6 @@ export function FreePlan() {
 
   const currentUsage = subscription?.monthlyEventCount || 0;
   const limit = subscription?.eventLimit || DEFAULT_EVENT_LIMIT;
-
-  // Calculate percentage of limit used
   const percentageUsed = Math.min((currentUsage / limit) * 100, 100);
   const isNearLimit = percentageUsed > 80;
   const isLimitExceeded = currentUsage >= limit;

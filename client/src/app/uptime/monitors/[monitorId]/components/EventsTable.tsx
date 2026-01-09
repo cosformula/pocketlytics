@@ -181,29 +181,23 @@ export function EventsTable({ monitor, monitorId }: { monitor?: UptimeMonitor; m
               {isLoadingEvents ? (
                 Array.from({ length: 10 }).map((_, i) => (
                   <TableRow key={`skeleton-${i}`}>
-                    {/* Status dot */}
                     <TableCell className="w-10">
                       <div className="flex justify-center">
                         <Skeleton className="h-2 w-2 rounded-full" />
                       </div>
                     </TableCell>
-                    {/* Time */}
                     <TableCell>
                       <Skeleton className="h-4 w-32" />
                     </TableCell>
-                    {/* Status Code */}
                     <TableCell>
                       <Skeleton className="h-6 w-12" />
                     </TableCell>
-                    {/* Latency */}
                     <TableCell>
                       <Skeleton className="h-4 w-16" />
                     </TableCell>
-                    {/* Timings */}
                     <TableCell>
                       <Skeleton className="h-3 w-24" />
                     </TableCell>
-                    {/* Region - only show for global monitoring */}
                     {monitor?.monitoringType === "global" && (
                       <TableCell>
                         <Skeleton className="h-4 w-12" />
@@ -240,7 +234,6 @@ export function EventsTable({ monitor, monitorId }: { monitor?: UptimeMonitor; m
           </Table>
         </div>
 
-        {/* Infinite scroll loader */}
         {isFetchingNextPage && (
           <div className="flex justify-center">
             <Button variant="ghost" size="sm" disabled>
@@ -250,7 +243,6 @@ export function EventsTable({ monitor, monitorId }: { monitor?: UptimeMonitor; m
           </div>
         )}
 
-        {/* Load more button (as fallback) */}
         {hasNextPage && !isFetchingNextPage && (
           <div className="flex justify-center">
             <Button variant="outline" size="sm" onClick={() => fetchNextPage()}>

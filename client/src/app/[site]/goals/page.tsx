@@ -18,7 +18,6 @@ import { Input } from "@/components/ui/input";
 const GoalCardSkeleton = () => (
   <div className="rounded-lg bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 overflow-hidden relative animate-pulse">
     <div className="px-4 py-3 flex items-center mb-1">
-      {/* Left section skeleton */}
       <div className="flex-1 pr-4">
         <div className="flex items-center gap-2">
           <div className="w-4 h-4 bg-neutral-200 dark:bg-neutral-800 rounded-full"></div>
@@ -29,7 +28,6 @@ const GoalCardSkeleton = () => (
         </div>
       </div>
 
-      {/* Center section skeleton */}
       <div className="flex-1 flex justify-center">
         <div className="grid grid-cols-2 gap-4 w-full">
           <div className="text-center">
@@ -43,7 +41,6 @@ const GoalCardSkeleton = () => (
         </div>
       </div>
 
-      {/* Right section skeleton */}
       <div className="flex shrink-0 gap-1 pl-4">
         <div className="w-7 h-7 bg-neutral-200 dark:bg-neutral-800 rounded"></div>
         <div className="w-7 h-7 bg-neutral-200 dark:bg-neutral-800 rounded"></div>
@@ -150,7 +147,6 @@ export default function GoalsPage() {
           />
           <CreateGoalButton siteId={Number(site)} />
         </div>
-        {/* if site is not loaded, show skeleton */}
         {isLoading || !site ? (
           <div className="space-y-3">
             {Array(3)

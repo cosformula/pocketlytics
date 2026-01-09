@@ -79,7 +79,6 @@ export function ReplayList() {
                   <ReplayCard key={`${replay.session_id}-${index}`} replay={replay} />
                 ))}
 
-                {/* Infinite scroll anchor and loading indicator */}
                 <div ref={ref} className="py-3 flex justify-center">
                   {isFetchingNextPage && (
                     <div className="flex items-center gap-2 text-neutral-600 dark:text-neutral-400 text-xs">

@@ -56,7 +56,6 @@ export function Users() {
   return (
     <AdminLayout>
       <div className="space-y-4">
-        {/* Filters */}
         <UserFilters
           table={
             {
@@ -80,7 +79,6 @@ export function Users() {
           }
         />
 
-        {/* Users Table */}
         <UsersTable
           data={data}
           isLoading={isLoading}
@@ -95,7 +93,6 @@ export function Users() {
           onImpersonate={onImpersonate}
         />
 
-        {/* Pagination */}
         <AdminTablePagination
           table={
             {

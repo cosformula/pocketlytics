@@ -99,7 +99,6 @@ function FunnelStepComponent({ step, index, steps, chartData, firstStep, siteId 
 
   return (
     <div key={step.stepNumber} className="relative pb-4">
-      {/* Step Header - Clickable */}
       <div
         className="flex items-center cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-800/30 rounded-md p-2 -ml-2 transition-colors"
         onClick={toggleExpansion}
@@ -116,9 +115,7 @@ function FunnelStepComponent({ step, index, steps, chartData, firstStep, siteId 
         </div>
       </div>
 
-      {/* Bar and metrics */}
       <div className="flex items-center pl-8">
-        {/* Metrics */}
         <div className="shrink-0 min-w-[130px] mr-4 space-y-1">
           <div className="flex items-baseline">
             <span className="text-base font-semibold">{step.visitors.toLocaleString()}</span>
@@ -131,9 +128,7 @@ function FunnelStepComponent({ step, index, steps, chartData, firstStep, siteId 
           )}
         </div>
 
-        {/* Bar */}
         <div className="grow h-10 bg-neutral-100 dark:bg-neutral-800 rounded-md overflow-hidden relative mt-2">
-          {/* Relative conversion bar (from previous step) */}
           {index > 0 && prevStep && (
             <div
               className="absolute h-full rounded-md"
@@ -149,7 +144,6 @@ function FunnelStepComponent({ step, index, steps, chartData, firstStep, siteId 
               }}
             ></div>
           )}
-          {/* Absolute conversion bar (from first step) */}
           <div className="h-full bg-emerald-500/70 rounded-md relative z-10" style={{ width: `${barWidth}%` }}></div>
           <div className="absolute top-2 right-2 z-20">
             <div className="text-base font-semibold">{round(step.conversionRate, 2)}%</div>
@@ -157,7 +151,6 @@ function FunnelStepComponent({ step, index, steps, chartData, firstStep, siteId 
         </div>
       </div>
 
-      {/* Expanded Sessions Section */}
       {isExpanded && (
         <div className=" ml-4 p-4">
           <Tabs value={currentTab} onValueChange={val => setCurrentTab(val as "reached" | "dropped")}>

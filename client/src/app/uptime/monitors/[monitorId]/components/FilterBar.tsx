@@ -21,7 +21,6 @@ export function FilterBar({ monitor, isLoading }: FilterBarProps) {
 
   return (
     <div className="flex items-center gap-2 justify-between">
-      {/* Time Range Selector */}
       <div className="flex items-center gap-1">
         {TIME_RANGES.map(range => (
           <Button
@@ -36,7 +35,6 @@ export function FilterBar({ monitor, isLoading }: FilterBarProps) {
         ))}
       </div>
 
-      {/* Region Filter - only show for multi-region monitors */}
       {showRegionFilter && !isLoading && (
         <Select
           value={selectedRegion || "all"}

@@ -30,7 +30,6 @@ export async function createFunnel(
   const { siteId } = request.params;
   const userId = request.user?.id;
 
-  // Validate request
   if (!steps || steps.length < 2) {
     return reply.status(400).send({ error: "At least 2 steps are required for a funnel" });
   }
@@ -39,7 +38,6 @@ export async function createFunnel(
     return reply.status(400).send({ error: "Funnel name is required" });
   }
 
-  // Check user access to site
   const userHasAccessToSite = await getUserHasAccessToSite(request, siteId);
   if (!userHasAccessToSite) {
     return reply.status(403).send({ error: "Forbidden" });
@@ -49,7 +47,6 @@ export async function createFunnel(
     let result;
 
     if (reportId) {
-      // Check if the funnel exists and user has access to it
       const existingFunnel = await db.query.funnels.findFirst({
         where: eq(funnelsTable.reportId, reportId),
       });
@@ -62,7 +59,6 @@ export async function createFunnel(
         return reply.status(403).send({ error: "Funnel does not belong to this site" });
       }
 
-      // Update existing funnel
       result = await db
         .update(funnelsTable)
         .set({
@@ -79,7 +75,6 @@ export async function createFunnel(
         return reply.status(500).send({ error: "Failed to update funnel" });
       }
     } else {
-      // Create new funnel
       result = await db
         .insert(funnelsTable)
         .values({

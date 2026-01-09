@@ -23,7 +23,6 @@ export async function getSiteExcludedIPs(request: FastifyRequest, reply: Fastify
     const { siteId } = validationResult.data;
     const numericSiteId = Number(siteId);
 
-    // Validate that siteId is a valid integer
     if (!Number.isInteger(numericSiteId) || isNaN(numericSiteId) || numericSiteId <= 0) {
       return reply.status(400).send({
         success: false,
@@ -31,7 +30,6 @@ export async function getSiteExcludedIPs(request: FastifyRequest, reply: Fastify
       });
     }
 
-    // Get the excluded IPs from the database
     const site = await db
       .select({
         excludedIPs: sites.excludedIPs,

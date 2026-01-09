@@ -91,7 +91,6 @@ export function UserSidebar({ data, isLoading, sessionCount, getRegionName }: Us
 
   return (
     <div className="w-full lg:w-[300px] md:shrink-0 space-y-3">
-      {/* Stats Grid */}
       <SidebarCard>
         <div className="grid grid-cols-2 gap-4">
           <StatCard
@@ -141,14 +140,12 @@ export function UserSidebar({ data, isLoading, sessionCount, getRegionName }: Us
         </div>
       </SidebarCard>
 
-      {/* Location & Device Info */}
       <SidebarCard>
         <h3 className="text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wide mb-2">
           Location & Device
         </h3>
         {isLoading ? (
           <div className="space-y-0">
-            {/* Country */}
             <div className="flex items-center justify-between py-1.5 border-b border-neutral-50 dark:border-neutral-850">
               <Skeleton className="h-3 w-14 rounded" />
               <div className="flex items-center gap-1.5">
@@ -156,17 +153,14 @@ export function UserSidebar({ data, isLoading, sessionCount, getRegionName }: Us
                 <Skeleton className="h-3 w-24 rounded" />
               </div>
             </div>
-            {/* Region */}
             <div className="flex items-center justify-between py-1.5 border-b border-neutral-50 dark:border-neutral-850">
               <Skeleton className="h-3 w-12 rounded" />
               <Skeleton className="h-3 w-32 rounded" />
             </div>
-            {/* Language */}
             <div className="flex items-center justify-between py-1.5 border-b border-neutral-50 dark:border-neutral-850">
               <Skeleton className="h-3 w-16 rounded" />
               <Skeleton className="h-3 w-20 rounded" />
             </div>
-            {/* Device */}
             <div className="flex items-center justify-between py-1.5 border-b border-neutral-50 dark:border-neutral-850">
               <Skeleton className="h-3 w-12 rounded" />
               <div className="flex items-center gap-1.5">
@@ -174,7 +168,6 @@ export function UserSidebar({ data, isLoading, sessionCount, getRegionName }: Us
                 <Skeleton className="h-3 w-14 rounded" />
               </div>
             </div>
-            {/* Browser */}
             <div className="flex items-center justify-between py-1.5 border-b border-neutral-50 dark:border-neutral-850">
               <Skeleton className="h-3 w-14 rounded" />
               <div className="flex items-center gap-1.5">
@@ -182,7 +175,6 @@ export function UserSidebar({ data, isLoading, sessionCount, getRegionName }: Us
                 <Skeleton className="h-3 w-20 rounded" />
               </div>
             </div>
-            {/* OS */}
             <div className="flex items-center justify-between py-1.5 border-b border-neutral-50 dark:border-neutral-850">
               <Skeleton className="h-3 w-8 rounded" />
               <div className="flex items-center gap-1.5">
@@ -190,7 +182,6 @@ export function UserSidebar({ data, isLoading, sessionCount, getRegionName }: Us
                 <Skeleton className="h-3 w-24 rounded" />
               </div>
             </div>
-            {/* Screen */}
             <div className="flex items-center justify-between py-1.5">
               <Skeleton className="h-3 w-12 rounded" />
               <Skeleton className="h-3 w-16 rounded" />
@@ -248,7 +239,6 @@ export function UserSidebar({ data, isLoading, sessionCount, getRegionName }: Us
         )}
       </SidebarCard>
 
-      {/* Activity Calendar */}
       <SidebarCard className="h-[180px]">
         <h3 className="text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wide mb-2">
           Activity Calendar
@@ -258,7 +248,6 @@ export function UserSidebar({ data, isLoading, sessionCount, getRegionName }: Us
         </div>
       </SidebarCard>
 
-      {/* User Traits (identified users only) */}
       {isIdentified && customTraits.length > 0 && (
         <SidebarCard>
           <h3 className="text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wide mb-2">
@@ -278,7 +267,6 @@ export function UserSidebar({ data, isLoading, sessionCount, getRegionName }: Us
         </SidebarCard>
       )}
 
-      {/* Linked Devices (identified users only) */}
       {/* {isIdentified && data?.linked_devices && data.linked_devices.length > 0 && (
         <SidebarCard>
           <h3 className="text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wide mb-2 flex items-center gap-1.5">

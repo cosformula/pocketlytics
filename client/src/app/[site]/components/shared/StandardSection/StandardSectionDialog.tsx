@@ -282,7 +282,6 @@ export function StandardSectionDialog({
             </tbody>
           </table>
 
-          {/* Infinite scroll loading indicator and observer anchor */}
           {filteredData.length > 0 && (
             <div ref={ref} className="py-4 flex justify-center">
               {isFetchingNextPage && (
