@@ -44,7 +44,7 @@ export type Member = {
   };
   siteAccess?: {
     hasRestrictedSiteAccess: boolean;
-    siteCount: number;
+    siteIds: number[];
   };
 };
 
@@ -214,7 +214,7 @@ function Organization({
                             onClick={() => isAdmin && setSelectedMemberForAccess(member)}
                           >
                             {member.siteAccess?.hasRestrictedSiteAccess
-                              ? `${member.siteAccess.siteCount} site${member.siteAccess.siteCount !== 1 ? "s" : ""}`
+                              ? `${member.siteAccess.siteIds.length} site${member.siteAccess.siteIds.length !== 1 ? "s" : ""}`
                               : "All sites"}
                           </Badge>
                         ) : (

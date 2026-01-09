@@ -1,14 +1,10 @@
 "use client";
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
-import {
-  getMemberSiteAccess,
-  GetOrganizationMembersResponse,
-  updateMemberSiteAccess,
-} from "@/api/admin/endpoints/auth";
+import { GetOrganizationMembersResponse, updateMemberSiteAccess } from "@/api/admin/endpoints/auth";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -45,23 +41,13 @@ export function MemberSiteAccessDialog({
   const [restrictSiteAccess, setRestrictSiteAccess] = useState(false);
   const [selectedSiteIds, setSelectedSiteIds] = useState<number[]>([]);
 
-  const { data: siteAccessData, isLoading: isFetching } = useQuery({
-    queryKey: ["memberSiteAccess", activeOrganization?.id, member?.id],
-    queryFn: () => getMemberSiteAccess(activeOrganization!.id, member!.id),
-    enabled: open && !!member && !!activeOrganization?.id,
-  });
-
-  // Initialize form state when data loads
+  // Initialize form state when dialog opens or member changes
   useEffect(() => {
-    if (siteAccessData) {
-      setRestrictSiteAccess(siteAccessData.hasRestrictedSiteAccess);
-      setSelectedSiteIds(siteAccessData.siteAccess.map(s => s.siteId));
-    } else if (member?.siteAccess) {
-      // Fallback to member data
+    if (open && member?.siteAccess) {
       setRestrictSiteAccess(member.siteAccess.hasRestrictedSiteAccess);
-      setSelectedSiteIds([]);
+      setSelectedSiteIds(member.siteAccess.siteIds);
     }
-  }, [siteAccessData, member?.siteAccess]);
+  }, [open, member]);
 
   const updateMutation = useMutation({
     mutationFn: () =>
@@ -70,7 +56,6 @@ export function MemberSiteAccessDialog({
         siteIds: selectedSiteIds,
       }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["memberSiteAccess", activeOrganization?.id, member?.id] });
       queryClient.invalidateQueries({ queryKey: ["organizationMembers"] });
       toast.success("Site access updated successfully");
       onSuccess();
@@ -108,9 +93,7 @@ export function MemberSiteAccessDialog({
           </DialogDescription>
         </DialogHeader>
 
-        {isFetching ? (
-          <div className="py-8 text-center text-muted-foreground">Loading...</div>
-        ) : isRestrictable ? (
+        {isRestrictable ? (
           <div className="grid gap-4 py-4">
             <div className="flex items-center space-x-2">
               <Checkbox

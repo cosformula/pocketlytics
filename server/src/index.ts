@@ -97,11 +97,7 @@ import {
   listOrganizationMembers,
   updateAccountSettings,
 } from "./api/user/index.js";
-import {
-  getMemberSiteAccess,
-  updateInvitationSiteAccess,
-  updateMemberSiteAccess,
-} from "./api/memberAccess/index.js";
+import { updateInvitationSiteAccess, updateMemberSiteAccess } from "./api/memberAccess/index.js";
 import { initializeClickhouse } from "./db/clickhouse/clickhouse.js";
 import { initPostgres } from "./db/postgres/initPostgres.js";
 import { mapHeaders } from "./lib/auth-utils.js";
@@ -325,7 +321,6 @@ async function organizationsRoutes(fastify: FastifyInstance) {
   fastify.post("/organizations/:organizationId/members", orgMember, addUserToOrganization);
 
   // Member site access management (admin/owner only)
-  fastify.get("/organizations/:organizationId/members/:memberId/sites", orgAdminParams, getMemberSiteAccess);
   fastify.put("/organizations/:organizationId/members/:memberId/sites", orgAdminParams, updateMemberSiteAccess);
 
   // Invitation site access management (admin/owner only)
