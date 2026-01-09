@@ -30,6 +30,30 @@ const pluginList = [
         inviteLink
       );
     },
+    schema: {
+      organization: {
+        additionalFields: {
+          stripeCustomerId: {
+            type: "string",
+            required: false,
+          },
+          monthlyEventCount: {
+            type: "number",
+            required: false,
+            defaultValue: 0,
+          },
+          overMonthlyLimit: {
+            type: "boolean",
+            required: false,
+            defaultValue: false,
+          },
+          planOverride: {
+            type: "string",
+            required: false,
+          },
+        },
+      },
+    },
   }),
   emailOTP({
     async sendVerificationOTP({ email, otp, type }) {
