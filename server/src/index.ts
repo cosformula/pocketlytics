@@ -140,7 +140,8 @@ const hasAxiom = !!(process.env.AXIOM_DATASET && process.env.AXIOM_TOKEN);
 const server = Fastify({
   disableRequestLogging: true,
   logger: {
-    level: process.env.LOG_LEVEL || (process.env.NODE_ENV === "development" ? "debug" : "info"),
+    // level: process.env.LOG_LEVEL || (process.env.NODE_ENV === "development" ? "debug" : "info"),
+    level: "debug",
     transport:
       process.env.NODE_ENV === "production" && IS_CLOUD && hasAxiom
         ? {

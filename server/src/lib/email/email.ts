@@ -10,6 +10,7 @@ import { WeeklyReportEmail } from "./templates/WeeklyReportEmail.js";
 import type { OrganizationReport } from "../../services/weekyReports/weeklyReportTypes.js";
 import type { OnboardingTipContent } from "../../services/onboardingTips/onboardingTipsContent.js";
 import type { ReengagementContent } from "../../services/reengagement/reengagementContent.js";
+import { logger } from "../logger/logger.js";
 
 let resend: Resend | undefined;
 let marketingAudienceId: string | null = null;
@@ -64,6 +65,7 @@ export const unsubscribeContact = async (email: string): Promise<void> => {
   if (!resend) return;
   try {
     const audienceId = await getOrCreateMarketingAudience();
+    logger.debug(`Unsubscribing contact ${email} from audience ${audienceId}`);
     await resend.contacts.update({ audienceId, email, unsubscribed: true });
   } catch (error) {
     console.error("Failed to unsubscribe contact:", error);
