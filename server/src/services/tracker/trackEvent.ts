@@ -7,6 +7,7 @@ import { sessionsService } from "../sessions/sessionsService.js";
 import { usageService } from "../usageService.js";
 import { pageviewQueue } from "./pageviewQueue.js";
 import { createBasePayload } from "./utils.js";
+import { getLocation } from "../../db/geolocation/geolocation.js";
 
 // Define Zod schema for validation
 export const trackingPayloadSchema = z.discriminatedUnion("type", [
@@ -257,7 +258,6 @@ export async function trackEvent(request: FastifyRequest, reply: FastifyReply) {
 
     // Check if the country should be excluded from tracking
     if (siteConfiguration.excludedCountries && siteConfiguration.excludedCountries.length > 0) {
-      const { getLocation } = await import("../../db/geolocation/geolocation.js");
       const locationResults = await getLocation([requestIP]);
       const locationData = locationResults[requestIP];
 

@@ -55,6 +55,7 @@ import {
   gscCallback,
   selectGSCProperty,
 } from "./api/gsc/index.js";
+import { updateInvitationSiteAccess, updateMemberSiteAccess } from "./api/memberAccess/index.js";
 import {
   deleteSessionReplay,
   getSessionReplayEvents,
@@ -95,28 +96,30 @@ import {
   getUserOrganizations,
   listApiKeys,
   listOrganizationMembers,
+  oneClickUnsubscribeMarketing,
+  unsubscribeMarketing,
   updateAccountSettings,
 } from "./api/user/index.js";
-import { updateInvitationSiteAccess, updateMemberSiteAccess } from "./api/memberAccess/index.js";
 import { initializeClickhouse } from "./db/clickhouse/clickhouse.js";
 import { initPostgres } from "./db/postgres/initPostgres.js";
+import {
+  allowPublicSiteAccess,
+  requireAdmin,
+  requireAuth,
+  requireOrgAdminFromParams,
+  requireOrgMember,
+  requireSiteAccess,
+  requireSiteAdminAccess,
+  resolveSiteId,
+} from "./lib/auth-middleware.js";
 import { mapHeaders } from "./lib/auth-utils.js";
 import { auth } from "./lib/auth.js";
 import { IS_CLOUD } from "./lib/const.js";
-import { trackEvent } from "./services/tracker/trackEvent.js";
-import { handleIdentify } from "./services/tracker/identifyService.js";
+import { reengagementService } from "./services/reengagement/reengagementService.js";
 import { telemetryService } from "./services/telemetryService.js";
+import { handleIdentify } from "./services/tracker/identifyService.js";
+import { trackEvent } from "./services/tracker/trackEvent.js";
 import { weeklyReportService } from "./services/weekyReports/weeklyReportService.js";
-import {
-  requireAuth,
-  requireAdmin,
-  requireSiteAccess,
-  requireSiteAdminAccess,
-  allowPublicSiteAccess,
-  requireOrgMember,
-  requireOrgAdminFromParams,
-  resolveSiteId,
-} from "./lib/auth-middleware.js";
 
 // Pre-composed middleware chains for common auth patterns
 // Cast as any to work around Fastify's type inference limitations with preHandler
@@ -131,49 +134,22 @@ const orgAdminParams = { preHandler: [requireOrgAdminFromParams] as any };
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const hasAxiom = !!(process.env.AXIOM_DATASET && process.env.AXIOM_TOKEN);
-
 const server = Fastify({
+  disableRequestLogging: true,
   logger: {
-    level: process.env.LOG_LEVEL || (process.env.NODE_ENV === "development" ? "debug" : "info"),
-    transport:
-      process.env.NODE_ENV === "production" && IS_CLOUD && hasAxiom
-        ? {
-            targets: [
-              // Send to Axiom
-              {
-                target: "@axiomhq/pino",
-                level: process.env.LOG_LEVEL || "info",
-                options: {
-                  dataset: process.env.AXIOM_DATASET,
-                  token: process.env.AXIOM_TOKEN,
-                },
-              },
-              // Pretty print to stdout for Docker logs
-              {
-                target: "pino-pretty",
-                level: process.env.LOG_LEVEL || "info",
-                options: {
-                  colorize: true,
-                  singleLine: true,
-                  translateTime: "HH:MM:ss",
-                  ignore: "pid,hostname,name",
-                  destination: 1, // stdout
-                },
-              },
-            ],
-          }
-        : process.env.NODE_ENV === "development"
-          ? {
-              target: "pino-pretty",
-              options: {
-                colorize: true,
-                singleLine: true,
-                translateTime: "HH:MM:ss",
-                ignore: "pid,hostname,name",
-              },
-            }
-          : undefined, // Production without Axiom - plain JSON to stdout
+    // level: process.env.LOG_LEVEL || (process.env.NODE_ENV === "development" ? "debug" : "info"),
+    level: "debug",
+    transport: {
+      target: "pino-pretty",
+      level: process.env.LOG_LEVEL || "debug",
+      options: {
+        colorize: true,
+        singleLine: true,
+        translateTime: "HH:MM:ss",
+        ignore: "pid,hostname,name",
+        destination: 1, // stdout
+      },
+    },
     serializers: {
       req(request) {
         return {
@@ -336,6 +312,9 @@ async function userRoutes(fastify: FastifyInstance) {
   fastify.get("/config", getConfig); // Public - returns app config
   fastify.get("/user/organizations", authOnly, getUserOrganizations);
   fastify.post("/user/account-settings", authOnly, updateAccountSettings);
+  fastify.post("/user/unsubscribe-marketing", authOnly, unsubscribeMarketing);
+  fastify.get("/user/unsubscribe-marketing-oneclick", oneClickUnsubscribeMarketing); // Public - for link clicks
+  fastify.post("/user/unsubscribe-marketing-oneclick", oneClickUnsubscribeMarketing); // Public - for List-Unsubscribe header
   fastify.get("/user/api-keys", authOnly, listApiKeys);
   fastify.post("/user/api-keys", authOnly, createApiKey);
   fastify.delete("/user/api-keys/:keyId", authOnly, deleteApiKey);
@@ -404,16 +383,12 @@ const start = async () => {
     telemetryService.startTelemetryCron();
     if (IS_CLOUD) {
       weeklyReportService.startWeeklyReportCron();
+      reengagementService.startReengagementCron();
     }
 
     // Start the server first
     await server.listen({ port: 3001, host: "0.0.0.0" });
     server.log.info("Server is listening on http://0.0.0.0:3001");
-
-    // Test Axiom logging
-    if (hasAxiom) {
-      server.log.info({ axiom: true, dataset: process.env.AXIOM_DATASET }, "Axiom logging is configured");
-    }
 
     // if (process.env.NODE_ENV === "production") {
     //   // Initialize uptime monitoring service in the background (non-blocking)
