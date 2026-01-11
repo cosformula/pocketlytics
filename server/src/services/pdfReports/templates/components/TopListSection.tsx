@@ -66,9 +66,10 @@ export interface TopListSectionProps {
   items: MetricData[];
   renderLabel: (item: MetricData) => string;
   showFavicon?: boolean;
+  getIconUrl?: (item: MetricData) => string;
 }
 
-export const TopListSection = ({ title, items, renderLabel, showFavicon }: TopListSectionProps) => {
+export const TopListSection = ({ title, items, renderLabel, showFavicon, getIconUrl }: TopListSectionProps) => {
   if (items.length === 0) return null;
 
   const ratio = items[0]?.percentage ? 100 / items[0].percentage : 1;
@@ -86,7 +87,12 @@ export const TopListSection = ({ title, items, renderLabel, showFavicon }: TopLi
       <div style={{ color: "#111827", fontSize: "14px", fontWeight: "600", marginBottom: "12px" }}>{title}</div>
       {items.map((item, index) => {
         const barWidth = (item.percentage ?? 0) * ratio;
-        const favicon = showFavicon ? `https://www.google.com/s2/favicons?domain=${item.value}&sz=16` : undefined;
+        let iconUrl: string | undefined;
+        if (getIconUrl) {
+          iconUrl = getIconUrl(item);
+        } else if (showFavicon) {
+          iconUrl = `https://www.google.com/s2/favicons?domain=${item.value}&sz=16`;
+        }
 
         return (
           <TopListItem
@@ -95,7 +101,7 @@ export const TopListSection = ({ title, items, renderLabel, showFavicon }: TopLi
             percentage={item.percentage}
             count={item.count}
             barWidth={barWidth}
-            favicon={favicon}
+            favicon={iconUrl}
           />
         );
       })}
