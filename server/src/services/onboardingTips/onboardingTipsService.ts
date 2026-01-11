@@ -13,7 +13,7 @@ class OnboardingTipsService {
 
     for (const tip of ONBOARDING_TIPS) {
       // Schedule email for day N at 9am UTC
-      const scheduledAt = now.plus({ minutes: tip.day }).toISO();
+      const scheduledAt = now.plus({ days: tip.day }).set({ hour: 9, minute: 0, second: 0 }).toISO();
 
       if (!scheduledAt) continue;
 
@@ -23,24 +23,6 @@ class OnboardingTipsService {
         emailIds.push(emailId);
       }
     }
-
-    // for (const tip of ONBOARDING_TIPS) {
-    //   // Schedule email for day N at 9am UTC
-    //   const scheduledAt = now.plus({ days: tip.day }).set({ hour: 9, minute: 0, second: 0 }).toISO();
-
-    //   if (!scheduledAt) continue;
-
-    //   const emailId = await scheduleOnboardingTipEmail(
-    //     email,
-    //     name || "",
-    //     tip,
-    //     scheduledAt
-    //   );
-
-    //   if (emailId) {
-    //     emailIds.push(emailId);
-    //   }
-    // }
 
     return emailIds;
   }

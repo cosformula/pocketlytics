@@ -117,14 +117,14 @@ class ReengagementService {
         }
 
         // Check if contact is unsubscribed
-        const unsubscribed = await isContactUnsubscribed("hello@rybbit.com");
+        const unsubscribed = await isContactUnsubscribed(userData.email);
         if (unsubscribed) {
           this.logger.debug({ userId: userData.id }, "User is unsubscribed, skipping");
           continue;
         }
 
         // Send re-engagement email
-        await sendReengagementEmail("hello@rybbit.com", userData.name, content, siteId, domain);
+        await sendReengagementEmail(userData.email, userData.name, content, siteId, domain);
         this.logger.info({ userId: userData.id, day: targetDay, siteId, domain }, "Sent re-engagement email");
         break;
       }
@@ -158,8 +158,6 @@ class ReengagementService {
       this.logger.warn("Re-engagement cron already running");
       return;
     }
-
-    this.processReengagementEmails();
 
     // Run daily at 10am UTC
     this.cronTask = cron.schedule(

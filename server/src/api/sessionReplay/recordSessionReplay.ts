@@ -40,7 +40,7 @@ export async function recordSessionReplay(
       (await siteConfig.getConfig(request.params.siteId)) ?? {};
 
     if (!sessionReplay) {
-      // logger.info(`[SessionReplay] Skipping event for site ${siteId} - session replay not enabled`);
+      logger.info(`[SessionReplay] Skipping event for site ${siteId} - session replay not enabled`);
       return reply.status(200).send({ success: true, message: "Session replay not enabled" });
     }
 
@@ -50,7 +50,7 @@ export async function recordSessionReplay(
 
     // Check if the site has exceeded its monthly limit
     if (usageService.isSiteOverLimit(Number(siteId))) {
-      // logger.info(`[SessionReplay] Skipping event for site ${siteId} - over monthly limit`);
+      logger.info(`[SessionReplay] Skipping event for site ${siteId} - over monthly limit`);
       return reply.status(200).send("Site over monthly limit, event not tracked");
     }
 
@@ -60,7 +60,7 @@ export async function recordSessionReplay(
     const requestIP = getIpAddress(request);
 
     if (excludedIPs && excludedIPs.includes(requestIP)) {
-      // logger.info(`[SessionReplay] IP ${requestIP} excluded from tracking for site ${siteId}`);
+      logger.info(`[SessionReplay] IP ${requestIP} excluded from tracking for site ${siteId}`);
       return reply.status(200).send({
         success: true,
         message: "Session replay not recorded - IP excluded",
@@ -75,7 +75,7 @@ export async function recordSessionReplay(
       if (locationData?.countryIso) {
         const isCountryExcluded = await siteConfig.isCountryExcluded(locationData.countryIso, request.params.siteId);
         if (isCountryExcluded) {
-          // logger.info(`[SessionReplay] Country ${locationData.countryIso} excluded from tracking for site ${siteId}`);
+          logger.info(`[SessionReplay] Country ${locationData.countryIso} excluded from tracking for site ${siteId}`);
           return reply.status(200).send({
             success: true,
             message: "Session replay not recorded - country excluded",

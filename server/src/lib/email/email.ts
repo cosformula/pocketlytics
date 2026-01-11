@@ -54,10 +54,12 @@ export const isContactUnsubscribed = async (email: string): Promise<boolean> => 
   try {
     const audienceId = await getOrCreateMarketingAudience();
     const { data: contact } = await resend.contacts.get({ audienceId, email });
-    return contact?.unsubscribed ?? false;
+    // If contact doesn't exist or is unsubscribed, return true to skip sending
+    if (!contact) return true;
+    return contact.unsubscribed ?? false;
   } catch (error) {
-    // If contact doesn't exist, treat as not unsubscribed
-    return false;
+    // If contact doesn't exist (404), don't send email
+    return true;
   }
 };
 
@@ -65,7 +67,6 @@ export const unsubscribeContact = async (email: string): Promise<void> => {
   if (!resend) return;
   try {
     const audienceId = await getOrCreateMarketingAudience();
-    logger.debug(`Unsubscribing contact ${email} from audience ${audienceId}`);
     await resend.contacts.update({ audienceId, email, unsubscribed: true });
   } catch (error) {
     console.error("Failed to unsubscribe contact:", error);

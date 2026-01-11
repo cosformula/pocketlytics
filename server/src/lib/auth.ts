@@ -139,19 +139,17 @@ export const auth = betterAuth({
 
           sendWelcomeEmail(u.email, u.name);
           // Add contact to marketing audience and schedule onboarding emails
-          if (u.email === "hello@rybbit.com") {
-            try {
-              await addContactToAudience(u.email, u.name);
+          try {
+            await addContactToAudience(u.email, u.name);
 
-              const emailIds = await onboardingTipsService.scheduleOnboardingEmails(u.email, u.name);
+            const emailIds = await onboardingTipsService.scheduleOnboardingEmails(u.email, u.name);
 
-              // Store scheduled email IDs for potential cancellation
-              if (emailIds.length > 0) {
-                await db.update(user).set({ scheduledTipEmailIds: emailIds }).where(eq(user.id, u.id));
-              }
-            } catch (error) {
-              console.error("Error setting up onboarding emails:", error);
+            // Store scheduled email IDs for potential cancellation
+            if (emailIds.length > 0) {
+              await db.update(user).set({ scheduledTipEmailIds: emailIds }).where(eq(user.id, u.id));
             }
+          } catch (error) {
+            console.error("Error setting up onboarding emails:", error);
           }
         },
       },
