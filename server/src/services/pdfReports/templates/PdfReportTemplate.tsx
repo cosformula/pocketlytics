@@ -185,6 +185,7 @@ export const PdfReportTemplate = ({ reportData }: PdfReportTemplateProps): React
                 items={topCountries}
                 renderLabel={item => getCountryName(item.value)}
                 getIconUrl={item => getCountryFlagUrl(item.value)}
+                iconSize={{ width: 20, height: 15 }}
               />
             }
             right={<TopListSection title="Top Regions" items={topRegions} renderLabel={item => item.value} />}
