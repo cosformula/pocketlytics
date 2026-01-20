@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 export const IS_CLOUD = process.env.CLOUD === "true";
+export const IS_WHITE_LABEL = process.env.WHITE_LABEL === "true";
 export const DISABLE_SIGNUP = process.env.DISABLE_SIGNUP === "true";
 export const DISABLE_TELEMETRY = process.env.DISABLE_TELEMETRY === "true";
 export const SECRET = process.env.BETTER_AUTH_SECRET;

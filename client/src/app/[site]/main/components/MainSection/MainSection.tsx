@@ -7,12 +7,12 @@ import { useGetOverviewBucketed } from "../../../../../api/analytics/hooks/useGe
 import { BucketSelection } from "../../../../../components/BucketSelection";
 import { RybbitLogo } from "../../../../../components/RybbitLogo";
 import { authClient } from "../../../../../lib/auth";
+import { IS_WHITE_LABEL } from "../../../../../lib/const";
 import { useStore } from "../../../../../lib/store";
 import { cn } from "../../../../../lib/utils";
 import { Chart } from "./Chart";
 import { Overview } from "./Overview";
 import { PreviousChart } from "./PreviousChart";
-import { IS_WHITE_LABEL } from "../../../../../lib/const";
 
 const SELECTED_STAT_MAP = {
   pageviews: "Pageviews",

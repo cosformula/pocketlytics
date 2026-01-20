@@ -9,7 +9,7 @@ import { NodeHttpHandler } from "@smithy/node-http-handler";
 import { Readable } from "stream";
 import { gunzipSync } from "zlib";
 import { compress as zstdCompress, decompress as zstdDecompress } from "@mongodb-js/zstd";
-import { IS_CLOUD } from "../../lib/const.js";
+import { IS_CLOUD, IS_WHITE_LABEL } from "../../lib/const.js";
 import { createServiceLogger } from "../../lib/logger/logger.js";
 
 class R2StorageService {
@@ -20,7 +20,7 @@ class R2StorageService {
 
   constructor() {
     // Only initialize R2 in cloud environment
-    if (IS_CLOUD && process.env.R2_ACCESS_KEY_ID && process.env.R2_SECRET_ACCESS_KEY) {
+    if ((IS_CLOUD || IS_WHITE_LABEL) && process.env.R2_ACCESS_KEY_ID && process.env.R2_SECRET_ACCESS_KEY) {
       // Create a custom HTTP handler that strips checksum headers
       const httpHandler = new NodeHttpHandler();
       const originalHandle = httpHandler.handle.bind(httpHandler);
