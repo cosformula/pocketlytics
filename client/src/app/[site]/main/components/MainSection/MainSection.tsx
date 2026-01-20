@@ -6,13 +6,13 @@ import { useGetOverview } from "../../../../../api/analytics/hooks/useGetOvervie
 import { useGetOverviewBucketed } from "../../../../../api/analytics/hooks/useGetOverviewBucketed";
 import { BucketSelection } from "../../../../../components/BucketSelection";
 import { RybbitLogo } from "../../../../../components/RybbitLogo";
-import { useWhiteLabel } from "../../../../../hooks/useIsWhiteLabel";
 import { authClient } from "../../../../../lib/auth";
 import { useStore } from "../../../../../lib/store";
 import { cn } from "../../../../../lib/utils";
 import { Chart } from "./Chart";
 import { Overview } from "./Overview";
 import { PreviousChart } from "./PreviousChart";
+import { IS_WHITE_LABEL } from "../../../../../lib/const";
 
 const SELECTED_STAT_MAP = {
   pageviews: "Pageviews",
@@ -29,7 +29,6 @@ const tilt_wrap = Tilt_Warp({
 });
 
 export function MainSection() {
-  const { isWhiteLabel } = useWhiteLabel();
   const session = authClient.useSession();
 
   const { selectedStat, time, site, bucket } = useStore();
@@ -75,7 +74,7 @@ export function MainSection() {
         <CardContent className="p-2 md:p-4 py-3 w-full">
           <div className="flex items-center justify-between px-2 md:px-0">
             <div className="flex items-center space-x-4">
-              {!isWhiteLabel && (
+              {!IS_WHITE_LABEL && (
                 <Link
                   href={session.data ? "/" : "https://rybbit.com"}
                   className={cn("text-lg font-semibold flex items-center gap-1.5 opacity-75", tilt_wrap.className)}

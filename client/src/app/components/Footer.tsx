@@ -1,14 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
-import { IS_CLOUD } from "../../lib/const";
-import { useWhiteLabel } from "../../hooks/useIsWhiteLabel";
+import { IS_CLOUD, IS_WHITE_LABEL } from "../../lib/const";
 import { HeartIcon } from "lucide-react";
 import { Button } from "../../components/ui/button";
 
 export function Footer() {
   const APP_VERSION = process.env.NEXT_PUBLIC_APP_VERSION;
-  const { isWhiteLabel } = useWhiteLabel();
-  if (isWhiteLabel) {
+
+  if (IS_WHITE_LABEL) {
     return null;
   }
 

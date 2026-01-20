@@ -10,15 +10,15 @@ import Link from "next/link";
 import { useState } from "react";
 import { useGetPerformanceTimeSeries } from "../../../../api/analytics/hooks/performance/useGetPerformanceTimeSeries";
 import { BucketSelection } from "../../../../components/BucketSelection";
+import { ChartTooltip } from "../../../../components/charts/ChartTooltip";
 import { RybbitLogo } from "../../../../components/RybbitLogo";
 import { authClient } from "../../../../lib/auth";
+import { IS_WHITE_LABEL } from "../../../../lib/const";
 import { formatChartDateTime, hour12, userLocale } from "../../../../lib/dateTimeUtils";
 import { getTimezone, useStore } from "../../../../lib/store";
 import { cn } from "../../../../lib/utils";
 import { usePerformanceStore } from "../performanceStore";
 import { formatMetricValue, getMetricUnit, getPerformanceThresholds, METRIC_LABELS } from "../utils/performanceUtils";
-import { ChartTooltip } from "../../../../components/charts/ChartTooltip";
-import { useWhiteLabel } from "../../../../hooks/useIsWhiteLabel";
 
 const tilt_wrap = Tilt_Warp({
   subsets: ["latin"],
@@ -30,7 +30,6 @@ export function PerformanceChart() {
   const { site, bucket } = useStore();
   const { selectedPerformanceMetric, selectedPercentile } = usePerformanceStore();
   const nivoTheme = useNivoTheme();
-  const { isWhiteLabel } = useWhiteLabel();
   const timezone = getTimezone();
 
   // State for toggling percentile visibility
@@ -196,13 +195,15 @@ export function PerformanceChart() {
       <CardContent className="p-2 md:p-4 py-3 w-full">
         <div className="flex items-center justify-between px-2 md:px-0">
           <div className="flex items-center space-x-4">
-            <Link
-              href={session.data ? "/" : "https://rybbit.com"}
-              className={cn("text-lg font-semibold flex items-center gap-1.5 opacity-75", tilt_wrap.className)}
-            >
-              <RybbitLogo width={20} height={20} />
-              rybbit
-            </Link>
+            {!IS_WHITE_LABEL && (
+              <Link
+                href={session.data ? "/" : "https://rybbit.com"}
+                className={cn("text-lg font-semibold flex items-center gap-1.5 opacity-75", tilt_wrap.className)}
+              >
+                <RybbitLogo width={20} height={20} />
+                rybbit
+              </Link>
+            )}
           </div>
           <div className="flex items-center space-x-4">
             <span className="text-sm text-neutral-600 dark:text-neutral-200">
@@ -300,7 +301,9 @@ export function PerformanceChart() {
               markers={markers}
               lineWidth={1}
               sliceTooltip={({ slice }: any) => {
-                const currentTime = DateTime.fromJSDate(new Date(slice.points[0].data.x), { zone: "utc" }).setZone(timezone);
+                const currentTime = DateTime.fromJSDate(new Date(slice.points[0].data.x), { zone: "utc" }).setZone(
+                  timezone
+                );
 
                 return (
                   <ChartTooltip>
