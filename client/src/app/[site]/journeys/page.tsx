@@ -2,10 +2,7 @@
 
 import { useJourneys } from "@/api/analytics/hooks/useGetJourneys";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import {
-  InputWithSuggestions,
-  SuggestionOption,
-} from "@/components/ui/input-with-suggestions";
+import { InputWithSuggestions, SuggestionOption } from "@/components/ui/input-with-suggestions";
 import { Slider } from "@/components/ui/slider";
 import { AlertCircle } from "lucide-react";
 import { useState } from "react";
@@ -22,8 +19,8 @@ import { SankeyDiagram } from "./components/SankeyDiagram";
 export default function JourneysPage() {
   useSetPageTitle("Rybbit · Journeys");
 
-  const [steps, setSteps] = useState<number>(3);
-  const [maxJourneys, setMaxJourneys] = useState<number>(25);
+  const [steps, setSteps] = useState<number>(4);
+  const [maxJourneys, setMaxJourneys] = useState<number>(70);
   const [stepFilters, setStepFilters] = useState<Record<number, string>>({});
 
   const { data: siteMetadata } = useGetSite();
@@ -37,7 +34,7 @@ export default function JourneysPage() {
   });
 
   const pathSuggestions: SuggestionOption[] =
-    pathsData?.data?.map((item) => ({
+    pathsData?.data?.map(item => ({
       value: item.value,
       label: item.value,
     })) ?? [];
@@ -106,7 +103,7 @@ export default function JourneysPage() {
                     suggestions={pathSuggestions}
                     placeholder="Path filter"
                     value={stepFilters[i] || ""}
-                    onChange={(e) => {
+                    onChange={e => {
                       const newFilters = { ...stepFilters };
                       if (e.target.value) {
                         newFilters[i] = e.target.value;

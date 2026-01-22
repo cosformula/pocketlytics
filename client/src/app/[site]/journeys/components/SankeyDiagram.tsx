@@ -217,6 +217,55 @@ export function SankeyDiagram({ journeys, steps, maxJourneys, domain }: SankeyDi
                 ${targetX},${targetY}`;
     };
 
+    // Calculate node colors based on first path segment
+    const getFirstSegment = (path: string) => {
+      // Split path and get first non-empty segment
+      const segments = path.split("/").filter(Boolean);
+      return segments.length > 0 ? `/${segments[0]}` : path;
+    };
+
+    // Count occurrences of each first segment
+    const segmentCounts = new Map<string, number>();
+    nodes.forEach(node => {
+      const segment = getFirstSegment(node.name);
+      segmentCounts.set(segment, (segmentCounts.get(segment) || 0) + 1);
+    });
+
+    // Color palette for repeated segments
+    const colorPalette = [
+      "hsl(160, 45%, 40%)", // teal
+      "hsl(220, 45%, 50%)", // blue
+      "hsl(270, 40%, 50%)", // purple
+      "hsl(25, 50%, 50%)", // orange
+      "hsl(340, 40%, 50%)", // pink
+      "hsl(190, 45%, 45%)", // cyan
+      "hsl(45, 45%, 50%)", // yellow
+      "hsl(0, 45%, 50%)", // red
+    ];
+    const defaultColor = "hsl(0, 0%, 50%)";
+
+    // Assign colors to repeated segments
+    const segmentColors = new Map<string, string>();
+    let colorIndex = 0;
+    segmentCounts.forEach((count, segment) => {
+      if (count > 1) {
+        segmentColors.set(segment, colorPalette[colorIndex % colorPalette.length]);
+        colorIndex++;
+      }
+    });
+
+    // Get color for a node
+    const getNodeColor = (node: any) => {
+      const segment = getFirstSegment(node.name);
+      return segmentColors.get(segment) || defaultColor;
+    };
+
+    // Get color for a link (based on source node)
+    const getLinkColor = (d: any) => {
+      const sourceNode = nodes.find(n => n.id === d.source);
+      return sourceNode ? getNodeColor(sourceNode) : linkColor;
+    };
+
     // Draw links (visual only, events handled by hit areas)
     g.selectAll(".link")
       .data(links)
@@ -224,9 +273,9 @@ export function SankeyDiagram({ journeys, steps, maxJourneys, domain }: SankeyDi
       .attr("class", "link")
       .attr("d", getLinkPath)
       .attr("fill", "none")
-      .attr("stroke", linkColor)
+      .attr("stroke", d => getLinkColor(d))
       .attr("stroke-width", d => linkWidthScale(d.value))
-      .attr("opacity", 0.2)
+      .attr("opacity", 0.3)
       .attr("data-source", d => d.source)
       .attr("data-target", d => d.target)
       .style("pointer-events", "none");
@@ -262,7 +311,7 @@ export function SankeyDiagram({ journeys, steps, maxJourneys, domain }: SankeyDi
       .attr("class", "node-rect")
       .attr("width", nodeWidth)
       .attr("height", d => d.height)
-      .attr("fill", "hsl(var(--emerald-600))")
+      .attr("fill", d => getNodeColor(d))
       .attr("rx", 2)
       .attr("ry", 2);
 
@@ -352,19 +401,12 @@ export function SankeyDiagram({ journeys, steps, maxJourneys, domain }: SankeyDi
           connectedNodeIds.add(link.target);
         });
 
-        d3.selectAll(".link")
-          .attr("opacity", function () {
-            const linkSource = d3.select(this).attr("data-source");
-            const linkTarget = d3.select(this).attr("data-target");
-            const thisLinkId = `${linkSource}|||${linkTarget}`;
-            return connectedLinkIds.has(thisLinkId) ? 0.5 : 0.1;
-          })
-          .attr("stroke", function () {
-            const linkSource = d3.select(this).attr("data-source");
-            const linkTarget = d3.select(this).attr("data-target");
-            const thisLinkId = `${linkSource}|||${linkTarget}`;
-            return connectedLinkIds.has(thisLinkId) ? "hsl(var(--emerald-600))" : linkColor;
-          });
+        d3.selectAll(".link").attr("opacity", function () {
+          const linkSource = d3.select(this).attr("data-source");
+          const linkTarget = d3.select(this).attr("data-target");
+          const thisLinkId = `${linkSource}|||${linkTarget}`;
+          return connectedLinkIds.has(thisLinkId) ? 0.6 : 0.1;
+        });
 
         d3.selectAll(".node-rect").attr("opacity", function (nodeData: any) {
           return connectedNodeIds.has(nodeData.id) ? 1 : 0.2;
@@ -378,7 +420,13 @@ export function SankeyDiagram({ journeys, steps, maxJourneys, domain }: SankeyDi
         tooltip.style("top", event.pageY - 10 + "px").style("left", event.pageX + 10 + "px");
       })
       .on("mouseleave", function () {
-        d3.selectAll(".link").attr("opacity", 0.2).attr("stroke", linkColor);
+        d3.selectAll(".link")
+          .attr("opacity", 0.3)
+          .attr("stroke", function () {
+            const linkSource = d3.select(this).attr("data-source");
+            const link = links.find(l => l.source === linkSource);
+            return link ? getLinkColor(link) : linkColor;
+          });
         d3.selectAll(".node-rect").attr("opacity", 1);
         d3.selectAll(".node-text").attr("opacity", 1);
         tooltip.style("visibility", "hidden");
@@ -424,19 +472,12 @@ export function SankeyDiagram({ journeys, steps, maxJourneys, domain }: SankeyDi
           connectedNodeIds.add(link.target);
         });
 
-        d3.selectAll(".link")
-          .attr("opacity", function () {
-            const linkSource = d3.select(this).attr("data-source");
-            const linkTarget = d3.select(this).attr("data-target");
-            const thisLinkId = `${linkSource}|||${linkTarget}`;
-            return connectedLinkIds.has(thisLinkId) ? 0.5 : 0.1;
-          })
-          .attr("stroke", function () {
-            const linkSource = d3.select(this).attr("data-source");
-            const linkTarget = d3.select(this).attr("data-target");
-            const thisLinkId = `${linkSource}|||${linkTarget}`;
-            return connectedLinkIds.has(thisLinkId) ? "hsl(var(--emerald-600))" : linkColor;
-          });
+        d3.selectAll(".link").attr("opacity", function () {
+          const linkSource = d3.select(this).attr("data-source");
+          const linkTarget = d3.select(this).attr("data-target");
+          const thisLinkId = `${linkSource}|||${linkTarget}`;
+          return connectedLinkIds.has(thisLinkId) ? 0.6 : 0.1;
+        });
 
         d3.selectAll(".node-rect").attr("opacity", function (nodeData: any) {
           return connectedNodeIds.has(nodeData.id) ? 1 : 0.2;
@@ -452,7 +493,13 @@ export function SankeyDiagram({ journeys, steps, maxJourneys, domain }: SankeyDi
         tooltip.style("top", event.pageY - 10 + "px").style("left", event.pageX + 10 + "px");
       })
       .on("mouseleave", function () {
-        d3.selectAll(".link").attr("opacity", 0.2).attr("stroke", linkColor);
+        d3.selectAll(".link")
+          .attr("opacity", 0.3)
+          .attr("stroke", function () {
+            const linkSource = d3.select(this).attr("data-source");
+            const link = links.find(l => l.source === linkSource);
+            return link ? getLinkColor(link) : linkColor;
+          });
         d3.selectAll(".node-rect").attr("opacity", 1);
         d3.selectAll(".node-text").attr("opacity", 1);
         tooltip.style("visibility", "hidden");
