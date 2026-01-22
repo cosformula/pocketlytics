@@ -6,6 +6,7 @@ import { useEffect, useRef } from "react";
 
 const MIN_LINK_HEIGHT = 0;
 const MAX_LINK_HEIGHT = 100;
+const MIN_NODE_HEIGHT = 2;
 
 interface Journey {
   path: string[];
@@ -96,7 +97,8 @@ export function SankeyDiagram({ journeys, steps, maxJourneys, domain }: SankeyDi
       const outgoingValue = node.outgoingLinks.reduce((sum: number, link: any) => sum + link.value, 0);
       const maxValue = Math.max(incomingValue, outgoingValue);
 
-      node.height = linkWidthScale(maxValue);
+      // Apply minimum height to nodes (but not to links/connections)
+      node.height = Math.max(linkWidthScale(maxValue), MIN_NODE_HEIGHT);
       node.count = node.step === 0 ? outgoingValue : incomingValue;
 
       const matchingJourney = journeys.find(journey => journey.path[node.step] === node.name);

@@ -89,33 +89,38 @@ export default function JourneysPage() {
                 </div>
               </div>
             )}
-            <div className="flex gap-1 mb-4 mt-4">
-              {Array.from({ length: steps }, (_, i) => (
-                <div
-                  key={i}
-                  className="flex-1 h-10 bg-neutral-100 dark:bg-neutral-800 flex items-center text-neutral-900 dark:text-white text-sm relative px-3"
-                  style={{
-                    clipPath: "polygon(0 0, 10px 50%, 0 100%, calc(100% - 10px) 100%, 100% 50%, calc(100% - 10px) 0)",
-                  }}
-                >
-                  <span className="ml-2 whitespace-nowrap text-neutral-700 dark:text-neutral-200">Step {i + 1}</span>
-                  <InputWithSuggestions
-                    suggestions={pathSuggestions}
-                    placeholder="Path filter"
-                    value={stepFilters[i] || ""}
-                    onChange={e => {
-                      const newFilters = { ...stepFilters };
-                      if (e.target.value) {
-                        newFilters[i] = e.target.value;
-                      } else {
-                        delete newFilters[i];
-                      }
-                      setStepFilters(newFilters);
+            <div className="flex flex-col gap-1 mb-4 mt-4">
+              <div className="flex gap-1">
+                {Array.from({ length: steps }, (_, i) => (
+                  <div
+                    key={i}
+                    className="flex-1 h-10 bg-neutral-100 dark:bg-neutral-800 flex items-center text-neutral-900 dark:text-white text-sm relative px-3"
+                    style={{
+                      clipPath: "polygon(0 0, 10px 50%, 0 100%, calc(100% - 10px) 100%, 100% 50%, calc(100% - 10px) 0)",
                     }}
-                    className="h-7 bg-white bg-neutral-50 dark:bg-neutral-850 border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500 ml-3 mr-3"
-                  />
-                </div>
-              ))}
+                  >
+                    <span className="ml-2 whitespace-nowrap text-neutral-700 dark:text-neutral-200">Step {i + 1}</span>
+                    <InputWithSuggestions
+                      suggestions={pathSuggestions}
+                      placeholder="Path filter"
+                      value={stepFilters[i] || ""}
+                      onChange={e => {
+                        const newFilters = { ...stepFilters };
+                        if (e.target.value) {
+                          newFilters[i] = e.target.value;
+                        } else {
+                          delete newFilters[i];
+                        }
+                        setStepFilters(newFilters);
+                      }}
+                      className="h-7 bg-white bg-neutral-50 dark:bg-neutral-850 border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500 ml-3 mr-3"
+                    />
+                  </div>
+                ))}
+              </div>
+              <div className="text-xs text-neutral-500">
+                Use * to match a single path segment, ** to match multiple segments
+              </div>
             </div>
             {data?.journeys?.length && data?.journeys?.length > 0 ? (
               <SankeyDiagram
