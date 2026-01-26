@@ -9,6 +9,8 @@ import {
   getAdminOrganizations,
   getAdminServiceEventCount,
   getAdminSites,
+  getClickhouseStats,
+  getClickhouseActiveQueries,
 } from "./api/admin/index.js";
 import {
   createFunnel,
@@ -335,6 +337,10 @@ async function gscRoutes(fastify: FastifyInstance) {
 }
 
 async function stripeAdminRoutes(fastify: FastifyInstance) {
+  // ClickHouse stats (available for all admins)
+  fastify.get("/admin/clickhouse-stats", adminOnly, getClickhouseStats);
+  fastify.get("/admin/clickhouse-active-queries", adminOnly, getClickhouseActiveQueries);
+
   // STRIPE & ADMIN
   if (IS_CLOUD) {
     // Stripe Routes

@@ -83,3 +83,15 @@ export type { GetSiteImportsResponse, CreateSiteImportResponse } from "./import"
 // Auth endpoints
 export { getOrganizationMembers } from "./auth";
 export type { GetOrganizationMembersResponse } from "./auth";
+
+// ClickHouse Stats endpoints
+export { getClickhouseStats, getClickhouseActiveQueries } from "./clickhouseStats";
+export type {
+  TableStats,
+  RowsByDate,
+  InsertRate,
+  QueryError,
+  ClickhouseStatsResponse,
+  ActiveQuery,
+  ClickhouseActiveQueriesResponse,
+} from "./clickhouseStats";

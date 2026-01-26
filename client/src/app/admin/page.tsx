@@ -7,6 +7,7 @@ import { Sites } from "./components/sites/Sites";
 import { Users } from "./components/users/Users";
 import { Organizations } from "./components/organizations/Organizations";
 import { AdminLayout } from "./components/shared/AdminLayout";
+import { Database } from "./components/database/Database";
 import { AppSidebar } from "../../components/AppSidebar";
 
 import { usePathname } from "next/navigation";
@@ -63,7 +64,7 @@ export default function AdminPage() {
               <TabsTrigger value="organizations">Organizations</TabsTrigger>
               <TabsTrigger value="sites">Sites</TabsTrigger>
               <TabsTrigger value="users">Users</TabsTrigger>
-              <TabsTrigger value="settings">Settings</TabsTrigger>
+              <TabsTrigger value="settings">Database</TabsTrigger>
             </TabsList>
 
             <TabsContent value="users">
@@ -79,10 +80,7 @@ export default function AdminPage() {
             </TabsContent>
 
             <TabsContent value="settings">
-              <div className="p-4 border border-neutral-100 dark:border-neutral-800 rounded-md">
-                <h2 className="text-xl font-bold mb-4">Admin Settings</h2>
-                <p className="text-muted-foreground">Settings panel coming soon...</p>
-              </div>
+              <Database />
             </TabsContent>
           </Tabs>
         </AdminLayout>
