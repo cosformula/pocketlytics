@@ -43,25 +43,24 @@ interface SimpleAnalyticsEvent {
 }
 
 interface MatomoEvent {
-  // Session/user identifiers
   visitorId: string;
-  fingerprint: string; // Use as session_id
+  fingerprint: string;
+  siteName: string;
 
-  // Action data (single action, not indexed)
-  type: string;      // action type
-  url: string;       // action URL
-  pageTitle: string; // page title
-  timestamp: string; // Unix timestamp
+  type: string;
+  url: string;
+  pageTitle: string;
+  timestamp: string;
 
-  // Visit metadata
-  referrerType: string;
   referrerUrl: string;
-  languageCode: string;
-  deviceType: string;
-  operatingSystemName: string;
-  operatingSystemVersion: string;
+
   browserName: string;
   browserVersion: string;
+  operatingSystemName: string;
+  operatingSystemVersion: string;
+  deviceType: string;
+
+  languageCode: string;
   countryCode: string;
   regionCode: string;
   city: string;
@@ -268,14 +267,14 @@ export class CsvParser {
     const visitMetadata = {
       visitorId: rawEvent.visitorId || "",
       fingerprint: rawEvent.fingerprint || "",
-      referrerType: rawEvent.referrerType || "",
+      siteName: rawEvent.siteName || "",
       referrerUrl: rawEvent.referrerUrl || "",
-      languageCode: rawEvent.languageCode || "",
-      deviceType: rawEvent.deviceType || "",
-      operatingSystemName: rawEvent.operatingSystemName || "",
-      operatingSystemVersion: rawEvent.operatingSystemVersion || "",
       browserName: rawEvent.browserName || "",
       browserVersion: rawEvent.browserVersion || "",
+      operatingSystemName: rawEvent.operatingSystemName || "",
+      operatingSystemVersion: rawEvent.operatingSystemVersion || "",
+      deviceType: rawEvent.deviceType || "",
+      languageCode: rawEvent.languageCode || "",
       countryCode: rawEvent.countryCode || "",
       regionCode: rawEvent.regionCode || "",
       city: rawEvent.city || "",
@@ -293,21 +292,44 @@ export class CsvParser {
       }
     }
 
-    // Create one MatomoEvent per action
+    // Track most recent "action" type's url and pageTitle for outlinks
+    let lastActionUrl = "";
+    let lastActionPageTitle = "";
+
+    // Create one MatomoEvent per action (sorted by index)
     for (const index of Array.from(actionIndices).sort((a, b) => a - b)) {
       const type = rawEvent[`actionDetails_${index}_type`] || "";
       const timestamp = rawEvent[`actionDetails_${index}_timestamp`] || "";
 
-      // Skip actions without type or timestamp
-      if (!type || !timestamp) {
+      // Only process "action" and "outlink" types
+      if ((type !== "action" && type !== "outlink") || !timestamp) {
         continue;
+      }
+
+      const actionUrl = rawEvent[`actionDetails_${index}_url`] || "";
+      const actionPageTitle = rawEvent[`actionDetails_${index}_pageTitle`] || "";
+
+      // For "action" type, update tracking and use its own url/pageTitle
+      // For "outlink" type, use the most recent "action"'s url/pageTitle
+      let url: string;
+      let pageTitle: string;
+
+      if (type === "action") {
+        lastActionUrl = actionUrl;
+        lastActionPageTitle = actionPageTitle;
+        url = actionUrl;
+        pageTitle = actionPageTitle;
+      } else {
+        // outlink - use last action's url/pageTitle
+        url = lastActionUrl;
+        pageTitle = lastActionPageTitle;
       }
 
       const event: MatomoEvent = {
         ...visitMetadata,
         type,
-        url: rawEvent[`actionDetails_${index}_url`] || "",
-        pageTitle: rawEvent[`actionDetails_${index}_pageTitle`] || "",
+        url,
+        pageTitle,
         timestamp,
       };
 
