@@ -25,6 +25,7 @@ export interface SiteConfigData {
   trackIp: boolean;
   trackButtonClicks: boolean;
   trackCopy: boolean;
+  trackFormInteractions: boolean;
   tags: string[];
 }
 
@@ -77,6 +78,7 @@ class SiteConfig {
           trackIp: sites.trackIp,
           trackButtonClicks: sites.trackButtonClicks,
           trackCopy: sites.trackCopy,
+          trackFormInteractions: sites.trackFormInteractions,
           tags: sites.tags,
         })
         .from(sites)
@@ -107,6 +109,7 @@ class SiteConfig {
         trackIp: site.trackIp || false,
         trackButtonClicks: site.trackButtonClicks || false,
         trackCopy: site.trackCopy || false,
+        trackFormInteractions: site.trackFormInteractions || false,
         tags: Array.isArray(site.tags) ? site.tags : [],
       };
 

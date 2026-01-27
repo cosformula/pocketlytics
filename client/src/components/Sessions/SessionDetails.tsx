@@ -5,7 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { getTimezone } from "@/lib/store";
-import { ArrowRight, Clock, Copy, ExternalLink, Loader2, Monitor, MousePointerClick, Smartphone, Tablet, TriangleAlert } from "lucide-react";
+import { ArrowRight, Clock, Copy, ExternalLink, FileInput, Loader2, Monitor, MousePointerClick, Smartphone, Tablet, TextCursorInput, TriangleAlert } from "lucide-react";
 import { DateTime } from "luxon";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -42,6 +42,8 @@ function PageviewItem({
   const isOutbound = item.type === "outbound";
   const isButtonClick = item.type === "button_click";
   const isCopy = item.type === "copy";
+  const isFormSubmit = item.type === "form_submit";
+  const isInputChange = item.type === "input_change";
   const timestamp = DateTime.fromSQL(item.timestamp, { zone: "utc" }).setZone(getTimezone());
   const formattedTime = timestamp.toFormat(hour12 ? "h:mm:ss a" : "HH:mm:ss");
 
@@ -89,6 +91,10 @@ function PageviewItem({
               <MousePointerClick className="w-4 h-4 text-green-500" />
             ) : isCopy ? (
               <Copy className="w-4 h-4 text-sky-500" />
+            ) : isFormSubmit ? (
+              <FileInput className="w-4 h-4 text-purple-500" />
+            ) : isInputChange ? (
+              <TextCursorInput className="w-4 h-4 text-amber-500" />
             ) : (
               <PageviewIcon />
             )}
@@ -131,6 +137,8 @@ function PageviewItem({
                   (isOutbound ? "Outbound Click" :
                    isButtonClick ? "Button Click" :
                    isCopy ? "Copy" :
+                   isFormSubmit ? "Form Submit" :
+                   isInputChange ? "Input Change" :
                    "Event")}
               </div>
             )}
@@ -230,7 +238,7 @@ function PageviewItem({
             </div>
           </div>
         )}
-        {(isButtonClick || isCopy) && (
+        {(isButtonClick || isCopy || isFormSubmit || isInputChange) && (
           <div className="flex items-center pl-7 mt-1">
             <div className="text-xs text-neutral-500 dark:text-neutral-400">
               {item.props && Object.keys(item.props).length > 0 ? (
@@ -351,9 +359,17 @@ export function SessionDetails({ session, userId }: SessionDetailsProps) {
     return allEvents.filter((p: SessionEvent) => p.type === "copy").length;
   }, [allEvents]);
 
+  const totalFormSubmits = useMemo(() => {
+    return allEvents.filter((p: SessionEvent) => p.type === "form_submit").length;
+  }, [allEvents]);
+
+  const totalInputChanges = useMemo(() => {
+    return allEvents.filter((p: SessionEvent) => p.type === "input_change").length;
+  }, [allEvents]);
+
   // Event type filter state
   const [visibleEventTypes, setVisibleEventTypes] = useState<Set<string>>(
-    new Set(["pageview", "custom_event", "outbound", "button_click", "copy"])
+    new Set(["pageview", "custom_event", "outbound", "button_click", "copy", "form_submit", "input_change"])
   );
 
   const toggleEventType = (type: string) => {
@@ -417,6 +433,8 @@ export function SessionDetails({ session, userId }: SessionDetailsProps) {
                   outbound: totalOutbound,
                   button_click: totalButtonClicks,
                   copy: totalCopies,
+                  form_submit: totalFormSubmits,
+                  input_change: totalInputChanges,
                 }}
               />
             </div>

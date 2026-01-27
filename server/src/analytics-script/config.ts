@@ -104,6 +104,7 @@ export async function parseScriptConfig(scriptTag: HTMLScriptElement): Promise<S
     enableSessionReplay: false,
     trackButtonClicks: false,
     trackCopy: false,
+    trackFormInteractions: false,
     // rrweb session replay options (undefined means use rrweb defaults)
     sessionReplayBlockClass,
     sessionReplayBlockSelector,
@@ -143,6 +144,7 @@ export async function parseScriptConfig(scriptTag: HTMLScriptElement): Promise<S
         enableSessionReplay: apiConfig.sessionReplay ?? defaultConfig.enableSessionReplay,
         trackButtonClicks: apiConfig.trackButtonClicks ?? defaultConfig.trackButtonClicks,
         trackCopy: apiConfig.trackCopy ?? defaultConfig.trackCopy,
+        trackFormInteractions: apiConfig.trackFormInteractions ?? defaultConfig.trackFormInteractions,
       };
     } else {
       // If API call fails, log warning and use defaults

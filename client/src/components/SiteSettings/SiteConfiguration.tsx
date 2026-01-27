@@ -72,6 +72,7 @@ export function SiteConfiguration({ siteMetadata, disabled = false, onClose }: S
     trackIp: siteMetadata.trackIp ?? false,
     trackButtonClicks: siteMetadata.trackButtonClicks ?? false,
     trackCopy: siteMetadata.trackCopy ?? false,
+    trackFormInteractions: siteMetadata.trackFormInteractions ?? false,
   });
 
   const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>({});
@@ -284,6 +285,15 @@ export function SiteConfiguration({ siteMetadata, disabled = false, onClose }: S
       key: "trackCopy",
       enabledMessage: "Copy tracking enabled",
       disabledMessage: "Copy tracking disabled",
+    },
+    {
+      id: "trackFormInteractions",
+      label: "Track Form Interactions",
+      description: "Automatically track form submissions and input/select changes",
+      value: toggleStates.trackFormInteractions,
+      key: "trackFormInteractions",
+      enabledMessage: "Form interaction tracking enabled",
+      disabledMessage: "Form interaction tracking disabled",
     },
   ];
 

@@ -45,6 +45,7 @@ const updateSiteConfigSchema = z.object({
   trackIp: z.boolean().optional(),
   trackButtonClicks: z.boolean().optional(),
   trackCopy: z.boolean().optional(),
+  trackFormInteractions: z.boolean().optional(),
 });
 
 type UpdateSiteConfigRequest = z.infer<typeof updateSiteConfigSchema>;
@@ -125,6 +126,7 @@ export async function updateSiteConfig(
       "trackIp",
       "trackButtonClicks",
       "trackCopy",
+      "trackFormInteractions",
     ];
 
     for (const field of directMappings) {

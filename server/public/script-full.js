@@ -122,6 +122,7 @@
       enableSessionReplay: false,
       trackButtonClicks: false,
       trackCopy: false,
+      trackFormInteractions: false,
       // rrweb session replay options (undefined means use rrweb defaults)
       sessionReplayBlockClass,
       sessionReplayBlockSelector,
@@ -155,7 +156,8 @@
           trackErrors: apiConfig.trackErrors ?? defaultConfig.trackErrors,
           enableSessionReplay: apiConfig.sessionReplay ?? defaultConfig.enableSessionReplay,
           trackButtonClicks: apiConfig.trackButtonClicks ?? defaultConfig.trackButtonClicks,
-          trackCopy: apiConfig.trackCopy ?? defaultConfig.trackCopy
+          trackCopy: apiConfig.trackCopy ?? defaultConfig.trackCopy,
+          trackFormInteractions: apiConfig.trackFormInteractions ?? defaultConfig.trackFormInteractions
         };
       } else {
         console.warn("Failed to fetch tracking config from API, using defaults");
@@ -469,7 +471,7 @@
       if (!basePayload) {
         return;
       }
-      const typesWithProperties = ["custom_event", "outbound", "error", "button_click", "copy"];
+      const typesWithProperties = ["custom_event", "outbound", "error", "button_click", "copy", "form_submit", "input_change"];
       const payload = {
         ...basePayload,
         type: eventType,
@@ -550,6 +552,12 @@
     }
     trackCopy(properties) {
       this.track("copy", "", properties);
+    }
+    trackFormSubmit(properties) {
+      this.track("form_submit", "", properties);
+    }
+    trackInputChange(properties) {
+      this.track("input_change", "", properties);
     }
     identify(userId, traits) {
       if (typeof userId !== "string" || userId.trim() === "") {
@@ -1031,6 +1039,46 @@
     }
   };
 
+  // formTracking.ts
+  var FormTrackingManager = class {
+    constructor(tracker, config) {
+      this.tracker = tracker;
+      this.config = config;
+    }
+    initialize() {
+      document.addEventListener("submit", this.handleSubmit.bind(this), true);
+      document.addEventListener("change", this.handleChange.bind(this), true);
+    }
+    handleSubmit(event) {
+      const form = event.target;
+      if (form.tagName !== "FORM") return;
+      const properties = {
+        formId: form.id || "",
+        formName: form.name || "",
+        formAction: form.action || "",
+        method: (form.method || "get").toUpperCase(),
+        fieldCount: form.elements.length
+      };
+      this.tracker.trackFormSubmit(properties);
+    }
+    handleChange(event) {
+      const target = event.target;
+      const tagName = target.tagName.toUpperCase();
+      if (!["INPUT", "SELECT", "TEXTAREA"].includes(tagName)) return;
+      if (tagName === "INPUT") {
+        const inputType = target.type?.toLowerCase();
+        if (inputType === "hidden" || inputType === "password") return;
+      }
+      const properties = {
+        element: tagName.toLowerCase(),
+        inputType: tagName === "INPUT" ? target.type?.toLowerCase() : void 0,
+        inputName: target.name || target.id || "",
+        formId: target.form?.id || void 0
+      };
+      this.tracker.trackInputChange(properties);
+    }
+  };
+
   // index.ts
   (async function() {
     const scriptTag = document.currentScript;
@@ -1083,6 +1131,10 @@
     if (config.trackCopy) {
       const copyManager = new CopyTrackingManager(tracker);
       copyManager.initialize();
+    }
+    if (config.trackFormInteractions) {
+      const formManager = new FormTrackingManager(tracker, config);
+      formManager.initialize();
     }
     if (config.trackErrors) {
       window.addEventListener("error", (event) => {

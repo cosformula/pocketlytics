@@ -23,9 +23,8 @@ export type SiteResponse = {
   trackSpaNavigation?: boolean;
   trackIp?: boolean;
   trackButtonClicks?: boolean;
-  trackRageClicks?: boolean;
-  trackDeadClicks?: boolean;
   trackCopy?: boolean;
+  trackFormInteractions?: boolean;
   tags?: string[];
 };
 
@@ -120,9 +119,8 @@ export function updateSiteConfig(
     trackInitialPageView?: boolean;
     trackSpaNavigation?: boolean;
     trackButtonClicks?: boolean;
-    trackRageClicks?: boolean;
-    trackDeadClicks?: boolean;
     trackCopy?: boolean;
+    trackFormInteractions?: boolean;
     tags?: string[];
   }
 ) {

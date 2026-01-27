@@ -29,6 +29,7 @@ export interface ScriptConfig {
   sessionReplaySampleRate?: number; // 0-100, percentage of sessions to record
   trackButtonClicks: boolean;
   trackCopy: boolean;
+  trackFormInteractions: boolean;
 }
 
 export interface BasePayload {
@@ -45,7 +46,7 @@ export interface BasePayload {
 }
 
 export interface TrackingPayload extends BasePayload {
-  type: "pageview" | "custom_event" | "outbound" | "performance" | "error" | "button_click" | "copy";
+  type: "pageview" | "custom_event" | "outbound" | "performance" | "error" | "button_click" | "copy" | "form_submit" | "input_change";
   event_name?: string;
   properties?: string;
   // Web vitals metrics
@@ -64,6 +65,21 @@ export interface ButtonClickProperties {
 export interface CopyProperties {
   textLength: number;
   sourceElement: string;
+}
+
+export interface FormSubmitProperties {
+  formId: string;
+  formName: string;
+  formAction: string;
+  method: string;
+  fieldCount: number;
+}
+
+export interface InputChangeProperties {
+  element: string; // "input" | "select" | "textarea"
+  inputType?: string; // For inputs: "text", "email", "checkbox", etc.
+  inputName: string; // Name or id attribute
+  formId?: string; // Parent form id if within a form
 }
 
 export interface WebVitalsData {

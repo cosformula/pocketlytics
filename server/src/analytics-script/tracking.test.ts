@@ -93,6 +93,7 @@ describe("Tracker", () => {
       maskPatterns: [],
       trackButtonClicks: false,
       trackCopy: false,
+      trackFormInteractions: false,
     };
 
     tracker = new Tracker(config);

@@ -1,9 +1,9 @@
 "use client";
 
-import { Copy, Eye, ExternalLink, MousePointerClick, TriangleAlert } from "lucide-react";
+import { Copy, Eye, ExternalLink, FileInput, MousePointerClick, TextCursorInput, TriangleAlert } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export type EventType = "pageview" | "custom_event" | "error" | "outbound" | "button_click" | "copy";
+export type EventType = "pageview" | "custom_event" | "error" | "outbound" | "button_click" | "copy" | "form_submit" | "input_change";
 
 interface EventTypeOption {
   value: EventType;
@@ -49,6 +49,18 @@ const EVENT_TYPE_OPTIONS: EventTypeOption[] = [
     color: "rgb(14, 165, 233)", // sky-500
     icon: <Copy className="h-3 w-3" />,
   },
+  {
+    value: "form_submit",
+    label: "Form Submits",
+    color: "rgb(168, 85, 247)", // purple-500
+    icon: <FileInput className="h-3 w-3" />,
+  },
+  {
+    value: "input_change",
+    label: "Input Changes",
+    color: "rgb(245, 158, 11)", // amber-500
+    icon: <TextCursorInput className="h-3 w-3" />,
+  },
 ];
 
 interface EventTypeFilterProps {
@@ -61,6 +73,8 @@ interface EventTypeFilterProps {
     outbound?: number;
     button_click?: number;
     copy?: number;
+    form_submit?: number;
+    input_change?: number;
   };
 }
 

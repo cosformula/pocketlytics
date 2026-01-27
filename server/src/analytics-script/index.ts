@@ -3,6 +3,7 @@ import { Tracker } from "./tracking.js";
 import { WebVitalsCollector } from "./webVitals.js";
 import { ClickTrackingManager } from "./clickTracking.js";
 import { CopyTrackingManager } from "./copyTracking.js";
+import { FormTrackingManager } from "./formTracking.js";
 import { debounce, isOutboundLink } from "./utils.js";
 import { RybbitAPI, WebVitalsData, ErrorProperties } from "./types.js";
 
@@ -71,6 +72,12 @@ declare global {
   if (config.trackCopy) {
     const copyManager = new CopyTrackingManager(tracker);
     copyManager.initialize();
+  }
+
+  // Initialize form interaction tracking if enabled
+  if (config.trackFormInteractions) {
+    const formManager = new FormTrackingManager(tracker, config);
+    formManager.initialize();
   }
 
   // Initialize error tracking if enabled
