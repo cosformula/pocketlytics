@@ -1026,11 +1026,8 @@
       if (!buttonElement) return;
       const properties = {
         element: buttonElement.tagName.toLowerCase(),
-        selector: this.getSelector(buttonElement),
         pathname: window.location.pathname,
-        text: this.getElementText(buttonElement),
-        id: buttonElement.id || void 0,
-        className: buttonElement.className || void 0
+        text: this.getElementText(buttonElement)
       };
       this.tracker.trackButtonClick(properties);
     }
@@ -1067,10 +1064,8 @@
           const properties = {
             clickCount: nearbyClicks.length,
             element: target.tagName.toLowerCase(),
-            selector: this.getSelector(target),
-            x: Math.round(x2),
-            y: Math.round(y2),
-            pathname: window.location.pathname
+            pathname: window.location.pathname,
+            text: this.getElementText(target)
           };
           this.tracker.trackRageClick(properties);
           this.clickHistory = [];
@@ -1093,48 +1088,12 @@
         if (!domChanged) {
           const properties = {
             element: element.tagName.toLowerCase(),
-            selector: this.getSelector(element),
-            tagName: element.tagName.toLowerCase(),
             pathname: window.location.pathname,
             text: this.getElementText(element)
           };
           this.tracker.trackDeadClick(properties);
         }
       }, this.deadClickObserverTimeout);
-    }
-    getSelector(element) {
-      if (element.id) {
-        return `#${element.id}`;
-      }
-      const parts = [];
-      let current = element;
-      let depth = 0;
-      while (current && current !== document.body && depth < 5) {
-        let selector = current.tagName.toLowerCase();
-        if (current.id) {
-          selector = `#${current.id}`;
-          parts.unshift(selector);
-          break;
-        }
-        if (current.className) {
-          const classes = current.className.split(/\s+/).filter((c2) => c2 && !c2.includes(":")).slice(0, 2);
-          if (classes.length > 0) {
-            selector += "." + classes.join(".");
-          }
-        }
-        const parent = current.parentElement;
-        if (parent) {
-          const siblings = Array.from(parent.children).filter((s2) => s2.tagName === current.tagName);
-          if (siblings.length > 1) {
-            const index = siblings.indexOf(current) + 1;
-            selector += `:nth-child(${index})`;
-          }
-        }
-        parts.unshift(selector);
-        current = current.parentElement;
-        depth++;
-      }
-      return parts.join(" > ").substring(0, 200);
     }
     getElementText(element) {
       const text = element.textContent?.trim().substring(0, 100);
@@ -1166,44 +1125,9 @@
       const properties = {
         textLength,
         sourceElement: sourceElement.tagName.toLowerCase(),
-        selector: this.getSelector(sourceElement),
         pathname: window.location.pathname
       };
       this.tracker.trackCopy(properties);
-    }
-    getSelector(element) {
-      if (element.id) {
-        return `#${element.id}`;
-      }
-      const parts = [];
-      let current = element;
-      let depth = 0;
-      while (current && current !== document.body && depth < 5) {
-        let selector = current.tagName.toLowerCase();
-        if (current.id) {
-          selector = `#${current.id}`;
-          parts.unshift(selector);
-          break;
-        }
-        if (current.className) {
-          const classes = current.className.split(/\s+/).filter((c2) => c2 && !c2.includes(":")).slice(0, 2);
-          if (classes.length > 0) {
-            selector += "." + classes.join(".");
-          }
-        }
-        const parent = current.parentElement;
-        if (parent) {
-          const siblings = Array.from(parent.children).filter((s2) => s2.tagName === current.tagName);
-          if (siblings.length > 1) {
-            const index = siblings.indexOf(current) + 1;
-            selector += `:nth-child(${index})`;
-          }
-        }
-        parts.unshift(selector);
-        current = current.parentElement;
-        depth++;
-      }
-      return parts.join(" > ").substring(0, 200);
     }
     cleanup() {
       document.removeEventListener("copy", this.handleCopy.bind(this));

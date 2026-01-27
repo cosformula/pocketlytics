@@ -111,11 +111,8 @@ export class ClickTrackingManager {
 
     const properties: ButtonClickProperties = {
       element: buttonElement.tagName.toLowerCase(),
-      selector: this.getSelector(buttonElement),
       pathname: window.location.pathname,
       text: this.getElementText(buttonElement),
-      id: buttonElement.id || undefined,
-      className: buttonElement.className || undefined,
     };
 
     this.tracker.trackButtonClick(properties);
@@ -164,10 +161,8 @@ export class ClickTrackingManager {
         const properties: RageClickProperties = {
           clickCount: nearbyClicks.length,
           element: target.tagName.toLowerCase(),
-          selector: this.getSelector(target),
-          x: Math.round(x),
-          y: Math.round(y),
           pathname: window.location.pathname,
+          text: this.getElementText(target),
         };
 
         this.tracker.trackRageClick(properties);
@@ -199,8 +194,6 @@ export class ClickTrackingManager {
       if (!domChanged) {
         const properties: DeadClickProperties = {
           element: element.tagName.toLowerCase(),
-          selector: this.getSelector(element),
-          tagName: element.tagName.toLowerCase(),
           pathname: window.location.pathname,
           text: this.getElementText(element),
         };
@@ -208,50 +201,6 @@ export class ClickTrackingManager {
         this.tracker.trackDeadClick(properties);
       }
     }, this.deadClickObserverTimeout);
-  }
-
-  private getSelector(element: HTMLElement): string {
-    // Generate a CSS selector for the element
-    if (element.id) {
-      return `#${element.id}`;
-    }
-
-    const parts: string[] = [];
-    let current: HTMLElement | null = element;
-    let depth = 0;
-
-    while (current && current !== document.body && depth < 5) {
-      let selector = current.tagName.toLowerCase();
-
-      if (current.id) {
-        selector = `#${current.id}`;
-        parts.unshift(selector);
-        break;
-      }
-
-      if (current.className) {
-        const classes = current.className.split(/\s+/).filter(c => c && !c.includes(":")).slice(0, 2);
-        if (classes.length > 0) {
-          selector += "." + classes.join(".");
-        }
-      }
-
-      // Add nth-child if there are siblings
-      const parent = current.parentElement;
-      if (parent) {
-        const siblings = Array.from(parent.children).filter(s => s.tagName === current!.tagName);
-        if (siblings.length > 1) {
-          const index = siblings.indexOf(current) + 1;
-          selector += `:nth-child(${index})`;
-        }
-      }
-
-      parts.unshift(selector);
-      current = current.parentElement;
-      depth++;
-    }
-
-    return parts.join(" > ").substring(0, 200);
   }
 
   private getElementText(element: HTMLElement): string | undefined {

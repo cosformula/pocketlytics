@@ -132,7 +132,15 @@ function PageviewItem({
                 </div>
               </Link>
             ) : (
-              <div className="text-sm truncate">{item.event_name || "Outbound Click"}</div>
+              <div className="text-sm truncate">
+                {item.event_name ||
+                  (isOutbound ? "Outbound Click" :
+                   isButtonClick ? "Button Click" :
+                   isRageClick ? "Rage Click" :
+                   isDeadClick ? "Dead Click" :
+                   isCopy ? "Copy" :
+                   "Event")}
+              </div>
             )}
           </div>
 
