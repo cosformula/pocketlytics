@@ -50,7 +50,6 @@ export class ClickTrackingManager {
     if (!buttonElement) return;
 
     const properties: ButtonClickProperties = {
-      element: buttonElement.tagName.toLowerCase(),
       text: this.getElementText(buttonElement),
     };
 

@@ -151,23 +151,7 @@ export const trackingPayloadSchema = z.discriminatedUnion("type", [
       type: z.literal("button_click"),
       ...baseEventFields,
       event_name: z.string().max(256).optional(),
-      properties: z
-        .string()
-        .max(2048)
-        .refine(
-          val => {
-            try {
-              const parsed = JSON.parse(val);
-              if (typeof parsed.element !== "string") return false;
-              return true;
-            } catch {
-              return false;
-            }
-          },
-          {
-            message: "Properties must be valid JSON with button_click fields (element required)",
-          }
-        ),
+      properties: jsonStringRefine("Properties must be valid JSON"),
     })
     .strict(),
   z

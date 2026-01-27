@@ -24,6 +24,43 @@ import { EventTypeFilter } from "../EventTypeFilter";
 import { IdentifiedBadge } from "../IdentifiedBadge";
 import { Button } from "../ui/button";
 
+// Helper to generate display name for auto-captured events
+function getEventDisplayName(item: SessionEvent): string {
+  if (item.event_name) return item.event_name;
+
+  switch (item.type) {
+    case "outbound":
+      return "Outbound Click";
+    case "button_click":
+      if (item.props?.text) return `Clicked button with text "${item.props.text}"`;
+      if (item.props?.selector) return `Clicked button "${item.props.selector}"`;
+      return "Clicked button";
+    case "copy": {
+      if (!item.props?.text) return "Copied text";
+      const text = String(item.props.text);
+      return `Copied "${text.substring(0, 50)}${text.length > 50 ? '...' : ''}"`;
+    }
+    case "form_submit":
+      if (item.props?.id) return `Submitted form "${item.props.id}"`;
+      if (item.props?.action) return `Submitted form to "${item.props.action}"`;
+      return "Submitted form";
+    case "input_change":
+      if (item.props?.name) return `Changed input "${item.props.name}"`;
+      if (item.props?.id) return `Changed input "${item.props.id}"`;
+      return "Changed input";
+    default:
+      return "Event";
+  }
+}
+
+// Props to hide from badges (already shown in event name or redundant)
+const PROPS_TO_HIDE: Record<string, string[]> = {
+  button_click: ['text'],
+  copy: ['text'],
+  form_submit: ['id', 'action'],
+  input_change: ['name', 'id'],
+};
+
 // Component to display a single pageview or event
 function PageviewItem({
   item,
@@ -132,15 +169,7 @@ function PageviewItem({
                 </div>
               </Link>
             ) : (
-              <div className="text-sm truncate">
-                {item.event_name ||
-                  (isOutbound ? "Outbound Click" :
-                   isButtonClick ? "Button Click" :
-                   isCopy ? "Copy" :
-                   isFormSubmit ? "Form Submit" :
-                   isInputChange ? "Input Change" :
-                   "Event")}
-              </div>
+              <div className="text-sm truncate">{getEventDisplayName(item)}</div>
             )}
           </div>
 
@@ -238,12 +267,19 @@ function PageviewItem({
             </div>
           </div>
         )}
-        {(isButtonClick || isCopy || isFormSubmit || isInputChange) && (
-          <div className="flex items-center pl-7 mt-1">
-            <div className="text-xs text-neutral-500 dark:text-neutral-400">
-              {item.props && Object.keys(item.props).length > 0 ? (
+        {(isButtonClick || isCopy || isFormSubmit || isInputChange) && (() => {
+          const propsToHide = PROPS_TO_HIDE[item.type] || [];
+          const remainingProps = item.props
+            ? Object.entries(item.props).filter(([key]) => !propsToHide.includes(key))
+            : [];
+
+          if (remainingProps.length === 0) return null;
+
+          return (
+            <div className="flex items-center pl-7 mt-1">
+              <div className="text-xs text-neutral-500 dark:text-neutral-400">
                 <span className="flex flex-wrap gap-2 mt-1">
-                  {Object.entries(item.props).map(([key, value]) => (
+                  {remainingProps.map(([key, value]) => (
                     <Badge key={key} variant="outline">
                       <span className="text-neutral-600 dark:text-neutral-300 font-light mr-1">{key}:</span>{" "}
                       <Tooltip>
@@ -261,10 +297,10 @@ function PageviewItem({
                     </Badge>
                   ))}
                 </span>
-              ) : null}
+              </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
       </div>
     </div>
   );

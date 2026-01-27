@@ -980,7 +980,6 @@
       const buttonElement = this.findButton(element);
       if (!buttonElement) return;
       const properties = {
-        element: buttonElement.tagName.toLowerCase(),
         text: this.getElementText(buttonElement)
       };
       this.tracker.trackButtonClick(properties);

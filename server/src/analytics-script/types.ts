@@ -58,7 +58,6 @@ export interface TrackingPayload extends BasePayload {
 }
 
 export interface ButtonClickProperties {
-  element: string;
   text?: string;
 }
 
