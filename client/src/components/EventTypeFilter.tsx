@@ -1,42 +1,35 @@
 "use client";
 
-import { Copy, Eye, ExternalLink, FileInput, MousePointerClick, TextCursorInput, TriangleAlert } from "lucide-react";
+import { useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { EVENT_TYPE_CONFIG, EventType } from "@/lib/events";
-
-// Icon mapping for event types
-const EVENT_TYPE_ICONS: Record<EventType, React.ReactNode> = {
-  pageview: <Eye className="h-3 w-3" />,
-  custom_event: <MousePointerClick className="h-3 w-3" />,
-  outbound: <ExternalLink className="h-3 w-3" />,
-  error: <TriangleAlert className="h-3 w-3" />,
-  button_click: <MousePointerClick className="h-3 w-3" />,
-  copy: <Copy className="h-3 w-3" />,
-  form_submit: <FileInput className="h-3 w-3" />,
-  input_change: <TextCursorInput className="h-3 w-3" />,
-};
+import { EventTypeIcon } from "./EventIcons";
 
 interface EventTypeFilterProps {
   visibleTypes: Set<string>;
   onToggle: (type: string) => void;
-  counts?: {
-    pageview?: number;
-    custom_event?: number;
-    error?: number;
-    outbound?: number;
-    button_click?: number;
-    copy?: number;
-    form_submit?: number;
-    input_change?: number;
-  };
+  events: { type: string }[];
 }
 
-export function EventTypeFilter({ visibleTypes, onToggle, counts }: EventTypeFilterProps) {
+export function EventTypeFilter({
+  visibleTypes,
+  onToggle,
+  events,
+}: EventTypeFilterProps) {
+  // Calculate counts for each event type
+  const counts = useMemo(() => {
+    const result: Record<string, number> = {};
+    for (const event of events) {
+      result[event.type] = (result[event.type] || 0) + 1;
+    }
+    return result;
+  }, [events]);
+
   return (
     <div className="flex items-center space-x-2">
       {EVENT_TYPE_CONFIG.map((option) => {
         const isSelected = visibleTypes.has(option.value);
-        const count = counts?.[option.value];
+        const count = counts[option.value] || 0;
 
         return (
           <button
@@ -51,15 +44,14 @@ export function EventTypeFilter({ visibleTypes, onToggle, counts }: EventTypeFil
           >
             <div
               className={cn(
-                "w-3 h-3 rounded-sm flex items-center justify-center transition-opacity",
-                option.colorClass,
+                "transition-opacity",
                 isSelected ? "opacity-100" : "opacity-30"
               )}
             >
-              {EVENT_TYPE_ICONS[option.value]}
+              <EventTypeIcon type={option.value as EventType} className="h-3 w-3" />
             </div>
             <span>{option.label}</span>
-            {count !== undefined && count > 0 && (
+            {count > 0 && (
               <span
                 className={cn(
                   "ml-1 px-1.5 py-0.5 rounded-full text-[10px] leading-none",

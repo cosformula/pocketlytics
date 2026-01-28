@@ -51,43 +51,6 @@ export function SessionDetails({ session, userId }: SessionDetailsProps) {
   // Get session details from the first page
   const sessionDetails = sessionDetailsData?.pages[0]?.data?.session;
 
-  // Calculate total pageviews and events
-  const totalPageviews = useMemo(() => {
-    return allEvents.filter((p: SessionEvent) => p.type === "pageview").length;
-  }, [allEvents]);
-
-  const totalEvents = useMemo(() => {
-    return allEvents.filter((p: SessionEvent) => p.type === "custom_event")
-      .length;
-  }, [allEvents]);
-
-  const totalErrors = useMemo(() => {
-    return allEvents.filter((p: SessionEvent) => p.type === "error").length;
-  }, [allEvents]);
-
-  const totalOutbound = useMemo(() => {
-    return allEvents.filter((p: SessionEvent) => p.type === "outbound").length;
-  }, [allEvents]);
-
-  const totalButtonClicks = useMemo(() => {
-    return allEvents.filter((p: SessionEvent) => p.type === "button_click")
-      .length;
-  }, [allEvents]);
-
-  const totalCopies = useMemo(() => {
-    return allEvents.filter((p: SessionEvent) => p.type === "copy").length;
-  }, [allEvents]);
-
-  const totalFormSubmits = useMemo(() => {
-    return allEvents.filter((p: SessionEvent) => p.type === "form_submit")
-      .length;
-  }, [allEvents]);
-
-  const totalInputChanges = useMemo(() => {
-    return allEvents.filter((p: SessionEvent) => p.type === "input_change")
-      .length;
-  }, [allEvents]);
-
   // Event type filter state
   const [visibleEventTypes, setVisibleEventTypes] = useState<Set<string>>(
     new Set([
@@ -161,16 +124,7 @@ export function SessionDetails({ session, userId }: SessionDetailsProps) {
               <EventTypeFilter
                 visibleTypes={visibleEventTypes}
                 onToggle={toggleEventType}
-                counts={{
-                  pageview: totalPageviews,
-                  custom_event: totalEvents,
-                  error: totalErrors,
-                  outbound: totalOutbound,
-                  button_click: totalButtonClicks,
-                  copy: totalCopies,
-                  form_submit: totalFormSubmits,
-                  input_change: totalInputChanges,
-                }}
+                events={allEvents}
               />
             </div>
             <div className="mb-4 px-1">
