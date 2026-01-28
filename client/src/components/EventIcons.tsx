@@ -3,12 +3,31 @@ import {
   ExternalLink,
   Eye,
   FileInput,
+  LucideIcon,
   MousePointerClick,
   TextCursorInput,
   TriangleAlert,
+  SquareMousePointer
 } from "lucide-react";
 import { cn } from "../lib/utils";
-import { EventType } from "../lib/events";
+import { EVENT_TYPE_CONFIG, EventType } from "../lib/events";
+
+// Icon mapping for each event type
+const EVENT_TYPE_ICONS: Record<EventType, LucideIcon> = {
+  pageview: Eye,
+  custom_event: MousePointerClick,
+  error: TriangleAlert,
+  outbound: ExternalLink,
+  button_click: SquareMousePointer,
+  copy: Copy,
+  form_submit: FileInput,
+  input_change: TextCursorInput,
+};
+
+// Build color lookup from shared config
+const EVENT_TYPE_COLORS: Record<string, string> = Object.fromEntries(
+  EVENT_TYPE_CONFIG.map((config) => [config.value, config.colorClass])
+);
 
 interface EventTypeIconProps {
   type: EventType | string;
@@ -16,28 +35,10 @@ interface EventTypeIconProps {
 }
 
 export function EventTypeIcon({ type, className }: EventTypeIconProps) {
-  const baseClass = cn("h-4 w-4", className);
+  const Icon = EVENT_TYPE_ICONS[type as EventType] || MousePointerClick;
+  const colorClass = EVENT_TYPE_COLORS[type] || "text-amber-400";
 
-  switch (type) {
-    case "pageview":
-      return <Eye className={cn(baseClass, "text-blue-400")} />;
-    case "custom_event":
-      return <MousePointerClick className={cn(baseClass, "text-amber-400")} />;
-    case "error":
-      return <TriangleAlert className={cn(baseClass, "text-red-500")} />;
-    case "outbound":
-      return <ExternalLink className={cn(baseClass, "text-purple-500")} />;
-    case "button_click":
-      return <MousePointerClick className={cn(baseClass, "text-green-500")} />;
-    case "copy":
-      return <Copy className={cn(baseClass, "text-sky-500")} />;
-    case "form_submit":
-      return <FileInput className={cn(baseClass, "text-purple-500")} />;
-    case "input_change":
-      return <TextCursorInput className={cn(baseClass, "text-amber-500")} />;
-    default:
-      return <MousePointerClick className={cn(baseClass, "text-amber-400")} />;
-  }
+  return <Icon className={cn("h-4 w-4", className, colorClass)} />;
 }
 
 // Backwards-compatible aliases

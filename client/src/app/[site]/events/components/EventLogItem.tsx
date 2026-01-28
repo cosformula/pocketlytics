@@ -83,12 +83,12 @@ export function EventLogItem({ event }: EventLogItemProps) {
                 // For outbound events, show the destination URL from properties
                 eventProperties.url ? (
                   <Link href={eventProperties.url} target="_blank" rel="noopener noreferrer">
-                    <div className="text-sm truncate hover:underline text-purple-400" title={eventProperties.url}>
+                    <div className="text-sm truncate hover:underline" title={eventProperties.url}>
                       {truncateString(eventProperties.url, 64)}
                     </div>
                   </Link>
                 ) : (
-                  <div className="text-sm font-medium truncate text-purple-400">Outbound Link</div>
+                  <div className="text-sm font-medium truncate">Outbound Link</div>
                 )
               ) : isButtonClick || isCopy || isFormSubmit || isInputChange ? (
                 <div className="text-sm font-medium truncate">

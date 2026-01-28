@@ -21,12 +21,12 @@ export interface EventTypeConfig {
 export const EVENT_TYPE_CONFIG: EventTypeConfig[] = [
   { value: "pageview", label: "Pageviews", colorClass: "text-blue-400" },
   { value: "custom_event", label: "Events", colorClass: "text-amber-400" },
-  { value: "outbound", label: "Outbound", colorClass: "text-purple-500" },
-  { value: "error", label: "Errors", colorClass: "text-red-500" },
-  { value: "button_click", label: "Button Clicks", colorClass: "text-green-500" },
-  { value: "copy", label: "Copies", colorClass: "text-sky-500" },
-  { value: "form_submit", label: "Form Submits", colorClass: "text-purple-500" },
-  { value: "input_change", label: "Input Changes", colorClass: "text-amber-500" },
+  { value: "outbound", label: "Outbound", colorClass: "text-lime-400" },
+  { value: "button_click", label: "Button Clicks", colorClass: "text-green-400" },
+  { value: "copy", label: "Copies", colorClass: "text-sky-400" },
+  { value: "form_submit", label: "Form Submits", colorClass: "text-purple-400" },
+  { value: "input_change", label: "Input Changes", colorClass: "text-pink-400" },
+  { value: "error", label: "Errors", colorClass: "text-red-400" },
 ];
 
 // ============================================================================

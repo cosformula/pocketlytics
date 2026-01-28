@@ -38,8 +38,8 @@ export function EventTypeFilter({
             className={cn(
               "flex items-center space-x-1.5 px-2 py-1 rounded text-xs font-medium transition-all",
               isSelected
-                ? "bg-neutral-200 dark:bg-neutral-800 text-neutral-900 dark:text-white"
-                : "bg-neutral-100 dark:bg-neutral-900 text-neutral-600 dark:text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-400"
+                ? "bg-neutral-100 dark:bg-neutral-800 text-neutral-900 dark:text-white"
+                : "bg-neutral-50 dark:bg-neutral-900 text-neutral-600 dark:text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-400"
             )}
           >
             <div
@@ -56,8 +56,8 @@ export function EventTypeFilter({
                 className={cn(
                   "ml-1 px-1.5 py-0.5 rounded-full text-[10px] leading-none",
                   isSelected
-                    ? "bg-neutral-300 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300"
-                    : "bg-neutral-200 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-500"
+                    ? "bg-neutral-200 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300"
+                    : "bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-500"
                 )}
               >
                 {count}

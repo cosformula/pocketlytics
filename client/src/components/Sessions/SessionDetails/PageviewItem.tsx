@@ -102,7 +102,7 @@ export function PageviewItem({
                 rel="noopener noreferrer"
               >
                 <div
-                  className="text-sm truncate hover:underline text-purple-400"
+                  className="text-sm truncate hover:underline"
                   title={String(item.props.url)}
                   style={{
                     maxWidth: "calc(min(100vw, 1150px) - 250px)",
@@ -231,8 +231,8 @@ export function PageviewItem({
             const propsToHide = PROPS_TO_HIDE[item.type] || [];
             const remainingProps = item.props
               ? Object.entries(item.props).filter(
-                  ([key]) => !propsToHide.includes(key)
-                )
+                ([key]) => !propsToHide.includes(key)
+              )
               : [];
 
             if (remainingProps.length === 0) return null;
