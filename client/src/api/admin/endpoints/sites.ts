@@ -150,6 +150,7 @@ export interface VerifyScriptResponse {
   scriptExecuted: boolean;
   siteIdMatch: boolean;
   issues: string[];
+  aiAnalysis: string | null;
 }
 
 export function verifyScript(siteId: number | string) {
