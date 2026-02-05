@@ -3,7 +3,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { getTimezone } from "@/lib/store";
-import { Laptop, Smartphone } from "lucide-react";
 import { DateTime } from "luxon";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -14,18 +13,8 @@ import { getEventDisplayName, PROPS_TO_HIDE } from "../../../../../lib/events";
 import { getCountryName, truncateString } from "../../../../../lib/utils";
 import { Browser } from "../../../components/shared/icons/Browser";
 import { CountryFlag } from "../../../components/shared/icons/CountryFlag";
+import { DeviceIcon } from "../../../components/shared/icons/Device";
 import { OperatingSystem } from "../../../components/shared/icons/OperatingSystem";
-
-// DeviceIcon component for displaying mobile/desktop icons
-function DeviceIcon({ deviceType }: { deviceType: string }) {
-  const type = deviceType.toLowerCase();
-
-  if (type.includes("mobile") || type.includes("tablet")) {
-    return <Smartphone className="w-4 h-4" />;
-  }
-
-  return <Laptop className="w-4 h-4" />;
-}
 
 interface EventLogItemProps {
   event: Event;

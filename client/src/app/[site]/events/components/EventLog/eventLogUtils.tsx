@@ -1,18 +1,7 @@
 "use client";
 
 import { Event } from "../../../../../api/analytics/endpoints";
-import { getEventDisplayName, EVENT_TYPE_CONFIG } from "../../../../../lib/events";
-import { Laptop, Smartphone } from "lucide-react";
-
-export function DeviceIcon({ deviceType }: { deviceType: string }) {
-  const type = deviceType.toLowerCase();
-
-  if (type.includes("mobile") || type.includes("tablet")) {
-    return <Smartphone className="w-4 h-4" />;
-  }
-
-  return <Laptop className="w-4 h-4" />;
-}
+import { EVENT_TYPE_CONFIG, getEventDisplayName } from "../../../../../lib/events";
 
 export function getEventKey(event: Event) {
   return `${event.timestamp}-${event.session_id}-${event.user_id}-${event.type}-${event.event_name ?? ""}-${event.pathname}`;
