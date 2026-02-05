@@ -12,7 +12,7 @@ import { getCountryName, getUserDisplayName, truncateString } from "../../../../
 import { Browser } from "../../../components/shared/icons/Browser";
 import { CountryFlag } from "../../../components/shared/icons/CountryFlag";
 import { OperatingSystem } from "../../../components/shared/icons/OperatingSystem";
-import { getEventTypeLabel, getMainData, parseEventProperties } from "./eventLogUtils";
+import { buildEventPath, getEventTypeLabel, getMainData, parseEventProperties } from "./eventLogUtils";
 import { DeviceIcon } from "../../../components/shared/icons/Device";
 
 interface EventRowProps {
@@ -26,7 +26,10 @@ export function EventRow({ event, site, onClick }: EventRowProps) {
   const eventTime = DateTime.fromSQL(event.timestamp, { zone: "utc" })
     .setLocale(userLocale)
     .setZone(getTimezone());
-  const mainData = getMainData(event, eventProperties);
+  const pagePath = buildEventPath(event);
+  const pageUrl = `https://${event.hostname}${pagePath}`;
+  const isPageview = event.type === "pageview";
+  const eventData = isPageview ? null : getMainData(event, eventProperties);
   const userProfileId = event.identified_user_id || event.user_id;
   const displayName = getUserDisplayName({
     identified_user_id: event.identified_user_id || undefined,
@@ -35,7 +38,7 @@ export function EventRow({ event, site, onClick }: EventRowProps) {
 
   return (
     <div
-      className="grid grid-cols-[28px_140px_220px_100px_minmax(240px,1fr)] border-b border-neutral-100 dark:border-neutral-800 hover:bg-neutral-50/60 dark:hover:bg-neutral-800/40 cursor-pointer"
+      className="grid grid-cols-[28px_140px_180px_100px_1fr_1fr] border-b border-neutral-100 dark:border-neutral-800 hover:bg-neutral-50/60 dark:hover:bg-neutral-800/40 cursor-pointer"
       onClick={() => onClick(event)}
     >
       <div className="flex items-center justify-center py-1">
@@ -118,22 +121,37 @@ export function EventRow({ event, site, onClick }: EventRowProps) {
         </Tooltip>
       </div>
 
-      <div className="text-neutral-600 dark:text-neutral-300 px-2 py-1">
-        {mainData.url ? (
-          <Link
-            href={mainData.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={e => e.stopPropagation()}
-            className="truncate hover:underline inline-block max-w-[380px]"
-            title={mainData.label}
-          >
-            {truncateString(mainData.label, 80)}
-          </Link>
-        ) : (
-          <span className="truncate inline-block max-w-[380px]" title={mainData.label}>
-            {truncateString(mainData.label, 80)}
-          </span>
+      <div className="text-neutral-600 dark:text-neutral-300 px-2 py-1 truncate">
+        <Link
+          href={pageUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={e => e.stopPropagation()}
+          className="hover:underline"
+          title={pagePath}
+        >
+          {truncateString(pagePath, 60)}
+        </Link>
+      </div>
+
+      <div className="text-neutral-600 dark:text-neutral-300 px-2 py-1 truncate">
+        {eventData && (
+          eventData.url ? (
+            <Link
+              href={eventData.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={e => e.stopPropagation()}
+              className="hover:underline"
+              title={eventData.label}
+            >
+              {truncateString(eventData.label, 60)}
+            </Link>
+          ) : (
+            <span title={eventData.label}>
+              {truncateString(eventData.label, 60)}
+            </span>
+          )
         )}
       </div>
     </div>

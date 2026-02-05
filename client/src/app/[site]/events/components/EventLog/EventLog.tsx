@@ -10,7 +10,6 @@ import { NothingFound } from "../../../../../components/NothingFound";
 import { ErrorState } from "../../../../../components/ErrorState";
 import { ScrollArea } from "../../../../../components/ui/scroll-area";
 import { EventDetailsSheet } from "./EventDetailsSheet";
-import { EventLogItemSkeleton } from "./EventLogItem";
 import { EventRow } from "./EventRow";
 import { RealtimeToggle } from "./RealtimeToggle";
 import { useEventLogState } from "./useEventLogState";
@@ -42,6 +41,7 @@ export function EventLog() {
     unfilteredEvents,
     isLoading,
     isError,
+    isFetched,
     scrollElement,
     scrollAreaCallbackRef,
     fetchNextPage,
@@ -73,45 +73,15 @@ export function EventLog() {
     fetchNextPage();
   }
 
-  if (isLoading) {
-    return (
-      <div className="space-y-2">
-        {Array.from({ length: 24 }).map((_, index) => (
-          <EventLogItemSkeleton key={index} showProperties={index % 3 === 0} />
-        ))}
-      </div>
-    );
-  }
-
-  if (isError) {
-    return (
-      <ErrorState
-        title="Failed to load events"
-        message="There was a problem fetching the events. Please try again later."
-      />
-    );
-  }
-
-  if (allEvents.length === 0) {
-    return (
-      <>
-        <div className="flex items-center gap-3 mb-2">
-          <RealtimeToggle isRealtime={isRealtime} onToggle={toggleRealtime} />
-          <EventTypeFilter visibleTypes={visibleTypes} onToggle={handleToggleType} events={unfilteredEvents} />
-        </div>
-        <NothingFound
-          title={"No events found"}
-          description={"Try a different date range or filter"}
-        />
-      </>
-    );
-  }
+  const showBody = !isLoading && !isError && allEvents.length > 0;
 
   return (
     <>
       <div className="flex items-center gap-3 mb-2">
         <RealtimeToggle isRealtime={isRealtime} onToggle={toggleRealtime} />
-        <EventTypeFilter visibleTypes={visibleTypes} onToggle={handleToggleType} events={unfilteredEvents} />
+        {!isLoading && (
+          <EventTypeFilter visibleTypes={visibleTypes} onToggle={handleToggleType} events={unfilteredEvents} />
+        )}
       </div>
 
       <div className="relative">
@@ -131,57 +101,84 @@ export function EventLog() {
         >
           <div className="relative h-full pr-2 font-mono text-[11px] leading-4">
             <div className="sticky top-0 z-20 bg-neutral-50/95 dark:bg-neutral-850/95 backdrop-blur border-b border-neutral-100 dark:border-neutral-800">
-              <div className="grid grid-cols-[28px_140px_220px_100px_minmax(240px,1fr)] px-2 py-1.5 uppercase tracking-wide text-[10px] text-neutral-500 dark:text-neutral-400">
+              <div className="grid grid-cols-[28px_140px_180px_100px_1fr_1fr] px-2 py-1.5 uppercase tracking-wide text-[10px] text-neutral-500 dark:text-neutral-400">
                 <div></div>
                 <div>Timestamp</div>
                 <div>User</div>
                 <div>Device Info</div>
-                <div>Main Data</div>
+                <div>Page</div>
+                <div>Data</div>
               </div>
             </div>
 
-            <div className="relative">
-              <div
-                style={{
-                  height: rowVirtualizer.getTotalSize(),
-                  position: "relative",
-                }}
-              >
-                {virtualItems.map((virtualRow) => {
-                  const event = allEvents[virtualRow.index];
-                  if (!event) return null;
-
-                  return (
-                    <div
-                      key={`${event.timestamp}-${virtualRow.index}`}
-                      style={{
-                        position: "absolute",
-                        top: 0,
-                        left: 0,
-                        width: "100%",
-                        transform: `translateY(${virtualRow.start}px)`,
-                      }}
-                    >
-                      <EventRow
-                        event={event}
-                        site={site as string}
-                        onClick={(selected) => {
-                          setSelectedEvent(selected);
-                          setSheetOpen(true);
-                        }}
-                      />
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {isFetchingNextPage && (
-              <div className="py-2">
-                {Array.from({ length: 3 }).map((_, index) => (
-                  <EventLogItemSkeleton key={`next-page-${index}`} />
+            {isLoading && (
+              <div>
+                {Array.from({ length: 24 }).map((_, index) => (
+                  <EventLogItemSkeleton key={index} showProperties={index % 3 === 0} />
                 ))}
               </div>
+            )}
+
+            {isError && (
+              <ErrorState
+                title="Failed to load events"
+                message="There was a problem fetching the events. Please try again later."
+              />
+            )}
+
+            {isFetched && !isError && allEvents.length === 0 && (
+              <NothingFound
+                title={"No events found"}
+                description={"Try a different date range or filter"}
+              />
+            )}
+
+            {showBody && (
+              <>
+                <div className="relative">
+                  <div
+                    style={{
+                      height: rowVirtualizer.getTotalSize(),
+                      position: "relative",
+                    }}
+                  >
+                    {virtualItems.map((virtualRow) => {
+                      const event = allEvents[virtualRow.index];
+                      if (!event) return null;
+
+                      return (
+                        <div
+                          key={`${event.timestamp}-${virtualRow.index}`}
+                          style={{
+                            position: "absolute",
+                            top: 0,
+                            left: 0,
+                            width: "100%",
+                            transform: `translateY(${virtualRow.start}px)`,
+                          }}
+                        >
+                          <EventRow
+                            event={event}
+                            site={site as string}
+                            onClick={(selected) => {
+                              setSelectedEvent(selected);
+                              setSheetOpen(true);
+                            }}
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {isFetchingNextPage && (
+                  <div className="py-2">
+                    {Array.from({ length: 3 }).map((_, index) => (
+                      <EventLogItemSkeleton key={`next-page-${index}`} />
+                    ))}
+                  </div>
+                )}
+              </>
             )}
           </div>
         </ScrollArea>
@@ -197,5 +194,35 @@ export function EventLog() {
         site={site as string}
       />
     </>
+  );
+}
+
+function EventLogItemSkeleton({ showProperties }: { showProperties?: boolean }) {
+  return (
+    <div className="grid grid-cols-[28px_140px_180px_100px_1fr_1fr] border-b border-neutral-100 dark:border-neutral-800 px-2 py-1">
+      <div className="flex items-center justify-center">
+        <div className="h-4 w-4 rounded bg-neutral-200 dark:bg-neutral-700 animate-pulse" />
+      </div>
+      <div className="flex items-center px-2">
+        <div className="h-3 w-24 rounded bg-neutral-200 dark:bg-neutral-700 animate-pulse" />
+      </div>
+      <div className="flex items-center gap-2 px-2">
+        <div className="h-[18px] w-[18px] rounded-full bg-neutral-200 dark:bg-neutral-700 animate-pulse" />
+        <div className="h-3 w-20 rounded bg-neutral-200 dark:bg-neutral-700 animate-pulse" />
+      </div>
+      <div className="flex items-center gap-1 px-2">
+        <div className="h-4 w-4 rounded bg-neutral-200 dark:bg-neutral-700 animate-pulse" />
+        <div className="h-4 w-4 rounded bg-neutral-200 dark:bg-neutral-700 animate-pulse" />
+        <div className="h-4 w-4 rounded bg-neutral-200 dark:bg-neutral-700 animate-pulse" />
+      </div>
+      <div className="flex items-center px-2">
+        <div className="h-3 w-28 rounded bg-neutral-200 dark:bg-neutral-700 animate-pulse" />
+      </div>
+      <div className="flex items-center px-2">
+        {showProperties && (
+          <div className="h-3 w-32 rounded bg-neutral-200 dark:bg-neutral-700 animate-pulse" />
+        )}
+      </div>
+    </div>
   );
 }

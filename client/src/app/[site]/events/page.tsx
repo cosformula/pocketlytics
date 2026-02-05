@@ -18,7 +18,7 @@ export default function EventsPage() {
 
   return (
     <DisabledOverlay message="Events" featurePath="events">
-      <div className="p-2 md:p-4 max-w-[1300px] mx-auto space-y-3">
+      <div className="p-2 md:p-4 mx-auto space-y-3">
         <SubHeader availableFilters={EVENT_FILTERS} />
 
         <EventsChart />

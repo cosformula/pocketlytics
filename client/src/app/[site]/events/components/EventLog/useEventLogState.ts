@@ -40,6 +40,7 @@ export function useEventLogState(options: {
     data: cursorData,
     isLoading,
     isError,
+    isFetched,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
@@ -215,6 +216,7 @@ export function useEventLogState(options: {
     unfilteredEvents: mergedEvents,
     isLoading,
     isError,
+    isFetched,
 
     // Virtualizer support
     scrollElement,
