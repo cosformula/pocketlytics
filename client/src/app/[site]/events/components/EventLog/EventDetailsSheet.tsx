@@ -146,7 +146,7 @@ export function EventDetailsSheet({ open, onOpenChange, event, site }: EventDeta
                     <span className="text-neutral-500 dark:text-neutral-400">Location</span>
                     <span className="flex items-center gap-1">{event.country && <CountryFlag country={event.country} />}{[event.city, getRegionName(event.region), getCountryName(event.country)].filter(Boolean).join(", ") || "-"}</span>
                   </div>
-                  {(event.lat !== 0 || event.lon !== 0) && event.lat && event.lon && (
+                  {(isFinite(event.lat) && isFinite(event.lon)) && (
                     <div className="flex items-center justify-between border-b border-neutral-50 dark:border-neutral-850 pb-1.5">
                       <span className="text-neutral-500 dark:text-neutral-400">Coordinates</span>
                       <span>{event.lat.toFixed(4)}, {event.lon.toFixed(4)}</span>

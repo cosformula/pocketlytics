@@ -3,7 +3,6 @@ import { authedFetch } from "../../utils";
 import {
   BucketedParams,
   CommonApiParams,
-  PaginationParams,
   toBucketedQueryParams,
   toQueryParams,
 } from "./types";
@@ -47,17 +46,6 @@ export interface CursorEventsResponse {
   cursor: { hasMore: boolean; oldestTimestamp: string | null };
 }
 
-// Legacy response type (kept for other potential consumers)
-export interface EventsResponse {
-  data: Event[];
-  pagination: {
-    total: number;
-    page: number;
-    pageSize: number;
-    totalPages: number;
-  };
-}
-
 // Event name with count
 export type EventName = {
   eventName: string;
@@ -84,10 +72,6 @@ export type EventBucketedPoint = {
   event_name: string;
   event_count: number;
 };
-
-export interface EventsParams extends CommonApiParams, PaginationParams {
-  pageSize?: number;
-}
 
 export interface EventBucketedParams extends BucketedParams {
   limit?: number;
@@ -144,27 +128,6 @@ export async function fetchEventsCursor(
     `/sites/${site}/events`,
     queryParams
   );
-}
-
-/**
- * Fetch paginated events (legacy)
- * GET /api/events/:site
- */
-export async function fetchEvents(
-  site: string | number,
-  params: EventsParams
-): Promise<EventsResponse> {
-  const queryParams = {
-    ...toQueryParams(params),
-    page: params.page,
-    page_size: params.pageSize ?? params.limit,
-  };
-
-  const response = await authedFetch<EventsResponse>(
-    `/sites/${site}/events`,
-    queryParams
-  );
-  return response;
 }
 
 /**

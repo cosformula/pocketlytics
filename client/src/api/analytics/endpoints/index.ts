@@ -13,7 +13,6 @@ export type {
 // Events endpoints
 export {
   fetchEventBucketed,
-  fetchEvents,
   fetchNewEvents,
   fetchEventsCursor,
   fetchEventNames,
@@ -23,14 +22,12 @@ export {
 export type {
   Event,
   EventBucketedPoint,
-  EventsResponse,
   NewEventsResponse,
   CursorEventsResponse,
   EventName,
   EventProperty,
   OutboundLink,
   EventBucketedParams,
-  EventsParams,
   EventPropertiesParams,
 } from "./events";
 
