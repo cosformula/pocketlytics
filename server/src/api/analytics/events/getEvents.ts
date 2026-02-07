@@ -122,7 +122,7 @@ export async function getEvents(
     const timeStatement =
       req.query.start_date || req.query.end_date
         ? getTimeStatement(req.query)
-        : "AND timestamp > now() - INTERVAL 30 MINUTE";
+        : "";
 
     let cursorCondition = "";
     const queryParams: Record<string, any> = {
