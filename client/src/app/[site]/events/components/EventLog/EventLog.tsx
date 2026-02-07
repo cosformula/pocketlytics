@@ -96,7 +96,7 @@ export function EventLog() {
         )}
 
         <ScrollArea
-          className="h-[80vh] border border-neutral-100 dark:border-neutral-800 rounded-lg"
+          className="h-[90vh] border border-neutral-100 dark:border-neutral-800 rounded-lg"
           ref={scrollAreaCallbackRef}
         >
           <div className="relative h-full pr-2 font-mono text-[11px] leading-4">
