@@ -18,6 +18,7 @@ export {
   fetchEventNames,
   fetchEventProperties,
   fetchOutboundLinks,
+  fetchSiteEventCount,
 } from "./events";
 export type {
   Event,
@@ -29,6 +30,8 @@ export type {
   OutboundLink,
   EventBucketedParams,
   EventPropertiesParams,
+  SiteEventCountPoint,
+  SiteEventCountParams,
 } from "./events";
 
 

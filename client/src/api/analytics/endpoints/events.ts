@@ -77,6 +77,23 @@ export interface EventBucketedParams extends BucketedParams {
   limit?: number;
 }
 
+// Site-level event count breakdown by type
+export type SiteEventCountPoint = {
+  time: string;
+  pageview_count: number;
+  custom_event_count: number;
+  performance_count: number;
+  outbound_count: number;
+  error_count: number;
+  button_click_count: number;
+  copy_count: number;
+  form_submit_count: number;
+  input_change_count: number;
+  event_count: number;
+};
+
+export type SiteEventCountParams = BucketedParams;
+
 export interface EventPropertiesParams extends CommonApiParams {
   eventName: string;
 }
@@ -196,6 +213,21 @@ export async function fetchEventBucketed(
   const response = await authedFetch<{ data: EventBucketedPoint[] }>(
     `/sites/${site}/events/bucketed`,
     queryParams
+  );
+  return response.data;
+}
+
+/**
+ * Fetch site-level event count breakdown by type
+ * GET /sites/:site/events/count
+ */
+export async function fetchSiteEventCount(
+  site: string | number,
+  params: SiteEventCountParams
+): Promise<SiteEventCountPoint[]> {
+  const response = await authedFetch<{ data: SiteEventCountPoint[] }>(
+    `/sites/${site}/events/count`,
+    toBucketedQueryParams(params)
   );
   return response.data;
 }
