@@ -37,6 +37,7 @@ import { Browser } from "../components/shared/icons/Browser";
 import { CountryFlag } from "../components/shared/icons/CountryFlag";
 import { OperatingSystem } from "../components/shared/icons/OperatingSystem";
 import { SubHeader } from "../components/SubHeader/SubHeader";
+import { DeviceIcon } from "../components/shared/icons/Device";
 
 // Set up column helper
 const columnHelper = createColumnHelper<UsersResponse>();
@@ -233,9 +234,7 @@ export default function UsersPage() {
             className="flex items-center gap-2 whitespace-nowrap cursor-pointer hover:opacity-70"
             onClick={e => handleFilterClick(e, "device_type", deviceType)}
           >
-            {deviceType === "Desktop" && <Monitor className="w-4 h-4" />}
-            {deviceType === "Mobile" && <Smartphone className="w-4 h-4" />}
-            {deviceType === "Tablet" && <Tablet className="w-4 h-4" />}
+            <DeviceIcon deviceType={deviceType || ""} />
             {deviceType}
           </div>
         );

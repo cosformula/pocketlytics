@@ -4,6 +4,7 @@ export { getEventNames } from "./events/getEventNames.js";
 export { getEventProperties } from "./events/getEventProperties.js";
 export { getEvents } from "./events/getEvents.js";
 export { getOutboundLinks } from "./events/getOutboundLinks.js";
+export { getSiteEventCount } from "./events/getSiteEventCount.js";
 
 
 // Funnels

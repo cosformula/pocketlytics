@@ -44,6 +44,7 @@ import {
   getSession,
   getSessionLocations,
   getSessions,
+  getSiteEventCount,
   getUserInfo,
   getUserSessionCount,
   getUsers,
@@ -139,7 +140,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const server = Fastify({
-  disableRequestLogging: true,
+  // disableRequestLogging: true,
   logger: {
     // level: process.env.LOG_LEVEL || (process.env.NODE_ENV === "development" ? "debug" : "info"),
     level: "debug",
@@ -241,6 +242,7 @@ async function analyticsRoutes(fastify: FastifyInstance) {
   fastify.get("/sites/:siteId/sessions/:sessionId", publicSite, getSession);
   fastify.get("/sites/:siteId/events", publicSite, getEvents);
   fastify.get("/sites/:siteId/events/bucketed", publicSite, getEventBucketed);
+  fastify.get("/sites/:siteId/events/count", publicSite, getSiteEventCount);
   fastify.get("/sites/:siteId/users", publicSite, getUsers);
 
   fastify.get("/sites/:siteId/users/session-count", publicSite, getUserSessionCount);

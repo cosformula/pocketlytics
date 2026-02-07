@@ -11,17 +11,27 @@ export type {
 } from "./overview";
 
 // Events endpoints
-export { fetchEventBucketed, fetchEvents, fetchEventNames, fetchEventProperties, fetchOutboundLinks } from "./events";
+export {
+  fetchEventBucketed,
+  fetchNewEvents,
+  fetchEventsCursor,
+  fetchEventNames,
+  fetchEventProperties,
+  fetchOutboundLinks,
+  fetchSiteEventCount,
+} from "./events";
 export type {
   Event,
   EventBucketedPoint,
-  EventsResponse,
+  NewEventsResponse,
+  CursorEventsResponse,
   EventName,
   EventProperty,
   OutboundLink,
   EventBucketedParams,
-  EventsParams,
   EventPropertiesParams,
+  SiteEventCountPoint,
+  SiteEventCountParams,
 } from "./events";
 
 
