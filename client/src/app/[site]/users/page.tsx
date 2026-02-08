@@ -38,6 +38,8 @@ import { CountryFlag } from "../components/shared/icons/CountryFlag";
 import { OperatingSystem } from "../components/shared/icons/OperatingSystem";
 import { SubHeader } from "../components/SubHeader/SubHeader";
 import { DeviceIcon } from "../components/shared/icons/Device";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/ui/tabs";
+import { TraitsExplorer } from "./components/TraitsExplorer";
 
 // Set up column helper
 const columnHelper = createColumnHelper<UsersResponse>();
@@ -333,107 +335,120 @@ export default function UsersPage() {
     <DisabledOverlay message="Users" featurePath="users">
       <div className="p-2 md:p-4 max-w-[1400px] mx-auto space-y-3">
         <SubHeader availableFilters={USER_PAGE_FILTERS} />
-        <div className="flex items-center justify-end gap-2">
-          <Switch id="identified-only" checked={identifiedOnly} onCheckedChange={setIdentifiedOnly} />
-          <Label htmlFor="identified-only" className="text-sm text-neutral-600 dark:text-neutral-400 cursor-pointer">
-            Identified only
-          </Label>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Link href="https://www.rybbit.io/docs/identify-users" target="_blank">
-                <Info className="h-4 w-4 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 cursor-pointer" />
-              </Link>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Learn how to identify users</p>
-            </TooltipContent>
-          </Tooltip>
-        </div>
-        <div className="rounded-md border border-neutral-100 dark:border-neutral-800 bg-white dark:bg-neutral-900">
-          <div className="relative overflow-x-auto">
-            <table className="w-full text-sm text-left">
-              <thead className="bg-neutral-50 dark:bg-neutral-850 text-neutral-500 dark:text-neutral-400 ">
-                {table.getHeaderGroups().map(headerGroup => (
-                  <tr key={headerGroup.id}>
-                    {headerGroup.headers.map(header => (
-                      <th
-                        key={header.id}
-                        scope="col"
-                        className="px-3 py-1 font-medium whitespace-nowrap"
-                        style={{
-                          minWidth: header.id === "user_id" ? "100px" : "auto",
-                        }}
-                      >
-                        {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                      </th>
-                    ))}
-                  </tr>
-                ))}
-              </thead>
-              <tbody>
-                {isLoading ? (
-                  Array.from({ length: 15 }).map((_, index) => (
-                    <tr key={index} className="border-b border-neutral-100 dark:border-neutral-800 animate-pulse">
-                      {Array.from({ length: columns.length }).map((_, cellIndex) => (
-                        <td key={cellIndex} className="px-3 py-3">
-                          <div className="h-4 bg-neutral-200 dark:bg-neutral-800 rounded"></div>
-                        </td>
-                      ))}
-                    </tr>
-                  ))
-                ) : table.getRowModel().rows.length === 0 ? (
-                  <tr>
-                    <td
-                      colSpan={columns.length}
-                      className="px-3 py-8 text-center text-neutral-500 dark:text-neutral-400"
-                    >
-                      No users found
-                    </td>
-                  </tr>
-                ) : (
-                  table.getRowModel().rows.map(row => {
-                    // Use identified_user_id for identified users, device ID (user_id) for anonymous
-                    const linkId = row.original.identified_user_id || row.original.user_id;
-                    const href = `/${site}/user/${encodeURIComponent(linkId)}`;
-
-                    return (
-                      <tr key={row.id} className="border-b border-neutral-100 dark:border-neutral-800 group">
-                        {row.getVisibleCells().map(cell => (
-                          <td key={cell.id} className="px-3 py-3 relative">
-                            {/* <Link
-                              href={href}
-                              className="absolute inset-0 z-10"
-                              aria-label={`View user ${userId}`}
+        <Tabs defaultValue="users">
+          <TabsList>
+            <TabsTrigger value="users">Users</TabsTrigger>
+            <TabsTrigger value="traits">Traits</TabsTrigger>
+          </TabsList>
+          <TabsContent value="users">
+            <div className="space-y-3">
+              <div className="flex items-center justify-end gap-2">
+                <Switch id="identified-only" checked={identifiedOnly} onCheckedChange={setIdentifiedOnly} />
+                <Label htmlFor="identified-only" className="text-sm text-neutral-600 dark:text-neutral-400 cursor-pointer">
+                  Identified only
+                </Label>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Link href="https://www.rybbit.io/docs/identify-users" target="_blank">
+                      <Info className="h-4 w-4 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 cursor-pointer" />
+                    </Link>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Learn how to identify users</p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+              <div className="rounded-md border border-neutral-100 dark:border-neutral-800 bg-white dark:bg-neutral-900">
+                <div className="relative overflow-x-auto">
+                  <table className="w-full text-sm text-left">
+                    <thead className="bg-neutral-50 dark:bg-neutral-850 text-neutral-500 dark:text-neutral-400 ">
+                      {table.getHeaderGroups().map(headerGroup => (
+                        <tr key={headerGroup.id}>
+                          {headerGroup.headers.map(header => (
+                            <th
+                              key={header.id}
+                              scope="col"
+                              className="px-3 py-1 font-medium whitespace-nowrap"
+                              style={{
+                                minWidth: header.id === "user_id" ? "100px" : "auto",
+                              }}
                             >
-                              <span className="sr-only">View user details</span>
-                            </Link> */}
-                            <span className="relative z-0">
-                              {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                            </span>
+                              {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                            </th>
+                          ))}
+                        </tr>
+                      ))}
+                    </thead>
+                    <tbody>
+                      {isLoading ? (
+                        Array.from({ length: 15 }).map((_, index) => (
+                          <tr key={index} className="border-b border-neutral-100 dark:border-neutral-800 animate-pulse">
+                            {Array.from({ length: columns.length }).map((_, cellIndex) => (
+                              <td key={cellIndex} className="px-3 py-3">
+                                <div className="h-4 bg-neutral-200 dark:bg-neutral-800 rounded"></div>
+                              </td>
+                            ))}
+                          </tr>
+                        ))
+                      ) : table.getRowModel().rows.length === 0 ? (
+                        <tr>
+                          <td
+                            colSpan={columns.length}
+                            className="px-3 py-8 text-center text-neutral-500 dark:text-neutral-400"
+                          >
+                            No users found
                           </td>
-                        ))}
-                      </tr>
-                    );
-                  })
-                )}
-              </tbody>
-            </table>
-          </div>
+                        </tr>
+                      ) : (
+                        table.getRowModel().rows.map(row => {
+                          // Use identified_user_id for identified users, device ID (user_id) for anonymous
+                          const linkId = row.original.identified_user_id || row.original.user_id;
+                          const href = `/${site}/user/${encodeURIComponent(linkId)}`;
 
-          {/* Pagination */}
-          <div className="border-t border-neutral-100 dark:border-neutral-800">
-            <div className="px-4 py-3">
-              <Pagination
-                table={table}
-                data={{ items: data?.data || [], total: data?.totalCount || 0 }}
-                pagination={pagination}
-                setPagination={setPagination}
-                isLoading={isLoading}
-                itemName="users"
-              />
+                          return (
+                            <tr key={row.id} className="border-b border-neutral-100 dark:border-neutral-800 group">
+                              {row.getVisibleCells().map(cell => (
+                                <td key={cell.id} className="px-3 py-3 relative">
+                                  {/* <Link
+                                    href={href}
+                                    className="absolute inset-0 z-10"
+                                    aria-label={`View user ${userId}`}
+                                  >
+                                    <span className="sr-only">View user details</span>
+                                  </Link> */}
+                                  <span className="relative z-0">
+                                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                  </span>
+                                </td>
+                              ))}
+                            </tr>
+                          );
+                        })
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Pagination */}
+                <div className="border-t border-neutral-100 dark:border-neutral-800">
+                  <div className="px-4 py-3">
+                    <Pagination
+                      table={table}
+                      data={{ items: data?.data || [], total: data?.totalCount || 0 }}
+                      pagination={pagination}
+                      setPagination={setPagination}
+                      isLoading={isLoading}
+                      itemName="users"
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
+          </TabsContent>
+          <TabsContent value="traits">
+            <TraitsExplorer />
+          </TabsContent>
+        </Tabs>
       </div>
     </DisabledOverlay>
   );
