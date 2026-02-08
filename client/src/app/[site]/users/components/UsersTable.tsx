@@ -14,7 +14,8 @@ import { ArrowDown, ArrowUp, ArrowUpDown, Info } from "lucide-react";
 import { DateTime } from "luxon";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useDebounce } from "@uidotdev/usehooks";
 import { UsersResponse } from "../../../../api/analytics/endpoints";
 import { useGetUsers } from "../../../../api/analytics/hooks/useGetUsers";
 import { Avatar } from "../../../../components/Avatar";
@@ -26,6 +27,7 @@ import { Pagination } from "../../../../components/pagination";
 import { Button } from "../../../../components/ui/button";
 import { Input } from "../../../../components/ui/input";
 import { Label } from "../../../../components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../../components/ui/select";
 import { Switch } from "../../../../components/ui/switch";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../../../../components/ui/tooltip";
 import { FilterParameter } from "@rybbit/shared";
@@ -90,6 +92,15 @@ export function UsersTable() {
   });
   const [sorting, setSorting] = useState<SortingState>([{ id: "last_seen", desc: true }]);
   const [identifiedOnly, setIdentifiedOnly] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchField, setSearchField] = useState("username");
+  const debouncedSearch = useDebounce(searchTerm, 300);
+
+  useEffect(() => {
+    setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+  }, [debouncedSearch]);
+
+  const effectiveIdentifiedOnly = identifiedOnly || debouncedSearch.length > 0;
 
   const page = pagination.pageIndex + 1;
   const sortBy = sorting.length > 0 ? sorting[0].id : "last_seen";
@@ -100,7 +111,9 @@ export function UsersTable() {
     pageSize: pagination.pageSize,
     sortBy,
     sortOrder,
-    identifiedOnly,
+    identifiedOnly: effectiveIdentifiedOnly,
+    search: debouncedSearch,
+    searchField,
   });
 
   const columns = [
@@ -313,9 +326,33 @@ export function UsersTable() {
   return (
     <div className="space-y-3">
       <div className="flex justify-between">
-        <Input placeholder="Search users..." className="max-w-sm" type="search" />
+        <div className="flex max-w-sm">
+          <Select value={searchField} onValueChange={setSearchField}>
+            <SelectTrigger className="w-[110px] shrink-0 rounded-r-none border-r-0">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="username">Username</SelectItem>
+              <SelectItem value="name">Name</SelectItem>
+              <SelectItem value="email">Email</SelectItem>
+              <SelectItem value="user_id">User ID</SelectItem>
+            </SelectContent>
+          </Select>
+          <Input
+            placeholder={`Search by ${searchField === "user_id" ? "user ID" : searchField}...`}
+            className="rounded-l-none"
+            type="search"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
         <div className="flex items-center gap-2">
-          <Switch id="identified-only" checked={identifiedOnly} onCheckedChange={setIdentifiedOnly} />
+          <Switch
+            id="identified-only"
+            checked={effectiveIdentifiedOnly}
+            onCheckedChange={setIdentifiedOnly}
+            disabled={debouncedSearch.length > 0}
+          />
           <Label htmlFor="identified-only" className="text-sm text-neutral-600 dark:text-neutral-400 cursor-pointer">
             Identified only
           </Label>
