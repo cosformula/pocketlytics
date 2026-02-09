@@ -19,7 +19,7 @@ export function TraitsExplorer() {
             <div className="flex items-center gap-2">
               <div className="h-4 w-4 bg-neutral-200 dark:bg-neutral-800 rounded" />
               <div
-                className="h-4 bg-neutral-200 dark:bg-neutral-800 rounded"
+                className="h-5 bg-neutral-200 dark:bg-neutral-800 rounded"
                 style={{ width: `${80 + i * 16}px` }}
               />
             </div>

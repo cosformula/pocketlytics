@@ -19,9 +19,11 @@ import { getUserDisplayName } from "../../../../lib/utils";
 export function TraitValueUsersList({
   traitKey,
   value,
+  userCount,
 }: {
   traitKey: string;
   value: string;
+  userCount: number;
 }) {
   const { site } = useParams();
   const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
@@ -58,18 +60,21 @@ export function TraitValueUsersList({
   if (isLoading) {
     return (
       <div className="border-l border-neutral-150 dark:border-neutral-750 ml-[19px]">
-        {Array.from({ length: 3 }).map((_, i) => (
+        {Array.from({ length: Math.min(userCount, 10) }).map((_, i) => (
           <div
             key={i}
             className="flex items-center gap-3 py-1.5 px-3 animate-pulse"
           >
             <div className="h-5 w-5 bg-neutral-200 dark:bg-neutral-800 rounded-full shrink-0" />
-            <div
-              className="h-4 bg-neutral-200 dark:bg-neutral-800 rounded"
-              style={{ width: `${80 + i * 24}px` }}
-            />
-            <div className="flex items-center gap-1.5 ml-auto shrink-0">
-              <div className="h-4 w-4 bg-neutral-200 dark:bg-neutral-800 rounded" />
+            <div className="w-56 shrink">
+              <div
+                className="h-4 bg-neutral-200 dark:bg-neutral-800 rounded"
+                style={{ width: `${20 + Math.random() * 100}px` }}
+              />
+            </div>
+            <div className="flex items-center gap-1.5 shrink-0">
+              <div className="h-5 w-7 bg-neutral-200 dark:bg-neutral-800 rounded" />
+              <div className="h-4 w-5 bg-neutral-200 dark:bg-neutral-800 rounded" />
               <div className="h-4 w-4 bg-neutral-200 dark:bg-neutral-800 rounded" />
               <div className="h-4 w-4 bg-neutral-200 dark:bg-neutral-800 rounded" />
               <div className="h-4 w-4 bg-neutral-200 dark:bg-neutral-800 rounded" />
@@ -104,18 +109,19 @@ export function TraitValueUsersList({
           >
             <Link
               href={`/${site}/user/${encodedLinkId}`}
-              className="flex items-center gap-2 min-w-0 shrink"
+              className="flex items-center gap-2 w-64 shrink"
+              target="_blank"
             >
               <Avatar size={20} id={linkId} />
               <span
-                className="truncate max-w-[160px] hover:underline"
+                className="truncate hover:underline"
                 title={displayName}
               >
                 {displayName}
               </span>
             </Link>
-            {isIdentified && <IdentifiedBadge traits={user.traits} />}
             <div className="flex items-center gap-1.5 shrink-0">
+              {isIdentified && <IdentifiedBadge traits={user.traits} />}
               <CountryFlagTooltipIcon
                 country={user.country || ""}
                 city={user.city || ""}
@@ -134,12 +140,14 @@ export function TraitValueUsersList({
           </div>
         );
       })}
-      {isFetchingNextPage && (
+      {hasNextPage && (
         <div ref={ref} className="py-2 flex justify-center">
-          <div className="flex items-center gap-2 text-neutral-600 dark:text-neutral-400 text-xs">
-            <Loader2 className="h-3 w-3 animate-spin" />
-            Loading more...
-          </div>
+          {isFetchingNextPage && (
+            <div className="flex items-center gap-2 text-neutral-600 dark:text-neutral-400 text-xs">
+              <Loader2 className="h-3 w-3 animate-spin" />
+              Loading more...
+            </div>
+          )}
         </div>
       )}
     </div>

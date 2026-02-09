@@ -126,9 +126,6 @@ export async function getUserTraitValueUsers(
     }
 
     const userIds = profiles.map((p: any) => p.user_id);
-    const traitsMap = new Map(
-      profiles.map((p: any) => [p.user_id, p.traits])
-    );
 
     // Step 2: Get session counts + metadata from ClickHouse
     // Use events.identified_user_id to avoid conflict with the argMax alias
@@ -172,19 +169,28 @@ export async function getUserTraitValueUsers(
       sessions: number;
     }>(chResult);
 
-    // Step 3: Merge traits from Postgres onto ClickHouse rows
-    const users = chData.map((row) => ({
-      user_id: row.user_id,
-      identified_user_id: row.identified_user_id,
-      traits: traitsMap.get(row.identified_user_id) || null,
-      country: row.country,
-      region: row.region,
-      city: row.city,
-      browser: row.browser,
-      operating_system: row.operating_system,
-      device_type: row.device_type,
-      sessions: row.sessions,
-    }));
+    // Step 3: Build lookup from ClickHouse data keyed by identified_user_id,
+    // then iterate Postgres profiles so every profile is returned even if
+    // ClickHouse has no matching events (zero-session fallback).
+    const chLookup = new Map(
+      chData.map((row) => [row.identified_user_id, row])
+    );
+
+    const users = profiles.map((p: any) => {
+      const ch = chLookup.get(p.user_id);
+      return {
+        user_id: ch?.user_id ?? p.user_id,
+        identified_user_id: p.user_id,
+        traits: p.traits ?? null,
+        country: ch?.country ?? "",
+        region: ch?.region ?? "",
+        city: ch?.city ?? "",
+        browser: ch?.browser ?? "",
+        operating_system: ch?.operating_system ?? "",
+        device_type: ch?.device_type ?? "",
+        sessions: ch?.sessions ?? 0,
+      };
+    });
 
     return res.send({
       users,

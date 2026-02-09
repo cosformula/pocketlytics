@@ -35,7 +35,7 @@ function TraitValueRow({
           {userCount.toLocaleString()} {userCount === 1 ? "user" : "users"}
         </span>
       </button>
-      {expanded && <TraitValueUsersList traitKey={traitKey} value={value} />}
+      {expanded && <TraitValueUsersList traitKey={traitKey} value={value} userCount={userCount} />}
     </div>
   );
 }
@@ -78,7 +78,7 @@ export function TraitValuesList({ traitKey }: { traitKey: string }) {
         {Array.from({ length: 3 }).map((_, i) => (
           <div
             key={i}
-            className="flex items-center justify-between py-1.5 px-3 animate-pulse"
+            className="flex items-center justify-between py-2 px-3 animate-pulse"
           >
             <div className="flex items-center gap-2">
               <div className="h-4 w-4 bg-neutral-200 dark:bg-neutral-800 rounded shrink-0" />
@@ -104,12 +104,14 @@ export function TraitValuesList({ traitKey }: { traitKey: string }) {
           userCount={item.userCount}
         />
       ))}
-      {isFetchingNextPage && (
+      {hasNextPage && (
         <div ref={ref} className="py-2 flex justify-center">
-          <div className="flex items-center gap-2 text-neutral-600 dark:text-neutral-400 text-xs">
-            <Loader2 className="h-3 w-3 animate-spin" />
-            Loading more...
-          </div>
+          {isFetchingNextPage && (
+            <div className="flex items-center gap-2 text-neutral-600 dark:text-neutral-400 text-xs">
+              <Loader2 className="h-3 w-3 animate-spin" />
+              Loading more...
+            </div>
+          )}
         </div>
       )}
     </div>
