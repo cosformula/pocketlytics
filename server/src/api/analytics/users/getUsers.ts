@@ -55,6 +55,7 @@ export async function getUsers(req: FastifyRequest<GetUsersRequest>, res: Fastif
   let filterIdentified = identifiedOnly === "true";
 
   // Search for matching user IDs in Postgres when search is provided
+  const MAX_MATCHING_USER_IDS = 10000;
   let matchingUserIds: string[] | null = null;
   if (search && search.trim()) {
     const searchTerm = `%${search.trim()}%`;
@@ -71,7 +72,9 @@ export async function getUsers(req: FastifyRequest<GetUsersRequest>, res: Fastif
     const searchResult = await db.execute<{ user_id: string }>(sql`
       SELECT user_id FROM user_profiles
       WHERE site_id = ${siteId} AND ${condition}
+      LIMIT ${MAX_MATCHING_USER_IDS}
     `);
+
     matchingUserIds = searchResult.map((r) => r.user_id);
     if (matchingUserIds.length === 0) {
       return res.send({
