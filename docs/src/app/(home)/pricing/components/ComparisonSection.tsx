@@ -1,7 +1,8 @@
 "use client";
 
-import { Check, Minus, X } from "lucide-react";
+import { Check, Minus } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { AppLink } from "@/components/AppLink";
 import { DEFAULT_EVENT_LIMIT, FREE_SITE_LIMIT, STANDARD_SITE_LIMIT, STANDARD_TEAM_LIMIT } from "../../../../lib/const";
 
 const COMPARISON_FEATURES = [
@@ -275,36 +276,36 @@ export function ComparisonSection({ isAnnual }: { isAnnual: boolean }) {
                 <div className="font-semibold text-lg text-center mb-3">
                   Free <span className="text-sm text-neutral-500 dark:text-neutral-400 font-normal block">$0/month</span>
                 </div>
-                <a
+                <AppLink
                   href="https://app.rybbit.io/signup"
                   className="inline-flex items-center justify-center px-4 py-2 bg-neutral-300 dark:bg-neutral-700 hover:bg-neutral-400 dark:hover:bg-neutral-600 text-neutral-900 dark:text-white text-sm font-medium rounded-lg border border-neutral-400 dark:border-neutral-600 transform hover:-translate-y-0.5 transition-all duration-200"
                 >
                   Start Free
-                </a>
+                </AppLink>
               </div>
               <div className="flex flex-col items-center justify-center px-6 border-r border-neutral-400/50 dark:border-neutral-700/50">
                 <div className="font-semibold text-lg text-center mb-3">
                   Standard{" "}
                   <span className="text-sm text-neutral-500 dark:text-neutral-400 font-normal block">From ${isAnnual ? "16" : "19"} /month</span>
                 </div>
-                <a
+                <AppLink
                   href="https://app.rybbit.io/signup"
                   className="inline-flex items-center justify-center px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium rounded-lg shadow-lg shadow-emerald-900/20 transform hover:-translate-y-0.5 transition-all duration-200"
                 >
                   Get started
-                </a>
+                </AppLink>
               </div>
               <div className="flex flex-col items-center justify-center px-6 border-r border-neutral-400/50 dark:border-neutral-700/50">
                 <div className="font-semibold text-lg text-emerald-600 dark:text-emerald-400 text-center mb-3">
                   Pro{" "}
                   <span className="text-sm text-neutral-500 dark:text-neutral-400 font-normal block">From ${isAnnual ? "33" : "39"} /month</span>
                 </div>
-                <a
+                <AppLink
                   href="https://app.rybbit.io/signup"
                   className="inline-flex items-center justify-center px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium rounded-lg shadow-lg shadow-emerald-900/20 transform hover:-translate-y-0.5 transition-all duration-200"
                 >
                   Get started
-                </a>
+                </AppLink>
               </div>
               <div className="flex flex-col items-center justify-center px-6">
                 <div className="font-semibold text-lg text-center mb-3">

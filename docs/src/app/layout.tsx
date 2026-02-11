@@ -85,31 +85,6 @@ export default function Layout({ children }: { children: ReactNode }) {
         {`(function(w,r){w._rwq=r;w[r]=w[r]||function(){(w[r].q=w[r].q||[]).push(arguments)}})(window,'rewardful');`}
       </Script>
       <Script src="https://r.wdfl.co/rw.js" data-rewardful="fc3780" strategy="afterInteractive" />
-      <Script id="rewardful-cross-domain" strategy="afterInteractive">
-        {`(function(){
-          function decorateLinks(referral){
-            document.querySelectorAll('a[href*="app.rybbit.io"]').forEach(function(a){
-              try{
-                var url=new URL(a.href);
-                if(!url.searchParams.has('referral')){
-                  url.searchParams.set('referral',referral);
-                  a.href=url.toString();
-                }
-              }catch(e){}
-            });
-          }
-          function start(referral){
-            decorateLinks(referral);
-            new MutationObserver(function(){decorateLinks(referral);})
-              .observe(document.body,{childList:true,subtree:true});
-          }
-          window.rewardful('ready',function(){
-            if(window.Rewardful&&window.Rewardful.referral){
-              start(window.Rewardful.referral);
-            }
-          });
-        })();`}
-      </Script>
       <body className={`flex flex-col min-h-screen ${inter.variable} font-sans`}>
         <RootProvider
           theme={{
