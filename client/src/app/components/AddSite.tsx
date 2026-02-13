@@ -120,7 +120,7 @@ export function AddSite({ trigger, disabled }: { trigger?: React.ReactNode; disa
   };
 
 
-  if (subscription?.status !== "active") {
+  if (subscription?.status !== "active" && IS_CLOUD) {
     return (
       <Tooltip>
         <TooltipTrigger asChild>
