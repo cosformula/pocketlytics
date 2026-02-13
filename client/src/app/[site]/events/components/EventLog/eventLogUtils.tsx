@@ -33,6 +33,7 @@ export function getMainData(event: Event, props: Record<string, any>) {
   const isCopy = event.type === "copy";
   const isFormSubmit = event.type === "form_submit";
   const isInputChange = event.type === "input_change";
+  const isAdClick = event.type === "ad_click";
 
   if (isPageview) {
     return {
@@ -45,6 +46,13 @@ export function getMainData(event: Event, props: Record<string, any>) {
     return {
       label: props.url as string,
       url: props.url as string,
+    };
+  }
+
+  if (isAdClick) {
+    return {
+      label: event.pathname || "Ad Click",
+      url: event.pathname,
     };
   }
 
