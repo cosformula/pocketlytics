@@ -72,6 +72,12 @@ function SidebarContent() {
       <div className="flex flex-col p-3 pt-1">
         <SidebarComponents.SectionHeader>Web Analytics</SidebarComponents.SectionHeader>
         <SidebarComponents.Item
+          label="Ads"
+          active={isActiveTab("ads")}
+          href={getTabPath("ads")}
+          icon={<LayoutDashboard className="w-4 h-4" />}
+        />
+        <SidebarComponents.Item
           label="Main"
           active={isActiveTab("main")}
           href={getTabPath("main")}
@@ -83,14 +89,12 @@ function SidebarContent() {
           href={getTabPath("globe")}
           icon={<Globe2 className="w-4 h-4" />}
         />
-        {IS_CLOUD && (
-          <SidebarComponents.Item
-            label="Pages"
-            active={isActiveTab("pages")}
-            href={getTabPath("pages")}
-            icon={<File className="w-4 h-4" />}
-          />
-        )}
+        <SidebarComponents.Item
+          label="Pages"
+          active={isActiveTab("pages")}
+          href={getTabPath("pages")}
+          icon={<File className="w-4 h-4" />}
+        />
         {IS_CLOUD && (
           <SidebarComponents.Item
             label="Performance"

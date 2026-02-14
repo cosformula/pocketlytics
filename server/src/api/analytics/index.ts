@@ -1,3 +1,6 @@
+// Ads
+export { getAdClicksBreakdown } from "./ads/getAdClicksBreakdown.js";
+
 // Events
 export { getEventBucketed } from "./events/getEventBucketed.js";
 export { getEventNames } from "./events/getEventNames.js";
