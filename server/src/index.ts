@@ -15,7 +15,7 @@ import {
   createGoal,
   deleteFunnel,
   deleteGoal,
-  getAdClicksBreakdown,
+  getAdsBreakdown,
   generatePdfReport,
   getErrorBucketed,
   getErrorEvents,
@@ -269,7 +269,7 @@ async function analyticsRoutes(fastify: FastifyInstance) {
   fastify.get("/sites/:siteId/events/names", publicSite, getEventNames);
   fastify.get("/sites/:siteId/events/properties", publicSite, getEventProperties);
   fastify.get("/sites/:siteId/events/outbound", publicSite, getOutboundLinks);
-  fastify.get("/sites/:siteId/ad-clicks/breakdown", publicSite, getAdClicksBreakdown);
+  fastify.get("/sites/:siteId/ads/breakdown", publicSite, getAdsBreakdown);
   fastify.get("/org-event-count/:organizationId", orgMember, getOrgEventCount);
   fastify.get("/sites/:siteId/performance/overview", publicSite, getPerformanceOverview);
   fastify.get("/sites/:siteId/performance/time-series", publicSite, getPerformanceTimeSeries);
