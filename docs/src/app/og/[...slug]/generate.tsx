@@ -4,12 +4,14 @@ interface GenerateOGImageProps {
   title: string;
   description?: string;
   logoSrc: string;
+  label?: string;
 }
 
 export function generateOGImage({
   title,
   description,
   logoSrc,
+  label,
 }: GenerateOGImageProps): ReactElement {
   return (
     <div
@@ -70,14 +72,16 @@ export function generateOGImage({
           style={{ height: '40px' }}
           alt=""
         />
-        <div
-          style={{
-            fontSize: 28,
-            color: 'rgb(115, 115, 115)',
-          }}
-        >
-          Docs
-        </div>
+        {label ? (
+          <div
+            style={{
+              fontSize: 28,
+              color: 'rgb(115, 115, 115)',
+            }}
+          >
+            {label}
+          </div>
+        ) : null}
       </div>
     </div>
   );

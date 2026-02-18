@@ -1,9 +1,7 @@
 import { ImageResponse } from 'next/og';
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { source } from '@/lib/source';
-import { notFound } from 'next/navigation';
-import { generateOGImage } from './generate';
+import { generateOGImage } from '@/app/og/[...slug]/generate';
 
 const logoBase64 = readFile(
   join(process.cwd(), 'public/rybbit/horizontal_white.png'),
@@ -24,19 +22,10 @@ async function loadInterFont(
   return fetch(match[1]).then((res) => res.arrayBuffer());
 }
 
-export async function GET(
-  _req: Request,
-  { params }: { params: Promise<{ slug: string[] }> },
-) {
-  const { slug } = await params;
-
-  // Strip trailing "image.png" segment if present
-  const pageSlug = slug[slug.length - 1] === 'image.png'
-    ? slug.slice(0, -1)
-    : slug;
-
-  const page = source.getPage(pageSlug.length > 0 ? pageSlug : undefined);
-  if (!page) notFound();
+export async function GET(req: Request) {
+  const { searchParams } = new URL(req.url);
+  const title = searchParams.get('title') ?? 'Rybbit';
+  const description = searchParams.get('description') ?? undefined;
 
   const [interRegular, interBoldFont, logoSrc] = await Promise.all([
     loadInterFont(400),
@@ -46,10 +35,9 @@ export async function GET(
 
   return new ImageResponse(
     generateOGImage({
-      title: page.data.title,
-      description: page.data.description,
+      title,
+      description,
       logoSrc,
-      label: 'Docs',
     }),
     {
       width: 1200,
@@ -70,11 +58,4 @@ export async function GET(
       ],
     },
   );
-}
-
-export function generateStaticParams() {
-  return source.generateParams().map((params) => {
-    const slugs = params.slug ?? [];
-    return { slug: [...slugs, 'image.png'] };
-  });
 }

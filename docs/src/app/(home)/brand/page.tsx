@@ -1,10 +1,17 @@
 import { Download } from "lucide-react";
+import { createMetadata, createOGImageUrl } from "@/lib/metadata";
 
-export const metadata = {
+export const metadata = createMetadata({
   title: "Brand Kit",
   description:
     "Download official Rybbit logos and brand assets for use in your projects",
-};
+  openGraph: {
+    images: [createOGImageUrl("Brand Kit", "Download official Rybbit logos and brand assets for use in your projects")],
+  },
+  twitter: {
+    images: [createOGImageUrl("Brand Kit", "Download official Rybbit logos and brand assets for use in your projects")],
+  },
+});
 
 type Variant = {
   name: string;
