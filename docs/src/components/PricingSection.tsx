@@ -4,11 +4,22 @@ import { Slider } from "@/components/ui/slider";
 import { cn } from "@/lib/utils";
 import { getCalApi } from "@calcom/embed-react";
 import { useEffect, useState } from "react";
-import { DEFAULT_EVENT_LIMIT, FREE_SITE_LIMIT, STANDARD_SITE_LIMIT, STANDARD_TEAM_LIMIT } from "../lib/const";
+import { BASIC_SITE_LIMIT, BASIC_TEAM_LIMIT, DEFAULT_EVENT_LIMIT, FREE_SITE_LIMIT, STANDARD_SITE_LIMIT, STANDARD_TEAM_LIMIT } from "../lib/const";
 import { PricingCard } from "./PricingCard";
 
 // Available event tiers for the slider
 const EVENT_TIERS = [100_000, 250_000, 500_000, 1_000_000, 2_000_000, 5_000_000, 10_000_000, 20_000_000, "Custom"];
+
+// Define basic plan features
+const BASIC_FEATURES = [
+  `${BASIC_SITE_LIMIT} website`,
+  `${BASIC_TEAM_LIMIT} team member`,
+  "Web analytics dashboard",
+  "Goals",
+  "Custom events",
+  "2 year data retention",
+  "Email support",
+];
 
 // Define standard plan features
 const STANDARD_FEATURES = [
@@ -68,13 +79,17 @@ export const formatter = Intl.NumberFormat("en", {
   notation: "compact",
 }).format;
 
-// Format price with dollar sign for both Standard and Pro
-function getFormattedPrice(eventLimit: number | string, planType: "standard" | "pro") {
+// Format price with dollar sign for Basic, Standard, and Pro
+function getFormattedPrice(eventLimit: number | string, planType: "basic" | "standard" | "pro") {
   // Monthly prices
   let monthlyPrice;
   if (typeof eventLimit === "string") return { custom: true }; // Custom pricing
 
-  if (planType === "standard") {
+  if (planType === "basic") {
+    if (eventLimit <= 100_000) monthlyPrice = 14;
+    else if (eventLimit <= 250_000) monthlyPrice = 24;
+    else return { custom: true };
+  } else if (planType === "standard") {
     // Standard tier prices
     if (eventLimit <= 100_000) monthlyPrice = 19;
     else if (eventLimit <= 250_000) monthlyPrice = 29;
@@ -111,6 +126,8 @@ export function PricingSection({ isAnnual, setIsAnnual }: { isAnnual: boolean, s
   const [eventLimitIndex, setEventLimitIndex] = useState(0); // Default to 100k (index 0)
 
   const eventLimit = EVENT_TIERS[eventLimitIndex];
+  const basicPrices = getFormattedPrice(eventLimit, "basic");
+  const isBasicAvailable = typeof eventLimit === "number" && eventLimit <= 250_000;
   const standardPrices = getFormattedPrice(eventLimit, "standard");
   const proPrices = getFormattedPrice(eventLimit, "pro");
 
@@ -206,24 +223,33 @@ export function PricingSection({ isAnnual, setIsAnnual }: { isAnnual: boolean, s
         </div>
 
         {/* Pricing cards layout */}
-        <div className="grid min-[1100px]:grid-cols-3 min-[400px]:grid-cols-1 gap-6 max-w-[1000px] mx-auto justify-center items-stretch">
-          {/* <div className="grid min-[1100px]:grid-cols-3 min-[600px]:grid-cols-2 min-[400px]:grid-cols-1 gap-6 max-w-[1300px] mx-auto justify-center items-stretch"> */}
-          {/* <PricingCard
-            title="Free"
-            description="Perfect for hobby projects"
-            priceDisplay={
-              <div>
-                <span className="text-3xl font-bold">{DEFAULT_EVENT_LIMIT.toLocaleString()}</span>
-                <span className="ml-1 text-neutral-400">pageviews/m</span>
-              </div>
-            }
-            buttonText="Start for free"
-            buttonHref="https://app.rybbit.io/signup"
-            buttonVariant="default"
-            features={FREE_FEATURES}
-            variant="free"
-            eventLocation="free"
-          /> */}
+        <div className="grid min-[1100px]:grid-cols-4 min-[700px]:grid-cols-2 min-[400px]:grid-cols-1 gap-4 mx-auto justify-center items-stretch">
+          {/* Basic Plan Card */}
+          <div className={cn("h-full", !isBasicAvailable && "opacity-60")}>
+            <PricingCard
+              title="Basic"
+              description="For personal projects and small sites"
+              priceDisplay={
+                !isBasicAvailable ? (
+                  <div className="text-3xl font-bold">-</div>
+                ) : basicPrices.custom ? (
+                  <div className="text-3xl font-bold">Custom</div>
+                ) : (
+                  <div>
+                    <span className="text-3xl font-bold">
+                      ${isAnnual ? Math.round(basicPrices.annual! / 12) : basicPrices.monthly}
+                    </span>
+                    <span className="ml-1 text-neutral-400">/month</span>
+                  </div>
+                )
+              }
+              buttonText={!isBasicAvailable ? "Up to 250k only" : "Get started"}
+              buttonHref={!isBasicAvailable ? undefined : "https://app.rybbit.io/signup"}
+              features={BASIC_FEATURES}
+              disabled={!isBasicAvailable}
+              eventLocation={isBasicAvailable ? "basic" : undefined}
+            />
+          </div>
 
           {/* Standard Plan Card */}
           <PricingCard

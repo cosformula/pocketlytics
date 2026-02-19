@@ -37,14 +37,20 @@ export function PaidPlan() {
 
   const stripePlan = getStripePrices().find(p => p.name === activeSubscription?.planName);
 
+  const planType = activeSubscription ? getPlanType(activeSubscription.planName) : null;
+
   const currentPlanDetails = activeSubscription
     ? {
-      id: getPlanType(activeSubscription?.planName),
-      name: getPlanType(activeSubscription?.planName),
+      id: planType,
+      name: planType,
       price: `$${stripePlan?.price}`,
       interval: stripePlan?.interval,
-      description: getPlanType(activeSubscription?.planName) === "Pro" ? "Premium features for professional teams" : "Advanced analytics for growing projects",
-      features: getPlanType(activeSubscription?.planName) === "Pro"
+      description: planType === "Pro"
+        ? "Premium features for professional teams"
+        : planType === "Basic"
+          ? "Core analytics for personal projects"
+          : "Advanced analytics for growing projects",
+      features: planType === "Pro"
         ? [
           "5+ year data retention",
           "Session replays",
@@ -52,10 +58,21 @@ export function PaidPlan() {
           "Unlimited websites",
           "Priority support",
         ]
-        : ["1 year data retention", "Standard support", "Core analytics features"],
-      color: getPlanType(activeSubscription?.planName) === "Pro"
+        : planType === "Basic"
+          ? [
+            "1 website",
+            "1 team member",
+            "Web analytics dashboard",
+            "Goals & custom events",
+            "2 year data retention",
+            "Email support",
+          ]
+          : ["2 year data retention", "Up to 5 websites", "Up to 3 team members", "Email support"],
+      color: planType === "Pro"
         ? "bg-linear-to-br from-purple-50 to-indigo-100 dark:from-purple-800 dark:to-indigo-800"
-        : "bg-linear-to-br from-green-50 to-emerald-100 dark:from-green-800 dark:to-emerald-800",
+        : planType === "Basic"
+          ? "bg-linear-to-br from-blue-50 to-sky-100 dark:from-blue-800 dark:to-sky-800"
+          : "bg-linear-to-br from-green-50 to-emerald-100 dark:from-green-800 dark:to-emerald-800",
       icon: <Shield className="h-5 w-5" />,
     }
     : null;

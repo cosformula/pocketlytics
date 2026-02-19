@@ -36,6 +36,43 @@ export interface StripePlan {
 }
 
 const STRIPE_PRICES: StripePlan[] = [
+  // Basic tiers
+  {
+    priceId: "price_1T2No5DFVprnAny2ahUc6TEI",
+    name: "basic100k",
+    interval: "month",
+    limits: {
+      events: 100_000,
+      replays: 10_000,
+    },
+  },
+  {
+    priceId: "price_1T2NqJDFVprnAny21UlXbpxY",
+    name: "basic100k-annual",
+    interval: "year",
+    limits: {
+      events: 100_000,
+      replays: 10_000,
+    },
+  },
+  {
+    priceId: "price_1T2NpzDFVprnAny2EmAIheV8",
+    name: "basic250k",
+    interval: "month",
+    limits: {
+      events: 250_000,
+      replays: 25_000,
+    },
+  },
+  {
+    priceId: "price_1T2NrRDFVprnAny2N4KhTwQn",
+    name: "basic250k-annual",
+    interval: "year",
+    limits: {
+      events: 250_000,
+      replays: 25_000,
+    },
+  },
   // Standard tiers
   {
     priceId: "price_1RKuxUDFVprnAny2xyyWvXNr",

@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { trackAdEvent } from "../../../lib/trackAdEvent";
 import {
+  BASIC_FEATURES,
   ENTERPRISE_FEATURES,
   EVENT_TIERS,
   PRO_FEATURES,
@@ -43,7 +44,7 @@ export function PricingCards({ isLoggedIn }: { isLoggedIn: boolean }) {
   const eventLimit = EVENT_TIERS[eventLimitIndex];
 
   // Handle subscription for a specific plan type
-  async function handleSubscribe(planType: "standard" | "pro"): Promise<void> {
+  async function handleSubscribe(planType: "basic" | "standard" | "pro"): Promise<void> {
     // Handle custom tier by redirecting to email contact
     if (eventLimit === "Custom") {
       window.location.href = "https://www.rybbit.com/contact";
@@ -164,7 +165,10 @@ export function PricingCards({ isLoggedIn }: { isLoggedIn: boolean }) {
     setEventLimitIndex(value[0]);
   }
 
-  // Get pricing information for both plans
+  // Get pricing information for all plans
+  const basicMonthlyPrice = findPriceForTier(eventLimit, "month", "basic")?.price || 0;
+  const basicAnnualPrice = findPriceForTier(eventLimit, "year", "basic")?.price || 0;
+  const isBasicAvailable = typeof eventLimit === "number" && eventLimit <= 250_000;
   const standardMonthlyPrice = findPriceForTier(eventLimit, "month", "standard")?.price || 0;
   const standardAnnualPrice = findPriceForTier(eventLimit, "year", "standard")?.price || 0;
   const proMonthlyPrice = findPriceForTier(eventLimit, "month", "pro")?.price || 0;
@@ -241,23 +245,22 @@ export function PricingCards({ isLoggedIn }: { isLoggedIn: boolean }) {
       </div>
 
       {/* Cards section */}
-      <div className="grid min-[1100px]:grid-cols-3 min-[400px]:grid-cols-1 gap-6 max-w-[1000px] mx-auto mb-16">
-        {/* <PricingCard
-          title="Free"
-          description="Perfect for hobby projects"
-          priceDisplay={
-            <div>
-              <span className="text-3xl font-bold">{DEFAULT_EVENT_LIMIT.toLocaleString()}</span>
-              <span className="ml-1 text-neutral-600 dark:text-neutral-400">pageviews/m</span>
-            </div>
-          }
-          buttonText={siteId ? "Continue free" : "Current plan"}
-          buttonVariant="default"
-          features={FREE_FEATURES}
-          variant="free"
-          onClick={() => (siteId ? router.push(`/${siteId}`) : undefined)}
-          disabled={!siteId}
-        /> */}
+      <div className="grid min-[1100px]:grid-cols-4 min-[700px]:grid-cols-2 min-[400px]:grid-cols-1 gap-4 mx-auto mb-16">
+        <div className={cn("h-full", !isBasicAvailable && "opacity-60")}>
+          <PricingCard
+            title="Basic"
+            description="For personal projects and small sites"
+            monthlyPrice={basicMonthlyPrice}
+            annualPrice={basicAnnualPrice}
+            isAnnual={isAnnual}
+            isCustomTier={!isBasicAvailable}
+            customPriceLabel="-"
+            buttonText={!isBasicAvailable ? "Up to 250k only" : isLoading ? "Processing..." : "Get started"}
+            features={BASIC_FEATURES}
+            onClick={() => handleSubscribe("basic")}
+            disabled={isLoading || !isBasicAvailable}
+          />
+        </div>
         <PricingCard
           title="Standard"
           description="Everything you need to get started as a small business"

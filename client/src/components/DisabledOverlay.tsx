@@ -16,10 +16,10 @@ interface DisabledOverlayProps {
   borderRadius?: number;
   showMessage?: boolean;
   style?: React.CSSProperties;
-  requiredPlan?: "pro" | "standard";
+  requiredPlan?: "pro" | "standard" | "basic";
 }
 
-function ownerMessage(message: string, featurePath?: string, requiredPlan?: "pro" | "standard") {
+function ownerMessage(message: string, featurePath?: string, requiredPlan?: "pro" | "standard" | "basic") {
   return (
     <div className="bg-neutral-900 rounded-lg  border border-neutral-700 shadow-xl flex flex-col gap-3 p-4">
       <div className="flex gap-3">
@@ -27,7 +27,7 @@ function ownerMessage(message: string, featurePath?: string, requiredPlan?: "pro
         <div className="flex-1 space-y-1">
           <p className="text-sm text-muted-foreground">
             Upgrade to{" "}
-            <span className="font-medium text-foreground">{requiredPlan === "pro" ? "Pro" : "Standard"}</span> to unlock{" "}
+            <span className="font-medium text-foreground">{requiredPlan === "pro" ? "Pro" : requiredPlan === "basic" ? "Basic" : "Standard"}</span> to unlock{" "}
             {message}
           </p>
           {featurePath && (
@@ -102,13 +102,21 @@ export const DisabledOverlay: React.FC<DisabledOverlayProps> = ({
     if (!IS_CLOUD) {
       return false;
     }
+    const isFree = subscription?.eventLimit === DEFAULT_EVENT_LIMIT;
+    const isBasic = subscription?.planName?.includes("basic") ?? false;
+
     if (requiredPlan === "pro") {
       if (organization?.createdAt && DateTime.fromJSDate(organization?.createdAt) < DateTime.fromISO("2025-09-19")) {
         return false;
       }
       return !subscription?.planName.includes("pro");
     }
-    return subscription?.eventLimit === DEFAULT_EVENT_LIMIT;
+    if (requiredPlan === "basic") {
+      // Basic and above can access — only free is blocked
+      return isFree;
+    }
+    // requiredPlan === "standard" (default): free and basic are blocked
+    return isFree || isBasic;
   }, [subscription, requiredPlan, organization]);
 
   // MutationObserver to detect and restore overlay if removed or modified
