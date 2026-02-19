@@ -1,6 +1,5 @@
 "use client";
 import { Card, CardContent, CardLoader } from "@/components/ui/card";
-import { Tilt_Warp } from "next/font/google";
 import Link from "next/link";
 import { useGetOverview } from "../../../../../api/analytics/hooks/useGetOverview";
 import { useGetOverviewBucketed } from "../../../../../api/analytics/hooks/useGetOverviewBucketed";
@@ -21,11 +20,6 @@ const SELECTED_STAT_MAP = {
   session_duration: "Session Duration",
   users: "Users",
 };
-
-const tilt_wrap = Tilt_Warp({
-  subsets: ["latin"],
-  weight: "400",
-});
 
 export function MainSection() {
   const { isWhiteLabel } = useWhiteLabel();

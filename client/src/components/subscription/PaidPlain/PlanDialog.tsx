@@ -5,6 +5,7 @@ import { BACKEND_URL } from "@/lib/const";
 import { getStripePrices, STRIPE_TIERS } from "@/lib/stripe";
 import { usePreviewSubscriptionUpdate, useUpdateSubscription } from "@/lib/subscription/useSubscriptionMutations";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { PlanChangePreviewDialog } from "./PlanChangePreviewDialog";
 
@@ -16,6 +17,8 @@ interface PlanDialogProps {
 }
 
 export function PlanDialog({ open, onOpenChange, currentPlanName, hasActiveSubscription }: PlanDialogProps) {
+  const t = useTranslations("subscription");
+  const tp = useTranslations("pricing");
   const [isAnnual, setIsAnnual] = useState(false);
   const [showProrationDialog, setShowProrationDialog] = useState(false);
   const [pendingPriceId, setPendingPriceId] = useState<string | null>(null);
@@ -27,7 +30,7 @@ export function PlanDialog({ open, onOpenChange, currentPlanName, hasActiveSubsc
 
   const handlePlanSelection = async (priceId: string, planName: string) => {
     if (!activeOrg) {
-      toast.error("Please select an organization");
+      toast.error(t("Please select an organization"));
       return;
     }
 
@@ -83,7 +86,7 @@ export function PlanDialog({ open, onOpenChange, currentPlanName, hasActiveSubsc
         }
       }
     } catch (error: any) {
-      toast.error(`${hasActiveSubscription ? "Failed to preview subscription" : "Checkout"} failed: ${error.message}`);
+      toast.error(`${hasActiveSubscription ? t("Failed to preview subscription") : t("Checkout")} ${t("failed")}: ${error.message}`);
     }
   };
 
@@ -133,7 +136,7 @@ export function PlanDialog({ open, onOpenChange, currentPlanName, hasActiveSubsc
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Choose Your Plan</DialogTitle>
+            <DialogTitle>{t("Choose Your Plan")}</DialogTitle>
           </DialogHeader>
 
           {/* Billing toggle */}
@@ -148,7 +151,7 @@ export function PlanDialog({ open, onOpenChange, currentPlanName, hasActiveSubsc
                     : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200"
                 )}
               >
-                Monthly
+                {tp("Monthly")}
               </button>
               <button
                 onClick={() => setIsAnnual(true)}
@@ -159,7 +162,7 @@ export function PlanDialog({ open, onOpenChange, currentPlanName, hasActiveSubsc
                     : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200"
                 )}
               >
-                Annual
+                {tp("Annual")}
                 <span className="ml-1 text-xs text-emerald-500">-33%</span>
               </button>
             </div>
@@ -168,9 +171,9 @@ export function PlanDialog({ open, onOpenChange, currentPlanName, hasActiveSubsc
           {/* Plan columns */}
           <div className="grid grid-cols-3 gap-6">
             {[
-              { type: "basic" as const, title: "Basic", subtitle: "For personal projects" },
-              { type: "standard" as const, title: "Standard", subtitle: "Core analytics features" },
-              { type: "pro" as const, title: "Pro", subtitle: "Advanced features + session replays" },
+              { type: "basic" as const, title: tp("Basic"), subtitle: t("For personal projects") },
+              { type: "standard" as const, title: tp("Standard"), subtitle: t("Core analytics features") },
+              { type: "pro" as const, title: tp("Pro"), subtitle: t("Advanced features + session replays") },
             ].map(({ type, title, subtitle }) => {
               const tiers = type === "basic"
                 ? STRIPE_TIERS.filter(t => t.events <= 250_000)
@@ -203,14 +206,14 @@ export function PlanDialog({ open, onOpenChange, currentPlanName, hasActiveSubsc
                         >
                           <div className="flex justify-between w-full">
                             <div className="text-neutral-900 dark:text-neutral-100 font-medium flex-end">
-                              {tier.shortName} events{" "}
-                              <span className="text-neutral-500 dark:text-neutral-400 text-xs font-normal">/ month</span>
+                              {tier.shortName} {t("events")}{" "}
+                              <span className="text-neutral-500 dark:text-neutral-400 text-xs font-normal">{t("/ month")}</span>
                             </div>
                             <div className="text-xs text-neutral-500 dark:text-neutral-400">
                               <span className="text-neutral-700 dark:text-neutral-200 font-semibold text-base">
                                 ${isAnnual ? Math.round(plan.price / 12) : plan.price}
                               </span>{" "}
-                              /month
+                              {t("/month")}
                             </div>
                           </div>
                         </div>
@@ -230,7 +233,7 @@ export function PlanDialog({ open, onOpenChange, currentPlanName, hasActiveSubsc
               rel="noopener noreferrer"
               className="text-neutral-600 dark:text-neutral-200 hover:text-neutral-900 dark:hover:text-neutral-100 text-sm underline"
             >
-              View detailed feature comparison →
+              {t("View detailed feature comparison")} {"→"}
             </a>
           </div>
         </DialogContent>

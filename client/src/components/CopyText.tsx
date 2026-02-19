@@ -1,6 +1,9 @@
+"use client";
+
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { Check, Copy } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { ReactNode, useEffect, useState } from "react";
 
 interface CopyTextProps {
@@ -26,6 +29,7 @@ export function CopyText({
   tooltipText = "Copy to clipboard",
   children,
 }: CopyTextProps) {
+  const t = useTranslations("common");
   const [copied, setCopied] = useState(false);
   const [displayText, setDisplayText] = useState("");
 
@@ -64,13 +68,13 @@ export function CopyText({
                 "p-1 rounded-md transition-colors text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800 focus:outline-none",
                 copyButtonClassName
               )}
-              aria-label="Copy to clipboard"
+              aria-label={t("Copy to clipboard")}
             >
               {copied ? <Check className="h-3.5 w-3.5 text-green-500" /> : <Copy className="h-3.5 w-3.5" />}
             </button>
           </TooltipTrigger>
           <TooltipContent>
-            <p>{copied ? "Copied!" : tooltipText}</p>
+            <p>{copied ? t("Copied!") : tooltipText}</p>
           </TooltipContent>
         </Tooltip>
       )}

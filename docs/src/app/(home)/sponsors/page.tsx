@@ -1,11 +1,10 @@
 import { BackgroundGrid } from "@/components/BackgroundGrid";
-import { CheckCircle } from "lucide-react";
+import { createOGImageUrl } from "@/lib/metadata";
+import type { Metadata } from "next";
 import { Tilt_Warp } from "next/font/google";
 import Image from "next/image";
 import { TrackedButton } from "../../../components/TrackedButton";
 import { cn } from "../../../lib/utils";
-import type { Metadata } from "next";
-import { createOGImageUrl } from "@/lib/metadata";
 
 const tilt_wrap = Tilt_Warp({
   subsets: ["latin"],

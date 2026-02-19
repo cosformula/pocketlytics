@@ -5,25 +5,19 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useNivoTheme } from "@/lib/nivo";
 import { ResponsiveLine } from "@nivo/line";
 import { DateTime } from "luxon";
-import { Tilt_Warp } from "next/font/google";
 import Link from "next/link";
 import { useState } from "react";
 import { useGetPerformanceTimeSeries } from "../../../../api/analytics/hooks/performance/useGetPerformanceTimeSeries";
 import { BucketSelection } from "../../../../components/BucketSelection";
-import { RybbitLogo, RybbitTextLogo } from "../../../../components/RybbitLogo";
+import { ChartTooltip } from "../../../../components/charts/ChartTooltip";
+import { RybbitTextLogo } from "../../../../components/RybbitLogo";
+import { useWhiteLabel } from "../../../../hooks/useIsWhiteLabel";
 import { authClient } from "../../../../lib/auth";
 import { formatChartDateTime, hour12, userLocale } from "../../../../lib/dateTimeUtils";
 import { getTimezone, useStore } from "../../../../lib/store";
 import { cn } from "../../../../lib/utils";
 import { usePerformanceStore } from "../performanceStore";
 import { formatMetricValue, getMetricUnit, getPerformanceThresholds, METRIC_LABELS } from "../utils/performanceUtils";
-import { ChartTooltip } from "../../../../components/charts/ChartTooltip";
-import { useWhiteLabel } from "../../../../hooks/useIsWhiteLabel";
-
-const tilt_wrap = Tilt_Warp({
-  subsets: ["latin"],
-  weight: "400",
-});
 
 export function PerformanceChart() {
   const session = authClient.useSession();

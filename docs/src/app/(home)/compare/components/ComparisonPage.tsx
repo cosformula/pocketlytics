@@ -1,6 +1,5 @@
 import { BackgroundGrid } from "@/components/BackgroundGrid";
 import { CTASection } from "@/components/CTASection";
-import { DEFAULT_EVENT_LIMIT } from "@/lib/const";
 import { CheckCircle, CircleMinus } from "lucide-react";
 import { Tilt_Warp } from "next/font/google";
 import Image from "next/image";
