@@ -126,7 +126,7 @@ export function CustomHeader() {
 
       {/* Mobile menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden">
+        <div className="md:hidden bg-neutral-50/50 dark:bg-neutral-900/80 backdrop-blur-md">
           <div className="space-y-1 px-4 pb-3 pt-2">
             <Link
               href="/pricing"
