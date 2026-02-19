@@ -17,6 +17,7 @@ export interface PricingCardProps {
   onClick?: () => void;
   disabled?: boolean;
   isCustomTier?: boolean;
+  customPriceLabel?: string;
   monthlyPrice?: number;
   annualPrice?: number;
   isAnnual?: boolean;
@@ -35,6 +36,7 @@ export function PricingCard({
   onClick,
   disabled,
   isCustomTier = false,
+  customPriceLabel,
   monthlyPrice,
   annualPrice,
   isAnnual = false,
@@ -47,7 +49,7 @@ export function PricingCard({
   const displayedFeatures = shouldShowToggle && !isExpanded ? features.slice(0, 7) : features;
 
   return (
-    <div className="w-full flex-shrink-0">
+    <div className="w-full flex-shrink-0 h-full">
       <div className="bg-neutral-200/20 dark:bg-neutral-900/40 p-2 rounded-3xl border border-neutral-200 dark:border-neutral-800 h-full">
         <div
           className={cn(
@@ -74,7 +76,7 @@ export function PricingCard({
 
             {/* Price display */}
             <div className="mb-6 space-y-1">
-              <div>{isCustomTier ? <div className="text-3xl font-bold">Custom
+              <div>{isCustomTier ? <div className="text-3xl font-bold">{customPriceLabel || "Custom"}
               </div> : <div>
                 <span className="text-3xl font-bold">
                   ${isAnnual ? Math.round(annualPrice! / 12) : monthlyPrice}

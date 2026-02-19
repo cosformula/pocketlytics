@@ -47,7 +47,7 @@ export function PricingCard({
   const displayedFeatures = shouldShowToggle && !isExpanded ? features.slice(0, 7) : features;
 
   return (
-    <div className="w-full flex-shrink-0">
+    <div className="w-full flex-shrink-0 h-full">
       <div className="bg-neutral-200/40 dark:bg-neutral-900/40 p-2 rounded-3xl border border-neutral-300 dark:border-neutral-800 h-full">
         <div
           className={cn(

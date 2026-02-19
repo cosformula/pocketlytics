@@ -12,3 +12,5 @@ export const DEMO_HOSTNAME = "demo.rybbit.com";
 export const FREE_SITE_LIMIT = 1;
 export const STANDARD_SITE_LIMIT = 5;
 export const STANDARD_TEAM_LIMIT = 3;
+export const BASIC_SITE_LIMIT = 1;
+export const BASIC_TEAM_LIMIT = 1;
