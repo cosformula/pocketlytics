@@ -32,15 +32,22 @@ jobs:
       - name: Extract messages
         run: cd client && node scripts/extract-messages.mjs
 
-      - name: Check for changes
+      - name: Check for untranslated strings
         id: changes
         run: |
           cd client/messages
-          if git diff --quiet .; then
-            echo "has_changes=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "has_changes=true" >> "$GITHUB_OUTPUT"
-          fi
+          # Check if any non-English file has empty string values or is missing keys from en.json
+          EN_KEYS=$(python3 -c "import json; f=open('en.json'); d=json.load(f); print(len(d))")
+          NEEDS_TRANSLATION=false
+          for file in zh.json ja.json de.json pl.json pt.json it.json fr.json ko.json es.json; do
+            LANG_KEYS=$(python3 -c "import json; f=open('$file'); d=json.load(f); print(len(d))")
+            EMPTY=$(python3 -c "import json; f=open('$file'); d=json.load(f); print(sum(1 for v in d.values() if v == ''))")
+            if [ "$EMPTY" -gt 0 ] || [ "$LANG_KEYS" -ne "$EN_KEYS" ]; then
+              NEEDS_TRANSLATION=true
+              break
+            fi
+          done
+          echo "has_changes=$NEEDS_TRANSLATION" >> "$GITHUB_OUTPUT"
 
       - name: Run Claude Code
         if: steps.changes.outputs.has_changes == 'true'
