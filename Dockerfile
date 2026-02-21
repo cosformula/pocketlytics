@@ -56,5 +56,5 @@ ENV DISABLE_TELEMETRY=true
 
 EXPOSE 3001
 
-# Run drizzle push to create/migrate SQLite tables, then start
-CMD sh -c "npx drizzle-kit push && node dist/index.js"
+# Run drizzle push (idempotent) to create/migrate SQLite tables, then start
+CMD sh -c "npx drizzle-kit push 2>/dev/null || true; node dist/index.js"
