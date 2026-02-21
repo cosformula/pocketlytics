@@ -54,22 +54,22 @@ export async function getUsers(req: FastifyRequest<GetUsersRequest>, res: Fastif
   const site = req.params.siteId;
   let filterIdentified = identifiedOnly === "true";
 
-  // Search for matching user IDs in Postgres when search is provided
+  // Search for matching user IDs in SQLite when search is provided
   const MAX_MATCHING_USER_IDS = 10000;
   let matchingUserIds: string[] | null = null;
   if (search && search.trim()) {
-    const searchTerm = `%${search.trim()}%`;
+    const searchTerm = `%${search.trim().toLowerCase()}%`;
     const siteId = Number(site);
 
     const fieldConditions: Record<string, SQL> = {
-      username: sql`traits->>'username' ILIKE ${searchTerm}`,
-      name: sql`traits->>'name' ILIKE ${searchTerm}`,
-      email: sql`traits->>'email' ILIKE ${searchTerm}`,
-      user_id: sql`user_id ILIKE ${searchTerm}`,
+      username: sql`LOWER(COALESCE(json_extract(traits, '$.username'), '')) LIKE ${searchTerm}`,
+      name: sql`LOWER(COALESCE(json_extract(traits, '$.name'), '')) LIKE ${searchTerm}`,
+      email: sql`LOWER(COALESCE(json_extract(traits, '$.email'), '')) LIKE ${searchTerm}`,
+      user_id: sql`LOWER(user_id) LIKE ${searchTerm}`,
     };
     const condition = fieldConditions[searchField] ?? fieldConditions.username;
 
-    const searchResult = await db.execute<{ user_id: string }>(sql`
+    const searchResult = await db.all<{ user_id: string }>(sql`
       SELECT user_id FROM user_profiles
       WHERE site_id = ${siteId} AND ${condition}
       LIMIT ${MAX_MATCHING_USER_IDS}

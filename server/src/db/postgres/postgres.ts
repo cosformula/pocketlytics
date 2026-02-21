@@ -1,20 +1,21 @@
 import dotenv from "dotenv";
-import { drizzle } from "drizzle-orm/postgres-js";
-import postgres from "postgres";
+import { createClient } from "@libsql/client";
+import { drizzle } from "drizzle-orm/libsql";
+import { mkdirSync } from "node:fs";
+import { dirname, resolve } from "node:path";
 import * as schema from "./schema.js";
 
 dotenv.config();
 
-// Create postgres connection
-const client = postgres({
-  host: process.env.POSTGRES_HOST || "postgres",
-  port: parseInt(process.env.POSTGRES_PORT || "5432", 10),
-  database: process.env.POSTGRES_DB,
-  username: process.env.POSTGRES_USER,
-  password: process.env.POSTGRES_PASSWORD,
-  onnotice: () => {},
-  max: 20,
-});
+const sqliteUrl = process.env.SQLITE_DB_PATH?.startsWith("file:")
+  ? process.env.SQLITE_DB_PATH
+  : `file:${process.env.SQLITE_DB_PATH || "./data/rybbit.sqlite"}`;
+const sqlitePath = resolve(sqliteUrl.replace(/^file:/, ""));
+mkdirSync(dirname(sqlitePath), { recursive: true });
+
+const client = createClient({ url: sqliteUrl });
+await client.execute("PRAGMA journal_mode = WAL");
+await client.execute("PRAGMA foreign_keys = ON");
 
 // Create drizzle ORM instance
 export const db = drizzle(client, { schema });

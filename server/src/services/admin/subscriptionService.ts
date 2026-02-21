@@ -1,7 +1,7 @@
 import { sql } from "drizzle-orm";
 import { DateTime } from "luxon";
 import { db } from "../../db/postgres/postgres.js";
-import { APPSUMO_TIER_LIMITS, DEFAULT_EVENT_LIMIT, getStripePrices } from "../../lib/const.js";
+import { APPSUMO_TIER_LIMITS, DEFAULT_EVENT_LIMIT, getStripePrices, IS_CLOUD } from "../../lib/const.js";
 import { stripe } from "../../lib/stripe.js";
 
 export interface SubscriptionData {
@@ -104,7 +104,7 @@ async function fetchAppSumoLicensesForOrganizations(
 ): Promise<Map<string, AppSumoLicenseData>> {
   const licenseMap = new Map<string, AppSumoLicenseData>();
 
-  if (organizationIds.size === 0) {
+  if (!IS_CLOUD || organizationIds.size === 0) {
     return licenseMap;
   }
 
@@ -119,7 +119,7 @@ async function fetchAppSumoLicensesForOrganizations(
         batch.map(id => sql`${id}`),
         sql`, `
       );
-      const licenses = await db.execute(
+      const licenses = await db.all(
         sql`SELECT organization_id, tier FROM appsumo.licenses WHERE organization_id IN (${placeholders}) AND status = 'active'`
       );
 

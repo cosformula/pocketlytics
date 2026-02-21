@@ -49,7 +49,7 @@ export const getSqlParam = (parameter: FilterParameter) => {
   }
 
   if (parameter === "referrer") {
-    return "domainWithoutWWW(referrer)";
+    return "regexp_replace(regexp_extract(COALESCE(referrer, ''), '^(?:https?://)?([^/]+)', 1), '^www\\\\.', '')";
   }
   if (parameter === "entry_page") {
     return "(SELECT argMin(pathname, timestamp) FROM events WHERE session_id = events.session_id)";
@@ -58,19 +58,19 @@ export const getSqlParam = (parameter: FilterParameter) => {
     return "(SELECT argMax(pathname, timestamp) FROM events WHERE session_id = events.session_id)";
   }
   if (parameter === "dimensions") {
-    return "concat(toString(screen_width), 'x', toString(screen_height))";
+    return "concat(CAST(screen_width AS VARCHAR), 'x', CAST(screen_height AS VARCHAR))";
   }
   if (parameter === "city") {
-    return "concat(toString(region), '-', toString(city))";
+    return "concat(CAST(region AS VARCHAR), '-', CAST(city AS VARCHAR))";
   }
   if (parameter === "browser_version") {
-    return "concat(toString(browser), ' ', toString(browser_version))";
+    return "concat(CAST(browser AS VARCHAR), ' ', CAST(browser_version AS VARCHAR))";
   }
   if (parameter === "operating_system_version") {
     return `CASE
-      WHEN concat(toString(operating_system), ' ', toString(operating_system_version)) = 'Windows 10'
+      WHEN concat(CAST(operating_system AS VARCHAR), ' ', CAST(operating_system_version AS VARCHAR)) = 'Windows 10'
       THEN 'Windows 10/11'
-      ELSE concat(toString(operating_system), ' ', toString(operating_system_version))
+      ELSE concat(CAST(operating_system AS VARCHAR), ' ', CAST(operating_system_version AS VARCHAR))
     END`;
   }
   return filterParamSchema.parse(parameter);
@@ -236,7 +236,7 @@ export function getFilterStatement(
           }
         }
 
-        // Handle regex filters using ClickHouse match() function
+        // Handle regex filters with DuckDB regexp_matches()
         if (filter.type === "regex" || filter.type === "not_regex") {
           const pattern = String(filter.value[0] ?? "");
 
@@ -258,7 +258,7 @@ export function getFilterStatement(
           }
 
           const regexPattern = SqlString.escape(pattern);
-          const matchExpr = `match(${getSqlParam(filter.parameter)}, ${regexPattern})`;
+          const matchExpr = `regexp_matches(${getSqlParam(filter.parameter)}, ${regexPattern})`;
           return filter.type === "regex" ? matchExpr : `NOT ${matchExpr}`;
         }
 

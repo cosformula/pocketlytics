@@ -3,7 +3,7 @@ import { DateTime } from "luxon";
 import Stripe from "stripe";
 import { db } from "../db/postgres/postgres.js";
 import { organization } from "../db/postgres/schema.js";
-import { APPSUMO_TIER_LIMITS, DEFAULT_EVENT_LIMIT, getStripePrices, StripePlan } from "./const.js";
+import { APPSUMO_TIER_LIMITS, DEFAULT_EVENT_LIMIT, getStripePrices, IS_CLOUD, StripePlan } from "./const.js";
 import { stripe } from "./stripe.js";
 import { logger } from "./logger/logger.js";
 
@@ -69,8 +69,12 @@ function getStartOfMonth(): string {
  * @returns AppSumo subscription info or null if no active license found
  */
 export async function getAppSumoSubscription(organizationId: string): Promise<AppSumoSubscriptionInfo | null> {
+  if (!IS_CLOUD) {
+    return null;
+  }
+
   try {
-    const appsumoLicense = await db.execute(
+    const appsumoLicense = await db.all(
       sql`SELECT tier, status FROM appsumo.licenses WHERE organization_id = ${organizationId} AND status = 'active' LIMIT 1`
     );
 

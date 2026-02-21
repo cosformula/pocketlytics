@@ -1,4 +1,4 @@
-import { and, desc, eq, inArray, sql } from "drizzle-orm";
+import { and, desc, eq, inArray } from "drizzle-orm";
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod";
 import { db } from "../../db/postgres/postgres.js";
@@ -69,82 +69,152 @@ export const incidentsRoutes = async (server: FastifyInstance) => {
         conditions.push(eq(uptimeIncidents.status, status));
       }
 
-      // Use SQL to group incidents by monitor and aggregate regions
-      const groupedIncidents = await db
+      const incidentRows = await db
         .select({
-          id: sql<number>`MIN(${uptimeIncidents.id})`,
-          organizationId: sql<string>`MIN(${uptimeIncidents.organizationId})`,
+          id: uptimeIncidents.id,
+          organizationId: uptimeIncidents.organizationId,
           monitorId: uptimeIncidents.monitorId,
-          monitorName: sql<string>`
-            CASE 
-              WHEN ${uptimeMonitors.name} IS NOT NULL AND ${uptimeMonitors.name} != '' THEN ${uptimeMonitors.name}
-              WHEN ${uptimeMonitors.monitorType} = 'http' THEN COALESCE(${uptimeMonitors.httpConfig}->>'url', 'HTTP Monitor')
-              WHEN ${uptimeMonitors.monitorType} = 'tcp' THEN CONCAT(${uptimeMonitors.tcpConfig}->>'host', ':', ${uptimeMonitors.tcpConfig}->>'port')
-              ELSE 'Unknown Monitor'
-            END
-          `,
-          affectedRegions: sql<
-            string[]
-          >`ARRAY_REMOVE(ARRAY_AGG(DISTINCT ${uptimeIncidents.region} ORDER BY ${uptimeIncidents.region}), NULL)`,
-          startTime: sql<string>`MIN(${uptimeIncidents.startTime})`,
-          endTime: sql<string>`MAX(${uptimeIncidents.endTime})`,
+          monitorName: uptimeMonitors.name,
+          monitorType: uptimeMonitors.monitorType,
+          httpConfig: uptimeMonitors.httpConfig,
+          tcpConfig: uptimeMonitors.tcpConfig,
+          region: uptimeIncidents.region,
+          startTime: uptimeIncidents.startTime,
+          endTime: uptimeIncidents.endTime,
           status: uptimeIncidents.status,
-          acknowledgedBy: sql<string>`MAX(${uptimeIncidents.acknowledgedBy})`,
-          acknowledgedAt: sql<string>`MAX(${uptimeIncidents.acknowledgedAt})`,
-          resolvedBy: sql<string>`MAX(${uptimeIncidents.resolvedBy})`,
-          resolvedAt: sql<string>`MAX(${uptimeIncidents.resolvedAt})`,
-          lastError: sql<string>`(ARRAY_AGG(${uptimeIncidents.lastError} ORDER BY ${uptimeIncidents.updatedAt} DESC))[1]`,
-          lastErrorType: sql<string>`(ARRAY_AGG(${uptimeIncidents.lastErrorType} ORDER BY ${uptimeIncidents.updatedAt} DESC))[1]`,
-          failureCount: sql<number>`SUM(${uptimeIncidents.failureCount})`,
-          createdAt: sql<string>`MIN(${uptimeIncidents.createdAt})`,
-          updatedAt: sql<string>`MAX(${uptimeIncidents.updatedAt})`,
+          acknowledgedBy: uptimeIncidents.acknowledgedBy,
+          acknowledgedAt: uptimeIncidents.acknowledgedAt,
+          resolvedBy: uptimeIncidents.resolvedBy,
+          resolvedAt: uptimeIncidents.resolvedAt,
+          lastError: uptimeIncidents.lastError,
+          lastErrorType: uptimeIncidents.lastErrorType,
+          failureCount: uptimeIncidents.failureCount,
+          createdAt: uptimeIncidents.createdAt,
+          updatedAt: uptimeIncidents.updatedAt,
         })
         .from(uptimeIncidents)
         .leftJoin(uptimeMonitors, eq(uptimeIncidents.monitorId, uptimeMonitors.id))
         .where(and(...conditions))
-        .groupBy(
-          uptimeIncidents.monitorId,
-          uptimeIncidents.status,
-          sql`CASE 
-            WHEN ${uptimeIncidents.status} = 'resolved' THEN 
-              DATE_TRUNC('hour', ${uptimeIncidents.endTime})
-            ELSE 
-              NULL
-          END`,
-          uptimeMonitors.name,
-          uptimeMonitors.monitorType,
-          uptimeMonitors.httpConfig,
-          uptimeMonitors.tcpConfig
-        )
-        .orderBy(desc(sql`MIN(${uptimeIncidents.startTime})`))
-        .limit(limit)
-        .offset(offset);
+        .orderBy(desc(uptimeIncidents.startTime));
 
-      // Get total count for pagination
-      const totalCountResult = await db
-        .select({
-          count: sql<number>`COUNT(DISTINCT 
-            CONCAT(
-              ${uptimeIncidents.monitorId}, 
-              '-', 
-              ${uptimeIncidents.status},
-              '-',
-              CASE 
-                WHEN ${uptimeIncidents.status} = 'resolved' THEN 
-                  DATE_TRUNC('hour', ${uptimeIncidents.endTime})::text
-                ELSE 
-                  ''
-              END
-            )
-          )`,
-        })
-        .from(uptimeIncidents)
-        .where(and(...conditions));
+      const toHourBucket = (value: string | null) => {
+        if (!value) return "";
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) return value;
+        date.setMinutes(0, 0, 0);
+        return date.toISOString();
+      };
 
-      const total = Number(totalCountResult[0]?.count || 0);
+      const getMonitorName = (row: (typeof incidentRows)[number]) => {
+        if (row.monitorName && row.monitorName.trim() !== "") {
+          return row.monitorName;
+        }
+        if (row.monitorType === "http") {
+          const httpConfig = row.httpConfig as { url?: string } | null;
+          return httpConfig?.url || "HTTP Monitor";
+        }
+        if (row.monitorType === "tcp") {
+          const tcpConfig = row.tcpConfig as { host?: string; port?: number } | null;
+          if (tcpConfig?.host && tcpConfig?.port) {
+            return `${tcpConfig.host}:${tcpConfig.port}`;
+          }
+          return "TCP Monitor";
+        }
+        return "Unknown Monitor";
+      };
+
+      type GroupedIncident = {
+        id: number;
+        organizationId: string;
+        monitorId: number;
+        monitorName: string;
+        affectedRegions: string[];
+        startTime: string;
+        endTime: string | null;
+        status: string;
+        acknowledgedBy: string | null;
+        acknowledgedAt: string | null;
+        resolvedBy: string | null;
+        resolvedAt: string | null;
+        lastError: string | null;
+        lastErrorType: string | null;
+        failureCount: number;
+        createdAt: string | null;
+        updatedAt: string | null;
+      };
+
+      const groupedMap = new Map<string, GroupedIncident & { affectedRegionSet: Set<string>; latestUpdatedAt: string }>();
+
+      for (const row of incidentRows) {
+        const resolvedBucket = row.status === "resolved" ? toHourBucket(row.endTime) : "";
+        const key = `${row.monitorId}-${row.status}-${resolvedBucket}`;
+        const fallbackUpdatedAt = row.updatedAt ?? row.createdAt ?? row.startTime;
+
+        if (!groupedMap.has(key)) {
+          groupedMap.set(key, {
+            id: row.id,
+            organizationId: row.organizationId,
+            monitorId: row.monitorId,
+            monitorName: getMonitorName(row),
+            affectedRegions: [],
+            affectedRegionSet: new Set<string>(),
+            startTime: row.startTime,
+            endTime: row.endTime,
+            status: row.status,
+            acknowledgedBy: row.acknowledgedBy,
+            acknowledgedAt: row.acknowledgedAt,
+            resolvedBy: row.resolvedBy,
+            resolvedAt: row.resolvedAt,
+            lastError: row.lastError,
+            lastErrorType: row.lastErrorType,
+            failureCount: row.failureCount ?? 0,
+            createdAt: row.createdAt,
+            updatedAt: row.updatedAt,
+            latestUpdatedAt: fallbackUpdatedAt,
+          });
+        } else {
+          const existing = groupedMap.get(key)!;
+
+          if (row.id < existing.id) existing.id = row.id;
+          if (row.startTime < existing.startTime) existing.startTime = row.startTime;
+          if (existing.createdAt === null || (row.createdAt && row.createdAt < existing.createdAt)) {
+            existing.createdAt = row.createdAt;
+          }
+          if (!existing.endTime || (row.endTime && row.endTime > existing.endTime)) existing.endTime = row.endTime;
+          if (row.updatedAt && (!existing.updatedAt || row.updatedAt > existing.updatedAt)) {
+            existing.updatedAt = row.updatedAt;
+          }
+          existing.failureCount += row.failureCount ?? 0;
+
+          if (fallbackUpdatedAt >= existing.latestUpdatedAt) {
+            existing.acknowledgedBy = row.acknowledgedBy;
+            existing.acknowledgedAt = row.acknowledgedAt;
+            existing.resolvedBy = row.resolvedBy;
+            existing.resolvedAt = row.resolvedAt;
+            existing.lastError = row.lastError;
+            existing.lastErrorType = row.lastErrorType;
+            existing.latestUpdatedAt = fallbackUpdatedAt;
+          }
+        }
+
+        const current = groupedMap.get(key)!;
+        if (row.region) {
+          current.affectedRegionSet.add(row.region);
+        }
+      }
+
+      const groupedIncidents = Array.from(groupedMap.values())
+        .map(({ affectedRegionSet, latestUpdatedAt: _, ...incident }) => ({
+          ...incident,
+          affectedRegions: Array.from(affectedRegionSet).sort(),
+        }))
+        .sort((a, b) => (a.startTime < b.startTime ? 1 : -1));
+
+      const total = groupedIncidents.length;
+      const paginatedIncidents = groupedIncidents.slice(offset, offset + limit);
 
       return reply.send({
-        incidents: groupedIncidents,
+        incidents: paginatedIncidents,
         pagination: {
           total,
           limit,

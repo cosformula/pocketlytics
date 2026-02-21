@@ -13,12 +13,12 @@ export async function getUserTraitKeys(
   const siteId = Number(req.params.siteId);
 
   try {
-    const result = await db.execute<{ key: string; user_count: number }>(sql`
-      SELECT key, COUNT(*)::int AS user_count
+    const result = await db.all<{ key: string; user_count: number }>(sql`
+      SELECT json_each.key AS key, COUNT(*) AS user_count
       FROM user_profiles,
-           LATERAL jsonb_object_keys(COALESCE(traits, '{}'::jsonb)) AS key
+           json_each(COALESCE(traits, '{}'))
       WHERE site_id = ${siteId}
-      GROUP BY key
+      GROUP BY json_each.key
       ORDER BY user_count DESC
     `);
 
@@ -53,18 +53,20 @@ export async function getUserTraitValues(
 
   try {
     const [valuesResult, countResult] = await Promise.all([
-      db.execute<{ value: string; user_count: number }>(sql`
-        SELECT traits->>${key} AS value, COUNT(*)::int AS user_count
+      db.all<{ value: string; user_count: number }>(sql`
+        SELECT CAST(json_extract(traits, '$.' || ${key}) AS TEXT) AS value, COUNT(*) AS user_count
         FROM user_profiles
-        WHERE site_id = ${siteId} AND traits ? ${key}
+        WHERE site_id = ${siteId}
+          AND json_type(traits, '$.' || ${key}) IS NOT NULL
         GROUP BY value
         ORDER BY user_count DESC
         LIMIT ${limit} OFFSET ${offset}
       `),
-      db.execute<{ total: number }>(sql`
-        SELECT COUNT(DISTINCT traits->>${key})::int AS total
+      db.all<{ total: number }>(sql`
+        SELECT COUNT(DISTINCT CAST(json_extract(traits, '$.' || ${key}) AS TEXT)) AS total
         FROM user_profiles
-        WHERE site_id = ${siteId} AND traits ? ${key}
+        WHERE site_id = ${siteId}
+          AND json_type(traits, '$.' || ${key}) IS NOT NULL
       `),
     ]);
 
@@ -102,19 +104,19 @@ export async function getUserTraitValueUsers(
   const offset = parseInt(offsetStr, 10);
 
   try {
-    // Step 1: Find matching user IDs and their traits from Postgres
+    // Step 1: Find matching user IDs and their traits from SQLite
     const [profilesResult, countResult] = await Promise.all([
-      db.execute<{ user_id: string; traits: Record<string, unknown> | null }>(sql`
+      db.all<{ user_id: string; traits: Record<string, unknown> | null }>(sql`
         SELECT user_id, traits
         FROM user_profiles
-        WHERE site_id = ${siteId} AND traits->>${key} = ${value}
+        WHERE site_id = ${siteId} AND CAST(json_extract(traits, '$.' || ${key}) AS TEXT) = ${value}
         ORDER BY user_id
         LIMIT ${limit} OFFSET ${offset}
       `),
-      db.execute<{ total: number }>(sql`
-        SELECT COUNT(*)::int AS total
+      db.all<{ total: number }>(sql`
+        SELECT COUNT(*) AS total
         FROM user_profiles
-        WHERE site_id = ${siteId} AND traits->>${key} = ${value}
+        WHERE site_id = ${siteId} AND CAST(json_extract(traits, '$.' || ${key}) AS TEXT) = ${value}
       `),
     ]);
 

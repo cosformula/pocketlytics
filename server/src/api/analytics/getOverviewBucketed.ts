@@ -146,7 +146,7 @@ FULL JOIN
         ${getTimeStatement(params)}
     GROUP BY time ORDER BY time ${isAllTime ? "" : getTimeStatementFill(params, bucket)}
 ) AS page_stats
-USING time
+USING (time)
 ORDER BY time`;
 
   return query;

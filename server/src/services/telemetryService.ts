@@ -76,21 +76,14 @@ class TelemetryService {
     return counts;
   }
 
-  // Get ClickHouse database size in GB
+  // Get DuckDB database size in GB
   private async getClickhouseSizeGb(): Promise<number> {
     try {
-      const result = await clickhouse.query({
-        query: `
-          SELECT sum(bytes_on_disk) / (1024 * 1024 * 1024) as size_gb
-          FROM system.parts
-          WHERE active
-        `,
-        format: "JSONEachRow",
-      });
-      const data = await processResults<{ size_gb: number }>(result);
-      return data[0]?.size_gb || 0;
+      const duckDbPath = path.resolve(process.cwd(), "data", "rybbit-analytics.duckdb");
+      const stats = await fs.stat(duckDbPath);
+      return stats.size / (1024 * 1024 * 1024);
     } catch (error) {
-      this.logger.error(error as Error, "Error getting ClickHouse size");
+      this.logger.error(error as Error, "Error getting DuckDB size");
       return 0;
     }
   }

@@ -44,21 +44,23 @@ class SessionsService {
     const existingSession = await this.getExistingSession(userId, siteId);
 
     if (existingSession) {
+      const nowIso = new Date().toISOString();
       await db
         .update(activeSessions)
         .set({
-          lastActivity: new Date(),
+          lastActivity: nowIso,
         })
         .where(eq(activeSessions.sessionId, existingSession.sessionId));
       return { sessionId: existingSession.sessionId };
     }
 
+    const nowIso = new Date().toISOString();
     const insertData = {
       sessionId: nanoid(14),
       siteId,
       userId,
-      startTime: new Date(),
-      lastActivity: new Date(),
+      startTime: nowIso,
+      lastActivity: nowIso,
     };
 
     await db.insert(activeSessions).values(insertData);
@@ -67,7 +69,7 @@ class SessionsService {
 
   async cleanupOldSessions(): Promise<number> {
     // Delete sessions older than 30 minutes
-    const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000);
+    const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000).toISOString();
 
     const deletedSessions = await db
       .delete(activeSessions)

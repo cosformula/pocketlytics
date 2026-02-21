@@ -1,24 +1,25 @@
+import { randomBytes, randomUUID } from "node:crypto";
 import { sql } from "drizzle-orm";
 import {
-  boolean,
   check,
   foreignKey,
   index,
   integer,
-  jsonb,
-  pgTable,
   primaryKey,
   real,
-  serial,
+  sqliteTable,
   text,
-  timestamp,
   unique,
-  pgEnum,
-  uuid,
-} from "drizzle-orm/pg-core";
+} from "drizzle-orm/sqlite-core";
+
+const boolean = (name?: string) =>
+  name ? integer(name, { mode: "boolean" }) : integer({ mode: "boolean" });
+const jsonb = <T = unknown>(name?: string) =>
+  (name ? text(name, { mode: "json" }) : text({ mode: "json" })).$type<T>();
+const nowIso = sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`;
 
 // User table (BetterAuth)
-export const user = pgTable(
+export const user = sqliteTable(
   "user",
   {
     id: text().primaryKey().notNull(),
@@ -27,13 +28,13 @@ export const user = pgTable(
     email: text().notNull(),
     emailVerified: boolean().notNull(),
     image: text(),
-    createdAt: timestamp({ mode: "string" }).notNull(),
-    updatedAt: timestamp({ mode: "string" }).notNull(),
+    createdAt: text().notNull(),
+    updatedAt: text().notNull(),
     role: text().default("user").notNull(),
     displayUsername: text(),
     banned: boolean(),
     banReason: text(),
-    banExpires: timestamp({ mode: "string" }),
+    banExpires: text(),
     // deprecated
     stripeCustomerId: text(),
     // deprecated
@@ -47,24 +48,24 @@ export const user = pgTable(
 );
 
 // Verification table (BetterAuth)
-export const verification = pgTable("verification", {
+export const verification = sqliteTable("verification", {
   id: text().primaryKey().notNull(),
   identifier: text().notNull(),
   value: text().notNull(),
-  expiresAt: timestamp({ mode: "string" }).notNull(),
-  createdAt: timestamp({ mode: "string" }),
-  updatedAt: timestamp({ mode: "string" }),
+  expiresAt: text().notNull(),
+  createdAt: text(),
+  updatedAt: text(),
 });
 
 // Sites table
-export const sites = pgTable("sites", {
-  id: text("id").$defaultFn(() => sql`encode(gen_random_bytes(6), 'hex')`),
+export const sites = sqliteTable("sites", {
+  id: text("id").$defaultFn(() => randomBytes(6).toString("hex")),
   // deprecated - keeping as primary key for backwards compatibility
-  siteId: serial("site_id").primaryKey().notNull(),
+  siteId: integer("site_id").primaryKey({ autoIncrement: true }).notNull(),
   name: text("name").notNull(),
   domain: text("domain").notNull(),
-  createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
-  updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow(),
+  createdAt: text("created_at").default(nowIso),
+  updatedAt: text("updated_at").default(nowIso),
   createdBy: text("created_by").references(() => user.id, { onDelete: "set null" }),
   organizationId: text("organization_id").references(() => organization.id),
   public: boolean().default(false),
@@ -89,25 +90,25 @@ export const sites = pgTable("sites", {
 });
 
 // Active sessions table
-export const activeSessions = pgTable("active_sessions", {
+export const activeSessions = sqliteTable("active_sessions", {
   sessionId: text("session_id").primaryKey().notNull(),
   siteId: integer("site_id"),
   userId: text("user_id"),
-  startTime: timestamp("start_time").defaultNow(),
-  lastActivity: timestamp("last_activity").defaultNow(),
+  startTime: text("start_time").default(nowIso),
+  lastActivity: text("last_activity").default(nowIso),
 });
 
-export const funnels = pgTable("funnels", {
-  reportId: serial("report_id").primaryKey().notNull(),
+export const funnels = sqliteTable("funnels", {
+  reportId: integer("report_id").primaryKey({ autoIncrement: true }).notNull(),
   siteId: integer("site_id").references(() => sites.siteId, { onDelete: "cascade" }),
   userId: text("user_id").references(() => user.id, { onDelete: "set null" }),
   data: jsonb(),
-  createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
-  updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow(),
+  createdAt: text("created_at").default(nowIso),
+  updatedAt: text("updated_at").default(nowIso),
 });
 
 // Account table (BetterAuth)
-export const account = pgTable("account", {
+export const account = sqliteTable("account", {
   id: text().primaryKey().notNull(),
   accountId: text().notNull(),
   providerId: text().notNull(),
@@ -117,23 +118,23 @@ export const account = pgTable("account", {
   accessToken: text(),
   refreshToken: text(),
   idToken: text(),
-  accessTokenExpiresAt: timestamp({ mode: "string" }),
-  refreshTokenExpiresAt: timestamp({ mode: "string" }),
+  accessTokenExpiresAt: text(),
+  refreshTokenExpiresAt: text(),
   scope: text(),
   password: text(),
-  createdAt: timestamp({ mode: "string" }).notNull(),
-  updatedAt: timestamp({ mode: "string" }).notNull(),
+  createdAt: text().notNull(),
+  updatedAt: text().notNull(),
 });
 
 // Organization table (BetterAuth)
-export const organization = pgTable(
+export const organization = sqliteTable(
   "organization",
   {
     id: text().primaryKey().notNull(),
     name: text().notNull(),
     slug: text().notNull(),
     logo: text(),
-    createdAt: timestamp({ mode: "string" }).notNull(),
+    createdAt: text().notNull(),
     metadata: text(),
     stripeCustomerId: text(),
     monthlyEventCount: integer().default(0),
@@ -144,7 +145,7 @@ export const organization = pgTable(
 );
 
 // Member table (BetterAuth)
-export const member = pgTable("member", {
+export const member = sqliteTable("member", {
   id: text().primaryKey().notNull(),
   organizationId: text()
     .notNull()
@@ -153,13 +154,13 @@ export const member = pgTable("member", {
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
   role: text().notNull(),
-  createdAt: timestamp({ mode: "string" }).notNull(),
+  createdAt: text().notNull(),
   // Site access restriction: false = all sites (default), true = only sites in member_site_access
   hasRestrictedSiteAccess: boolean("has_restricted_site_access").default(false).notNull(),
 });
 
 // Invitation table (BetterAuth)
-export const invitation = pgTable("invitation", {
+export const invitation = sqliteTable("invitation", {
   id: text().primaryKey().notNull(),
   email: text().notNull(),
   inviterId: text().references(() => user.id, { onDelete: "set null" }),
@@ -168,7 +169,7 @@ export const invitation = pgTable("invitation", {
     .references(() => organization.id),
   role: text().notNull(),
   status: text().notNull(),
-  expiresAt: timestamp({ mode: "string" }).notNull(),
+  expiresAt: text().notNull(),
   // Site access restriction for the invited member
   hasRestrictedSiteAccess: boolean("has_restricted_site_access").default(false).notNull(),
   siteIds: jsonb("site_ids").default([]).$type<number[]>(), // Array of site IDs to grant access to
@@ -176,17 +177,17 @@ export const invitation = pgTable("invitation", {
 
 // Member site access junction table - stores which sites a member has access to
 // Only used when member.hasRestrictedSiteAccess = true
-export const memberSiteAccess = pgTable(
+export const memberSiteAccess = sqliteTable(
   "member_site_access",
   {
-    id: serial("id").primaryKey().notNull(),
+    id: integer("id").primaryKey({ autoIncrement: true }).notNull(),
     memberId: text("member_id")
       .notNull()
       .references(() => member.id, { onDelete: "cascade" }),
     siteId: integer("site_id")
       .notNull()
       .references(() => sites.siteId, { onDelete: "cascade" }),
-    createdAt: timestamp("created_at", { mode: "string" }).defaultNow().notNull(),
+    createdAt: text("created_at").default(nowIso).notNull(),
     createdBy: text("created_by").references(() => user.id, { onDelete: "set null" }),
   },
   (table) => [
@@ -197,14 +198,14 @@ export const memberSiteAccess = pgTable(
 );
 
 // Session table (BetterAuth)
-export const session = pgTable(
+export const session = sqliteTable(
   "session",
   {
     id: text().primaryKey().notNull(),
-    expiresAt: timestamp({ mode: "string" }).notNull(),
+    expiresAt: text().notNull(),
     token: text().notNull(),
-    createdAt: timestamp({ mode: "string" }).notNull(),
-    updatedAt: timestamp({ mode: "string" }).notNull(),
+    createdAt: text().notNull(),
+    updatedAt: text().notNull(),
     ipAddress: text(),
     userAgent: text(),
     userId: text()
@@ -217,7 +218,7 @@ export const session = pgTable(
 );
 
 // API Key table (BetterAuth)
-export const apiKey = pgTable("apikey", {
+export const apiKey = sqliteTable("apikey", {
   id: text().primaryKey().notNull(),
   name: text(),
   start: text(),
@@ -228,26 +229,26 @@ export const apiKey = pgTable("apikey", {
     .references(() => user.id, { onDelete: "cascade" }),
   refillInterval: integer(),
   refillAmount: integer(),
-  lastRefillAt: timestamp({ mode: "string" }),
+  lastRefillAt: text(),
   enabled: boolean().notNull().default(true),
   rateLimitEnabled: boolean().notNull().default(false),
   rateLimitTimeWindow: integer(),
   rateLimitMax: integer(),
   requestCount: integer().notNull().default(0),
   remaining: integer(),
-  lastRequest: timestamp({ mode: "string" }),
-  expiresAt: timestamp({ mode: "string" }),
-  createdAt: timestamp({ mode: "string" }).notNull(),
-  updatedAt: timestamp({ mode: "string" }).notNull(),
+  lastRequest: text(),
+  expiresAt: text(),
+  createdAt: text().notNull(),
+  updatedAt: text().notNull(),
   permissions: text(),
   metadata: jsonb(),
 });
 
 // Goals table for tracking conversion goals
-export const goals = pgTable(
+export const goals = sqliteTable(
   "goals",
   {
-    goalId: serial("goal_id").primaryKey().notNull(),
+    goalId: integer("goal_id").primaryKey({ autoIncrement: true }).notNull(),
     siteId: integer("site_id").notNull(),
     name: text("name"), // Optional, user-defined name for the goal
     goalType: text("goal_type").notNull(), // 'path' or 'event'
@@ -265,7 +266,7 @@ export const goals = pgTable(
         value: string | number | boolean;
       }>; // Array of property filters to match (all must match)
     }>(),
-    createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
+    createdAt: text("created_at").default(nowIso),
   },
   table => [
     foreignKey({
@@ -277,18 +278,18 @@ export const goals = pgTable(
 );
 
 // Telemetry table for tracking self-hosted instances
-export const telemetry = pgTable("telemetry", {
-  id: serial("id").primaryKey().notNull(),
+export const telemetry = sqliteTable("telemetry", {
+  id: integer("id").primaryKey({ autoIncrement: true }).notNull(),
   instanceId: text("instance_id").notNull(),
-  timestamp: timestamp("timestamp", { mode: "string" }).notNull().defaultNow(),
+  timestamp: text("timestamp").notNull().default(nowIso),
   version: text("version").notNull(),
   tableCounts: jsonb("table_counts").notNull().$type<Record<string, number>>(),
   clickhouseSizeGb: real("clickhouse_size_gb").notNull(),
 });
 
 // Uptime monitor definitions
-export const uptimeMonitors = pgTable("uptime_monitors", {
-  id: serial("id").primaryKey().notNull(),
+export const uptimeMonitors = sqliteTable("uptime_monitors", {
+  id: integer("id").primaryKey({ autoIncrement: true }).notNull(),
   organizationId: text("organization_id")
     .notNull()
     .references(() => organization.id),
@@ -369,21 +370,21 @@ export const uptimeMonitors = pgTable("uptime_monitors", {
   selectedRegions: jsonb("selected_regions").default(["local"]).$type<string[]>(),
 
   // Metadata
-  createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
-  updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow(),
+  createdAt: text("created_at").default(nowIso),
+  updatedAt: text("updated_at").default(nowIso),
   createdBy: text("created_by").references(() => user.id, { onDelete: "set null" }),
 });
 
 // Monitor status tracking
-export const uptimeMonitorStatus = pgTable(
+export const uptimeMonitorStatus = sqliteTable(
   "uptime_monitor_status",
   {
     monitorId: integer("monitor_id")
       .primaryKey()
       .notNull()
       .references(() => uptimeMonitors.id, { onDelete: "cascade" }),
-    lastCheckedAt: timestamp("last_checked_at", { mode: "string" }),
-    nextCheckAt: timestamp("next_check_at", { mode: "string" }),
+    lastCheckedAt: text("last_checked_at"),
+    nextCheckAt: text("next_check_at"),
     currentStatus: text("current_status").default("unknown"), // 'up', 'down', 'unknown'
     consecutiveFailures: integer("consecutive_failures").default(0),
     consecutiveSuccesses: integer("consecutive_successes").default(0),
@@ -391,7 +392,7 @@ export const uptimeMonitorStatus = pgTable(
     uptimePercentage7d: real("uptime_percentage_7d"),
     uptimePercentage30d: real("uptime_percentage_30d"),
     averageResponseTime24h: real("average_response_time_24h"),
-    updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow(),
+    updatedAt: text("updated_at").default(nowIso),
   },
   table => [
     foreignKey({
@@ -408,10 +409,10 @@ export const uptimeMonitorStatus = pgTable(
 );
 
 // Alert configuration (scaffolding)
-export const uptimeAlerts = pgTable(
+export const uptimeAlerts = sqliteTable(
   "uptime_alerts",
   {
-    id: serial("id").primaryKey().notNull(),
+    id: integer("id").primaryKey({ autoIncrement: true }).notNull(),
     monitorId: integer("monitor_id")
       .notNull()
       .references(() => uptimeMonitors.id, { onDelete: "cascade" }),
@@ -423,7 +424,7 @@ export const uptimeAlerts = pgTable(
       uptimePercentageThreshold?: number;
     }>(),
     enabled: boolean("enabled").default(true),
-    createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
+    createdAt: text("created_at").default(nowIso),
   },
   table => [
     foreignKey({
@@ -435,18 +436,18 @@ export const uptimeAlerts = pgTable(
 );
 
 // Alert history (scaffolding)
-export const uptimeAlertHistory = pgTable(
+export const uptimeAlertHistory = sqliteTable(
   "uptime_alert_history",
   {
-    id: serial("id").primaryKey().notNull(),
+    id: integer("id").primaryKey({ autoIncrement: true }).notNull(),
     alertId: integer("alert_id")
       .notNull()
       .references(() => uptimeAlerts.id, { onDelete: "cascade" }),
     monitorId: integer("monitor_id")
       .notNull()
       .references(() => uptimeMonitors.id, { onDelete: "cascade" }),
-    triggeredAt: timestamp("triggered_at", { mode: "string" }).defaultNow(),
-    resolvedAt: timestamp("resolved_at", { mode: "string" }),
+    triggeredAt: text("triggered_at").default(nowIso),
+    resolvedAt: text("resolved_at"),
     alertData: jsonb("alert_data"), // Context about what triggered the alert
   },
   table => [
@@ -464,18 +465,18 @@ export const uptimeAlertHistory = pgTable(
 );
 
 // Agent regions for VPS-based monitoring
-export const agentRegions = pgTable("agent_regions", {
+export const agentRegions = sqliteTable("agent_regions", {
   code: text("code").primaryKey().notNull(), // Region code (e.g., 'us-east', 'europe')
   name: text("name").notNull(), // Region display name
   endpointUrl: text("endpoint_url").notNull(), // Agent endpoint URL
   enabled: boolean("enabled").default(true),
-  lastHealthCheck: timestamp("last_health_check", { mode: "string" }),
+  lastHealthCheck: text("last_health_check"),
   isHealthy: boolean("is_healthy").default(true),
 });
 
 // Uptime incidents table
-export const uptimeIncidents = pgTable("uptime_incidents", {
-  id: serial("id").primaryKey().notNull(),
+export const uptimeIncidents = sqliteTable("uptime_incidents", {
+  id: integer("id").primaryKey({ autoIncrement: true }).notNull(),
   organizationId: text("organization_id")
     .notNull()
     .references(() => organization.id),
@@ -485,31 +486,31 @@ export const uptimeIncidents = pgTable("uptime_incidents", {
   region: text("region"), // Region where incident occurred
 
   // Incident timing
-  startTime: timestamp("start_time", { mode: "string" }).notNull(),
-  endTime: timestamp("end_time", { mode: "string" }), // null if ongoing
+  startTime: text("start_time").notNull(),
+  endTime: text("end_time"), // null if ongoing
 
   // Status
   status: text("status").notNull().default("active"), // 'active', 'acknowledged', 'resolved'
 
   // Acknowledgement details
   acknowledgedBy: text("acknowledged_by").references(() => user.id, { onDelete: "set null" }),
-  acknowledgedAt: timestamp("acknowledged_at", { mode: "string" }),
+  acknowledgedAt: text("acknowledged_at"),
 
   // Resolution details
   resolvedBy: text("resolved_by").references(() => user.id, { onDelete: "set null" }),
-  resolvedAt: timestamp("resolved_at", { mode: "string" }),
+  resolvedAt: text("resolved_at"),
 
   // Error details
   lastError: text("last_error"),
   lastErrorType: text("last_error_type"),
   failureCount: integer("failure_count").default(1),
-  createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
-  updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow(),
+  createdAt: text("created_at").default(nowIso),
+  updatedAt: text("updated_at").default(nowIso),
 });
 
 // Notification channels table
-export const notificationChannels = pgTable("notification_channels", {
-  id: serial("id").primaryKey().notNull(),
+export const notificationChannels = sqliteTable("notification_channels", {
+  id: integer("id").primaryKey({ autoIncrement: true }).notNull(),
   organizationId: text("organization_id")
     .notNull()
     .references(() => organization.id),
@@ -538,15 +539,15 @@ export const notificationChannels = pgTable("notification_channels", {
   monitorIds: jsonb("monitor_ids").$type<number[] | null>(), // null = all monitors
   triggerEvents: jsonb("trigger_events").notNull().default(["down", "recovery"]).$type<string[]>(), // 'down', 'recovery', 'degraded'
   cooldownMinutes: integer("cooldown_minutes").default(5), // Minimum time between notifications
-  lastNotifiedAt: timestamp("last_notified_at", { mode: "string" }),
+  lastNotifiedAt: text("last_notified_at"),
 
-  createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
-  updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow(),
+  createdAt: text("created_at").default(nowIso),
+  updatedAt: text("updated_at").default(nowIso),
   createdBy: text("created_by").references(() => user.id, { onDelete: "set null" }),
 });
 
 // Google Search Console connections table
-export const gscConnections = pgTable("gsc_connections", {
+export const gscConnections = sqliteTable("gsc_connections", {
   siteId: integer("site_id")
     .primaryKey()
     .notNull()
@@ -555,17 +556,17 @@ export const gscConnections = pgTable("gsc_connections", {
   // OAuth tokens
   accessToken: text("access_token").notNull(),
   refreshToken: text("refresh_token").notNull(),
-  expiresAt: timestamp("expires_at", { mode: "string" }).notNull(),
+  expiresAt: text("expires_at").notNull(),
 
   // Which GSC property this connection is for
   gscPropertyUrl: text("gsc_property_url").notNull(),
 
-  createdAt: timestamp("created_at", { mode: "string" }).defaultNow().notNull(),
-  updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow().notNull(),
+  createdAt: text("created_at").default(nowIso).notNull(),
+  updatedAt: text("updated_at").default(nowIso).notNull(),
 });
 
 // User profiles - stores identified user traits (email, name, custom fields)
-export const userProfiles = pgTable(
+export const userProfiles = sqliteTable(
   "user_profiles",
   {
     siteId: integer("site_id")
@@ -573,8 +574,8 @@ export const userProfiles = pgTable(
       .references(() => sites.siteId, { onDelete: "cascade" }),
     userId: text("user_id").notNull(), // The identified user ID from identify() call
     traits: jsonb("traits").$type<Record<string, unknown>>().default({}),
-    createdAt: timestamp("created_at", { mode: "string" }).defaultNow().notNull(),
-    updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow().notNull(),
+    createdAt: text("created_at").default(nowIso).notNull(),
+    updatedAt: text("updated_at").default(nowIso).notNull(),
   },
   (table) => [
     primaryKey({ columns: [table.siteId, table.userId] }),
@@ -583,16 +584,16 @@ export const userProfiles = pgTable(
 );
 
 // User aliases - maps anonymous IDs to identified users (multi-device support)
-export const userAliases = pgTable(
+export const userAliases = sqliteTable(
   "user_aliases",
   {
-    id: serial("id").primaryKey().notNull(),
+    id: integer("id").primaryKey({ autoIncrement: true }).notNull(),
     siteId: integer("site_id")
       .notNull()
       .references(() => sites.siteId, { onDelete: "cascade" }),
     anonymousId: text("anonymous_id").notNull(), // Hash of IP+UserAgent (device fingerprint)
     userId: text("user_id").notNull(), // The identified user ID
-    createdAt: timestamp("created_at", { mode: "string" }).defaultNow().notNull(),
+    createdAt: text("created_at").default(nowIso).notNull(),
   },
   (table) => [
     unique("user_aliases_site_anon_unique").on(table.siteId, table.anonymousId),
@@ -603,20 +604,18 @@ export const userAliases = pgTable(
 
 export const importPlatforms = ["umami", "simple_analytics"] as const;
 
-export const importPlatformEnum = pgEnum("import_platform_enum", importPlatforms);
-
-export const importStatus = pgTable(
+export const importStatus = sqliteTable(
   "import_status",
   {
-    importId: uuid("import_id").primaryKey().notNull().defaultRandom(),
+    importId: text("import_id").primaryKey().notNull().$defaultFn(() => randomUUID()),
     siteId: integer("site_id").notNull(),
     organizationId: text("organization_id").notNull(),
-    platform: importPlatformEnum("platform").notNull(),
+    platform: text("platform", { enum: importPlatforms }).notNull(),
     importedEvents: integer("imported_events").notNull().default(0),
     skippedEvents: integer("skipped_events").notNull().default(0),
     invalidEvents: integer("invalid_events").notNull().default(0),
-    startedAt: timestamp("started_at", { mode: "string" }).notNull().defaultNow(),
-    completedAt: timestamp("completed_at", { mode: "string" }),
+    startedAt: text("started_at").notNull().default(nowIso),
+    completedAt: text("completed_at"),
   },
   table => [
     foreignKey({

@@ -1,4 +1,3 @@
-import { ResultSet } from "@clickhouse/client";
 import { FilterParams } from "@rybbit/shared";
 import { and, eq, inArray } from "drizzle-orm";
 import SqlString from "sqlstring";
@@ -31,19 +30,13 @@ export function getTimeStatement(
       return "";
     }
 
-    // Use SqlString.escape for date and timeZone values
-    return `AND timestamp >= toTimeZone(
-      toStartOfDay(toDateTime(${SqlString.escape(start_date)}, ${SqlString.escape(time_zone)})),
-      'UTC'
-      )
-      AND timestamp < if(
-        toDate(${SqlString.escape(end_date)}) = toDate(now(), ${SqlString.escape(time_zone)}),
-        now(),
-        toTimeZone(
-          toStartOfDay(toDateTime(${SqlString.escape(end_date)}, ${SqlString.escape(time_zone)})) + INTERVAL 1 DAY,
-          'UTC'
-        )
-      )`;
+    // Use DuckDB-native date/timestamp expressions.
+    return `AND timestamp >= date_trunc('day', CAST(${SqlString.escape(start_date)} AS TIMESTAMP))
+      AND timestamp < CASE
+        WHEN CAST(${SqlString.escape(end_date)} AS DATE) = CAST(now() AS DATE)
+          THEN now()
+        ELSE date_trunc('day', CAST(${SqlString.escape(end_date)} AS TIMESTAMP)) + INTERVAL 1 DAY
+      END`;
   }
 
   // Handle specific range of past minutes - convert to exact timestamps for better performance
@@ -55,19 +48,31 @@ export function getTimeStatement(
     const startTimestamp = new Date(now.getTime() - start * 60 * 1000);
     const endTimestamp = new Date(now.getTime() - end * 60 * 1000);
 
-    // Format as YYYY-MM-DD HH:MM:SS without milliseconds for ClickHouse
+    // Format as YYYY-MM-DD HH:MM:SS without milliseconds
     const startIso = startTimestamp.toISOString().slice(0, 19).replace("T", " ");
     const endIso = endTimestamp.toISOString().slice(0, 19).replace("T", " ");
 
-    return `AND timestamp > toDateTime(${SqlString.escape(startIso)}) AND timestamp <= toDateTime(${SqlString.escape(endIso)})`;
+    return `AND timestamp > CAST(${SqlString.escape(startIso)} AS TIMESTAMP) AND timestamp <= CAST(${SqlString.escape(endIso)} AS TIMESTAMP)`;
   }
 
   // If no valid time parameters were provided, return empty string
   return "";
 }
 
-export async function processResults<T>(results: ResultSet<"JSONEachRow">): Promise<T[]> {
-  const data: T[] = await results.json();
+type DuckDbLikeResult = {
+  json?: (...args: any[]) => Promise<any>;
+};
+
+export async function processResults<T>(results: DuckDbLikeResult | T[]): Promise<T[]> {
+  let data: any[] = [];
+
+  if (Array.isArray(results)) {
+    data = results;
+  } else if (results && typeof results.json === "function") {
+    const raw = await results.json();
+    data = Array.isArray(raw) ? raw : Array.isArray(raw?.data) ? raw.data : [];
+  }
+
   for (const row of data) {
     for (const key in row) {
       // Only convert to number if the value is not null/undefined and is a valid number

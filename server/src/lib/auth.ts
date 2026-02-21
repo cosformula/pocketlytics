@@ -3,9 +3,9 @@ import { createAuthMiddleware } from "better-auth/api";
 import { admin, captcha, emailOTP, organization, apiKey } from "better-auth/plugins";
 import dotenv from "dotenv";
 import { and, asc, eq } from "drizzle-orm";
-import pg from "pg";
 
 import { db } from "../db/postgres/postgres.js";
+import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import * as schema from "../db/postgres/schema.js";
 import { invitation, member, memberSiteAccess, user } from "../db/postgres/schema.js";
 import { DISABLE_SIGNUP, IS_CLOUD } from "./const.js";
@@ -72,13 +72,7 @@ const pluginList = [
 
 export const auth = betterAuth({
   basePath: "/api/auth",
-  database: new pg.Pool({
-    host: process.env.POSTGRES_HOST || "postgres",
-    port: parseInt(process.env.POSTGRES_PORT || "5432", 10),
-    database: process.env.POSTGRES_DB,
-    user: process.env.POSTGRES_USER,
-    password: process.env.POSTGRES_PASSWORD,
-  }),
+  database: drizzleAdapter(db, { provider: "sqlite" }),
   emailAndPassword: {
     enabled: true,
     // Disable email verification for now

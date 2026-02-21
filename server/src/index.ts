@@ -108,7 +108,7 @@ import {
   unsubscribeMarketing,
   updateAccountSettings,
 } from "./api/user/index.js";
-import { initializeClickhouse } from "./db/clickhouse/clickhouse.js";
+import { initializeDuckDB } from "./db/clickhouse/clickhouse.js";
 import { initPostgres } from "./db/postgres/initPostgres.js";
 import {
   allowPublicSiteAccess,
@@ -362,11 +362,6 @@ async function stripeAdminRoutes(fastify: FastifyInstance) {
     fastify.get("/admin/service-event-count", adminOnly, getAdminServiceEventCount);
     fastify.post("/admin/telemetry", collectTelemetry); // Public - telemetry collection
 
-    // AppSumo Routes
-    const { activateAppSumoLicense, handleAppSumoWebhook } = await import("./api/as/index.js");
-
-    fastify.post("/as/activate", authOnly, activateAppSumoLicense);
-    fastify.post("/as/webhook", handleAppSumoWebhook); // Public - AppSumo webhook
   }
 }
 
@@ -392,7 +387,7 @@ server.register(apiRoutes, { prefix: "/api" });
 
 const start = async () => {
   try {
-    await Promise.all([initializeClickhouse(), initPostgres()]);
+    await Promise.all([initializeDuckDB(), initPostgres()]);
 
     telemetryService.startTelemetryCron();
     if (IS_CLOUD && process.env.NODE_ENV !== "development") {
