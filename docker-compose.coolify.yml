@@ -35,6 +35,9 @@ services:
       - traefik.http.routers.rybbit-backend.tls.certresolver=letsencrypt
       - traefik.http.routers.rybbit-backend.priority=100
       - traefik.http.services.rybbit-backend.loadbalancer.server.port=3001
+    networks:
+      - coolify
+      - default
 
   client:
     build:
@@ -59,6 +62,13 @@ services:
       - traefik.http.routers.rybbit-client.tls.certresolver=letsencrypt
       - traefik.http.routers.rybbit-client.priority=1
       - traefik.http.services.rybbit-client.loadbalancer.server.port=3002
+    networks:
+      - coolify
+      - default
+
+networks:
+  coolify:
+    external: true
 
 volumes:
   rybbit-data:
