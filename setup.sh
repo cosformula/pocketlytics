@@ -15,6 +15,8 @@ show_help() {
   echo "Example: $0 myapp.example.com"
   echo "Example with no webserver: $0 myapp.example.com --no-webserver"
   echo ""
+  echo "This setup uses embedded SQLite + DuckDB (no external Postgres/ClickHouse containers)."
+  echo ""
   echo "Options:"
   echo "  --no-webserver          Disable the built-in Caddy webserver"
   echo "  --backend-port <port>   Set custom host port for backend (default: 3001)"
@@ -109,6 +111,9 @@ DOMAIN_NAME=${DOMAIN_NAME}
 BASE_URL=${BASE_URL}
 BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
 DISABLE_SIGNUP=false
+DISABLE_TELEMETRY=true
+SQLITE_DB_PATH=file:/app/data/rybbit.sqlite
+DUCKDB_PATH=/app/data/rybbit-analytics.duckdb
 EOL
 
 # Add MAPBOX_TOKEN if provided
@@ -161,4 +166,4 @@ else
 fi
 
 echo "Setup complete. Services are starting in the background."
-echo "You can monitor logs with: docker compose logs -f" 
+echo "You can monitor logs with: docker compose logs -f"

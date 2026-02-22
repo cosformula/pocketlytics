@@ -70,6 +70,11 @@ const pluginList = [
     : []),
 ];
 
+const trustedOrigins = new Set<string>(["http://localhost:3002", "http://127.0.0.1:3002"]);
+if (process.env.BASE_URL) {
+  trustedOrigins.add(process.env.BASE_URL);
+}
+
 export const auth = betterAuth({
   basePath: "/api/auth",
   database: drizzleAdapter(db, { provider: "sqlite" }),
@@ -111,7 +116,7 @@ export const auth = betterAuth({
     },
   },
   plugins: pluginList,
-  trustedOrigins: ["http://localhost:3002"],
+  trustedOrigins: Array.from(trustedOrigins),
   advanced: {
     useSecureCookies: process.env.NODE_ENV === "production", // don't mark Secure in dev
     defaultCookieAttributes: {

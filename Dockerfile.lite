@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 # rybbit-lite: SQLite + DuckDB, single-process
 
-FROM node:20-alpine AS builder
+FROM node:20-slim AS builder
 
 WORKDIR /app
 
@@ -20,20 +20,17 @@ COPY server/ .
 RUN npm run build
 
 # Runtime image
-FROM node:20-alpine
+FROM node:20-slim
 
 WORKDIR /app
 
-# Chromium for Puppeteer PDF generation (optional, can remove to save space)
-RUN apk add --no-cache \
+# Chromium for Puppeteer PDF generation
+RUN apt-get update && apt-get install -y --no-install-recommends \
     chromium \
-    nss \
-    freetype \
-    harfbuzz \
-    ca-certificates \
-    ttf-freefont
+    fonts-freefont-ttf \
+    && rm -rf /var/lib/apt/lists/*
 
-ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
 # Copy built application
