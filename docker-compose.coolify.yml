@@ -27,6 +27,14 @@ services:
       timeout: 5s
       retries: 5
       start_period: 20s
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.rybbit-backend.rule=Host(`analytics.eu.cosformula.org`) && (PathPrefix(`/api`) || PathPrefix(`/auth`))
+      - traefik.http.routers.rybbit-backend.entrypoints=http,https
+      - traefik.http.routers.rybbit-backend.tls=true
+      - traefik.http.routers.rybbit-backend.tls.certresolver=letsencrypt
+      - traefik.http.routers.rybbit-backend.priority=100
+      - traefik.http.services.rybbit-backend.loadbalancer.server.port=3001
 
   client:
     build:
@@ -43,6 +51,14 @@ services:
     depends_on:
       backend:
         condition: service_healthy
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.rybbit-client.rule=Host(`analytics.eu.cosformula.org`)
+      - traefik.http.routers.rybbit-client.entrypoints=http,https
+      - traefik.http.routers.rybbit-client.tls=true
+      - traefik.http.routers.rybbit-client.tls.certresolver=letsencrypt
+      - traefik.http.routers.rybbit-client.priority=1
+      - traefik.http.services.rybbit-client.loadbalancer.server.port=3002
 
 volumes:
   rybbit-data:
