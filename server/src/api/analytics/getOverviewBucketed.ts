@@ -3,66 +3,14 @@ import { FastifyReply, FastifyRequest } from "fastify";
 import SqlString from "sqlstring";
 import { clickhouse } from "../../db/clickhouse/clickhouse.js";
 import { validateTimeStatementFillParams } from "./utils/query-validation.js";
-import { getTimeStatement, processResults, TimeBucketToFn, bucketIntervalMap } from "./utils/utils.js";
+import { getTimeStatement, processResults, TimeBucketToFn } from "./utils/utils.js";
 import { getFilterStatement } from "./utils/getFilterStatement.js";
 import { TimeBucket } from "./types.js";
 
 function getTimeStatementFill(params: FilterParams, bucket: TimeBucket) {
-  const { params: validatedParams, bucket: validatedBucket } = validateTimeStatementFillParams(params, bucket);
-
-  if (validatedParams.start_date && validatedParams.end_date && validatedParams.time_zone) {
-    const { start_date, end_date, time_zone } = validatedParams;
-    return `WITH FILL FROM toTimeZone(
-      toDateTime(${TimeBucketToFn[validatedBucket]}(toDateTime(${SqlString.escape(start_date)}, ${SqlString.escape(
-        time_zone
-      )}))),
-      'UTC'
-      )
-      TO if(
-        toDate(${SqlString.escape(end_date)}) = toDate(now(), ${SqlString.escape(time_zone)}),
-        now(),
-        toTimeZone(
-          toDateTime(${TimeBucketToFn[validatedBucket]}(toDateTime(${SqlString.escape(end_date)}, ${SqlString.escape(
-            time_zone
-          )}))) + INTERVAL 1 DAY,
-          'UTC'
-        )
-      ) STEP INTERVAL ${bucketIntervalMap[validatedBucket]}`;
-  }
-  // For specific past minutes range - convert to exact timestamps for better performance
-  if (validatedParams.past_minutes_start !== undefined && validatedParams.past_minutes_end !== undefined) {
-    const { past_minutes_start: start, past_minutes_end: end } = validatedParams;
-
-    // Calculate exact timestamps in JavaScript to avoid runtime ClickHouse calculations
-    const now = new Date();
-    const startTimestamp = new Date(now.getTime() - start * 60 * 1000);
-    const endTimestamp = new Date(now.getTime() - end * 60 * 1000);
-
-    // Format as YYYY-MM-DD HH:MM:SS without milliseconds for ClickHouse
-    const startIso = startTimestamp.toISOString().slice(0, 19).replace("T", " ");
-    const endIso = endTimestamp.toISOString().slice(0, 19).replace("T", " ");
-
-    return ` WITH FILL 
-      FROM ${TimeBucketToFn[validatedBucket]}(toDateTime(${SqlString.escape(startIso)}))
-      TO ${TimeBucketToFn[validatedBucket]}(toDateTime(${SqlString.escape(endIso)})) + INTERVAL 1 ${
-        validatedBucket === "minute"
-          ? "MINUTE"
-          : validatedBucket === "five_minutes"
-            ? "MINUTE"
-            : validatedBucket === "ten_minutes"
-              ? "MINUTE"
-              : validatedBucket === "fifteen_minutes"
-                ? "MINUTE"
-                : validatedBucket === "month"
-                  ? "MONTH"
-                  : validatedBucket === "week"
-                    ? "WEEK"
-                    : validatedBucket === "day"
-                      ? "DAY"
-                      : "HOUR"
-      }
-      STEP INTERVAL ${bucketIntervalMap[validatedBucket]}`;
-  }
+  // DuckDB does not support ClickHouse `WITH FILL` semantics the same way.
+  // Keep query output dense on the frontend instead of generating DB-side fill rows.
+  validateTimeStatementFillParams(params, bucket);
   return "";
 }
 
@@ -115,13 +63,13 @@ SessionsWithPageviews AS (
     LEFT JOIN AllSessionPageviews asp ON fs.session_id = asp.session_id
 )
 SELECT
-    session_stats.time AS time,
-    session_stats.sessions,
-    session_stats.pages_per_session,
-    session_stats.bounce_rate * 100 AS bounce_rate,
-    session_stats.session_duration,
-    page_stats.pageviews,
-    page_stats.users
+    COALESCE(session_stats.time, page_stats.time) AS time,
+    COALESCE(session_stats.sessions, 0) AS sessions,
+    COALESCE(session_stats.pages_per_session, 0) AS pages_per_session,
+    COALESCE(session_stats.bounce_rate * 100, 0) AS bounce_rate,
+    COALESCE(session_stats.session_duration, 0) AS session_duration,
+    COALESCE(page_stats.pageviews, 0) AS pageviews,
+    COALESCE(page_stats.users, 0) AS users
 FROM
 (
     SELECT
@@ -129,7 +77,7 @@ FROM
         COUNT() AS sessions,
         AVG(total_pageviews_in_session) AS pages_per_session,
         sumIf(1, total_pageviews_in_session = 1) / COUNT() AS bounce_rate,
-        AVG(end_time - start_time) AS session_duration
+        AVG(dateDiff('second', start_time, end_time)) AS session_duration
     FROM SessionsWithPageviews
     GROUP BY time ORDER BY time ${isAllTime ? "" : getTimeStatementFill(params, bucket)}
 ) AS session_stats
@@ -146,7 +94,8 @@ FULL JOIN
         ${getTimeStatement(params)}
     GROUP BY time ORDER BY time ${isAllTime ? "" : getTimeStatementFill(params, bucket)}
 ) AS page_stats
-USING (time)
+ON session_stats.time = page_stats.time
+WHERE COALESCE(session_stats.time, page_stats.time) IS NOT NULL
 ORDER BY time`;
 
   return query;
@@ -190,7 +139,7 @@ export async function getOverviewBucketed(
       },
     });
 
-    const data = await processResults<getOverviewBucketed[number]>(result);
+    const data = (await processResults<getOverviewBucketed[number]>(result)).filter(row => !!row.time);
     return res.send({ data });
   } catch (error) {
     console.error("Error fetching pageviews:", error);
