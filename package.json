@@ -1,0 +1,8 @@
+{
+  "name": "rybbit-lite-tools",
+  "private": true,
+  "scripts": {
+    "smoke:dev": "bash ./scripts/smoke-dev.sh",
+    "load:dev": "bash ./scripts/load-dev.sh"
+  }
+}
