@@ -132,6 +132,14 @@ export interface SessionDetailsParams {
   minutes?: number;
 }
 
+const getSitePathValue = (site: string | number): string => {
+  const siteValue = String(site).trim();
+  if (!siteValue) {
+    throw new Error("Site ID is required");
+  }
+  return siteValue;
+};
+
 /**
  * Fetch sessions list
  * GET /api/sessions/:site
@@ -140,6 +148,7 @@ export async function fetchSessions(
   site: string | number,
   params: SessionsParams
 ): Promise<{ data: GetSessionsResponse }> {
+  const siteValue = getSitePathValue(site);
   const queryParams = {
     ...toQueryParams(params),
     page: params.page,
@@ -153,7 +162,7 @@ export async function fetchSessions(
   };
 
   const response = await authedFetch<{ data: GetSessionsResponse }>(
-    `/sites/${site}/sessions`,
+    `/sites/${siteValue}/sessions`,
     queryParams
   );
   return response;
@@ -167,6 +176,7 @@ export async function fetchSession(
   site: string | number,
   params: SessionDetailsParams
 ): Promise<{ data: SessionPageviewsAndEvents }> {
+  const siteValue = getSitePathValue(site);
   const queryParams: Record<string, any> = {
     limit: params.limit,
     offset: params.offset,
@@ -177,7 +187,7 @@ export async function fetchSession(
   }
 
   const response = await authedFetch<{ data: SessionPageviewsAndEvents }>(
-    `/sites/${site}/sessions/${params.sessionId}`,
+    `/sites/${siteValue}/sessions/${params.sessionId}`,
     queryParams
   );
   return response;
@@ -191,8 +201,9 @@ export async function fetchSessionLocations(
   site: string | number,
   params: CommonApiParams
 ): Promise<LiveSessionLocation[]> {
+  const siteValue = getSitePathValue(site);
   const response = await authedFetch<{ data: LiveSessionLocation[] }>(
-    `/sites/${site}/session-locations`,
+    `/sites/${siteValue}/session-locations`,
     toQueryParams(params)
   );
   return response.data;

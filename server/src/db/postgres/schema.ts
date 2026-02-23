@@ -244,6 +244,10 @@ export const apiKey = sqliteTable("apikey", {
   metadata: jsonb(),
 });
 
+// Better Auth drizzle adapter resolves this model by the "apikey" key.
+// Keep both names exported for compatibility across existing imports.
+export const apikey = apiKey;
+
 // Goals table for tracking conversion goals
 export const goals = sqliteTable(
   "goals",

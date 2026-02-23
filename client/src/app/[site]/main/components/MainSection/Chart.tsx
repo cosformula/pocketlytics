@@ -146,17 +146,27 @@ export function Chart({
     data?.data
       ?.map((e, i) => {
         // Parse timestamp in the selected timezone, then convert to UTC for chart
-        const timestamp = DateTime.fromSQL(e.time, { zone: timezone }).toUTC();
+        const parsedTimestamp = DateTime.fromSQL(e.time, { zone: timezone });
+        if (!parsedTimestamp.isValid) {
+          return null;
+        }
+        const timestamp = parsedTimestamp.toUTC();
+        const currentValue = e[selectedStat];
+        if (typeof currentValue !== "number" || !Number.isFinite(currentValue)) {
+          return null;
+        }
 
         // filter out dates from the future
         if (timestamp > DateTime.now()) {
           return null;
         }
 
+        const previousValue = i >= lengthDiff ? previousData?.data?.[i - lengthDiff]?.[selectedStat] : undefined;
+
         return {
           x: timestamp.toFormat("yyyy-MM-dd HH:mm:ss"),
-          y: e[selectedStat],
-          previousY: i >= lengthDiff && previousData?.data?.[i - lengthDiff][selectedStat],
+          y: currentValue,
+          previousY: typeof previousValue === "number" && Number.isFinite(previousValue) ? previousValue : undefined,
           currentTime: timestamp,
           previousTime:
             i >= lengthDiff ? DateTime.fromSQL(previousData?.data?.[i - lengthDiff]?.time ?? "", { zone: timezone }).toUTC() : undefined,
@@ -237,15 +247,26 @@ export function Chart({
     xScale,
     yScale,
   }: LineCustomSvgLayerProps<LineSeries>) => {
-    return series.map(({ id, data, color }) => (
-      <path
-        key={id}
-        d={lineGenerator(data.map(d => ({ x: xScale(d.data.x), y: yScale(d.data.y) })))!}
-        fill="none"
-        stroke={color}
-        style={id === "dashedData" ? { strokeDasharray: "3, 6", strokeWidth: 3 } : { strokeWidth: 2 }}
-      />
-    ));
+    return series.map(({ id, data, color }) => {
+      const points = data
+        .map(d => ({ x: xScale(d.data.x), y: yScale(d.data.y) }))
+        .filter(point => Number.isFinite(point.x) && Number.isFinite(point.y));
+      const path = lineGenerator(points);
+
+      if (!path) {
+        return null;
+      }
+
+      return (
+        <path
+          key={id}
+          d={path}
+          fill="none"
+          stroke={color}
+          style={id === "dashedData" ? { strokeDasharray: "3, 6", strokeWidth: 3 } : { strokeWidth: 2 }}
+        />
+      );
+    });
   };
 
   return (

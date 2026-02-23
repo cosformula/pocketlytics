@@ -63,7 +63,8 @@ class PageviewQueue {
 
       return {
         site_id: pv.site_id,
-        timestamp: DateTime.fromISO(pv.timestamp).toFormat("yyyy-MM-dd HH:mm:ss"),
+        // Persist analytics timestamps in UTC to match query window calculations.
+        timestamp: DateTime.fromISO(pv.timestamp, { setZone: true }).toUTC().toFormat("yyyy-MM-dd HH:mm:ss"),
         session_id: pv.sessionId,
         user_id: pv.userId, // Always the device fingerprint
         anonymous_id: pv.anonymousId,

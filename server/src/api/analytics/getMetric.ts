@@ -166,7 +166,7 @@ const getQuery = (request: FastifyRequest<GetMetricRequest>, isCountQuery: boole
               2
           ) as percentage,
           ROUND(
-              countIf(DISTINCT session_id, pageviews_in_session = 1) * 100.0 / nullIf(COUNT(DISTINCT session_id), 0),
+              COUNT(DISTINCT CASE WHEN pageviews_in_session = 1 THEN session_id END) * 100.0 / nullIf(COUNT(DISTINCT session_id), 0),
               2
           ) as bounce_rate
       FROM TitleStatsWithSessions
@@ -237,7 +237,7 @@ const getQuery = (request: FastifyRequest<GetMetricRequest>, isCountQuery: boole
               count(DISTINCT session_id) as unique_sessions,
               count() as visits,
               avg(if(time_diff_seconds < 0, 0, if(time_diff_seconds > 1800, 1800, time_diff_seconds))) as avg_time_on_page_seconds,
-              countIf(DISTINCT session_id, pageviews_in_session = 1) as bounced_sessions
+              COUNT(DISTINCT CASE WHEN pageviews_in_session = 1 THEN session_id END) as bounced_sessions
           FROM FilteredDurations
           WHERE pathname IS NOT NULL AND pathname <> ''
           GROUP BY pathname
@@ -311,7 +311,7 @@ const getQuery = (request: FastifyRequest<GetMetricRequest>, isCountQuery: boole
               count() as visits,
               count(DISTINCT session_id) as unique_sessions,
               avg(if(time_diff_seconds < 0, 0, if(time_diff_seconds > 1800, 1800, time_diff_seconds))) as avg_time_on_page_seconds,
-              countIf(DISTINCT session_id, pageviews_in_session = 1) as bounced_sessions
+              COUNT(DISTINCT CASE WHEN pageviews_in_session = 1 THEN session_id END) as bounced_sessions
           FROM PageDurations
           GROUP BY pathname
       )
@@ -386,7 +386,7 @@ const getQuery = (request: FastifyRequest<GetMetricRequest>, isCountQuery: boole
         round((COUNT(DISTINCT session_id) / sum(COUNT(DISTINCT session_id)) OVER ()) * 100, 2) as percentage,
         COUNT() as pageviews,
         round((COUNT() / sum(COUNT()) OVER ()) * 100, 2) as pageviews_percentage,
-        round((countIf(DISTINCT session_id, pageviews_in_session = 1) / nullIf(COUNT(DISTINCT session_id), 0)) * 100, 2) as bounce_rate
+        round((COUNT(DISTINCT CASE WHEN pageviews_in_session = 1 THEN session_id END) / nullIf(COUNT(DISTINCT session_id), 0)) * 100, 2) as bounce_rate
     FROM SessionData
     GROUP BY value
     ORDER BY count desc

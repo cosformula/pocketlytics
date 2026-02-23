@@ -1,5 +1,6 @@
 import { FilterParams } from "@rybbit/shared";
 import { and, eq, inArray } from "drizzle-orm";
+import { DateTime } from "luxon";
 import SqlString from "sqlstring";
 import { db } from "../../../db/postgres/postgres.js";
 import { userProfiles } from "../../../db/postgres/schema.js";
@@ -29,14 +30,23 @@ export function getTimeStatement(
     if (!start_date && !end_date) {
       return "";
     }
+    if (!start_date || !end_date || !time_zone) {
+      return "";
+    }
 
-    // Use DuckDB-native date/timestamp expressions.
-    return `AND timestamp >= date_trunc('day', CAST(${SqlString.escape(start_date)} AS TIMESTAMP))
-      AND timestamp < CASE
-        WHEN CAST(${SqlString.escape(end_date)} AS DATE) = CAST(now() AS DATE)
-          THEN now()
-        ELSE date_trunc('day', CAST(${SqlString.escape(end_date)} AS TIMESTAMP)) + INTERVAL 1 DAY
-      END`;
+    // Compute exact UTC bounds in JS so DuckDB SQL stays simple and timezone-correct.
+    const startUtc = DateTime.fromISO(start_date, { zone: time_zone }).startOf("day").toUTC();
+    const nowInZone = DateTime.now().setZone(time_zone);
+    const isEndTodayInZone = end_date === nowInZone.toISODate();
+    const endUtc = isEndTodayInZone
+      ? nowInZone.toUTC()
+      : DateTime.fromISO(end_date, { zone: time_zone }).plus({ days: 1 }).startOf("day").toUTC();
+
+    const startUtcSql = startUtc.toFormat("yyyy-MM-dd HH:mm:ss");
+    const endUtcSql = endUtc.toFormat("yyyy-MM-dd HH:mm:ss");
+
+    return `AND timestamp >= CAST(${SqlString.escape(startUtcSql)} AS TIMESTAMP)
+      AND timestamp < CAST(${SqlString.escape(endUtcSql)} AS TIMESTAMP)`;
   }
 
   // Handle specific range of past minutes - convert to exact timestamps for better performance

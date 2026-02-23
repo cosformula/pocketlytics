@@ -77,7 +77,7 @@ if (process.env.BASE_URL) {
 
 export const auth = betterAuth({
   basePath: "/api/auth",
-  database: drizzleAdapter(db, { provider: "sqlite" }),
+  database: drizzleAdapter(db, { provider: "sqlite", schema }),
   emailAndPassword: {
     enabled: true,
     // Disable email verification for now

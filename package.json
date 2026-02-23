@@ -3,6 +3,8 @@
   "private": true,
   "scripts": {
     "smoke:dev": "bash ./scripts/smoke-dev.sh",
-    "load:dev": "bash ./scripts/load-dev.sh"
+    "load:dev": "bash ./scripts/load-dev.sh",
+    "endpoints:dev": "node ./scripts/endpoint-sweep-dev.mjs",
+    "dev:test:open": "bash ./scripts/dev-test-open.sh"
   }
 }

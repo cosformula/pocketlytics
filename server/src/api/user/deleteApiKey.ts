@@ -18,8 +18,13 @@ export const deleteApiKey = async (
     });
 
     return reply.send(result);
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error deleting API key:", error);
+    if (typeof error?.statusCode === "number" && error.statusCode >= 400 && error.statusCode < 500) {
+      const message =
+        typeof error?.body?.message === "string" ? error.body.message : typeof error?.message === "string" ? error.message : "API key not found";
+      return reply.status(error.statusCode).send({ error: message });
+    }
     return reply.status(500).send({ error: "Failed to delete API key" });
   }
 };

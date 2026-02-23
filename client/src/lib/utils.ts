@@ -37,7 +37,8 @@ export const getCountryName = (countryCode: string) => {
   }
 };
 
-export function truncateString(str: string, n = 50) {
+export function truncateString(str: string | null | undefined, n = 50) {
+  if (!str) return "";
   return str.length > n ? str.substring(0, n) + "..." : str;
 }
 

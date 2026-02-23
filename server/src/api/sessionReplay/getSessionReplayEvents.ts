@@ -31,7 +31,7 @@ export async function getSessionReplayEvents(
     });
   } catch (error) {
     console.error("Error fetching session replay events:", error);
-    if (error instanceof Error && error.message === "Session replay not found") {
+    if (error instanceof Error && error.message.includes("Session replay not found")) {
       return reply.status(404).send({ error: "Session replay not found" });
     }
     return reply.status(500).send({ error: "Internal server error" });

@@ -65,9 +65,9 @@ const getQuery = (params: FilterParams, siteId: number) => {
         -- Session-level metrics
         SELECT
             COUNT() AS sessions,
-            AVG(total_pageviews_in_session) AS pages_per_session,
-            sumIf(1, total_pageviews_in_session = 1) / COUNT() AS bounce_rate,
-            AVG(dateDiff('second', start_time, end_time)) AS session_duration
+            COALESCE(AVG(total_pageviews_in_session), 0) AS pages_per_session,
+            COALESCE(sumIf(1, total_pageviews_in_session = 1) / NULLIF(COUNT(), 0), 0) AS bounce_rate,
+            COALESCE(AVG(dateDiff('second', start_time, end_time)), 0) AS session_duration
         FROM SessionsWithPageviews
     ) AS session_stats
     CROSS JOIN

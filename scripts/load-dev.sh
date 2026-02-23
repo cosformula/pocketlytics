@@ -1,6 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Load local backend env when available (for TEST_USER_* and related vars).
+if [[ -f "./server/.env" ]]; then
+  set -a
+  # shellcheck disable=SC1091
+  source "./server/.env"
+  set +a
+fi
+
 BACKEND_URL="${BACKEND_URL:-http://127.0.0.1:3001}"
 CLIENT_ORIGIN="${CLIENT_ORIGIN:-http://127.0.0.1:3002}"
 TEST_USER_EMAIL="${TEST_USER_EMAIL:-test@rybbit-lite.local}"
@@ -74,6 +82,7 @@ if [[ -z "$org_id" ]]; then
 fi
 
 SITE_ID="${SITE_ID:-}"
+TODAY_UTC="$(date -u +%F)"
 if [[ -z "$SITE_ID" ]]; then
   sites_code="$(req GET "/api/organizations/${org_id}/sites")"
   if [[ "$sites_code" != "200" ]]; then
@@ -96,8 +105,11 @@ base_paths=(
   "/api/sites/${SITE_ID}/overview?past_minutes_start=60&past_minutes_end=0"
   "/api/sites/${SITE_ID}/page-titles?past_minutes_start=60&past_minutes_end=0&page=1&limit=10"
   "/api/sites/${SITE_ID}/events/names?past_minutes_start=60&past_minutes_end=0"
+  "/api/sites/${SITE_ID}/events/names?start_date=${TODAY_UTC}&end_date=${TODAY_UTC}&time_zone=UTC"
   "/api/sites/${SITE_ID}/metric?parameter=referrer&past_minutes_start=60&past_minutes_end=0&page=1&limit=20"
   "/api/sites/${SITE_ID}/metric?parameter=browser&past_minutes_start=60&past_minutes_end=0&page=1&limit=20"
+  "/api/sites/${SITE_ID}/metric?parameter=referrer&start_date=${TODAY_UTC}&end_date=${TODAY_UTC}&time_zone=UTC&page=1&limit=20"
+  "/api/sites/${SITE_ID}/metric?parameter=browser&start_date=${TODAY_UTC}&end_date=${TODAY_UTC}&time_zone=UTC&page=1&limit=20"
 )
 
 : > "$URL_LIST"

@@ -32,6 +32,7 @@ export function useGetSessions({
   minDuration?: number;
 }) {
   const { time, site, timezone } = useStore();
+  const hasSite = !!site;
 
   const filteredFilters = getFilteredFilters(SESSION_PAGE_FILTERS);
 
@@ -56,6 +57,7 @@ export function useGetSessions({
       });
     },
     staleTime: Infinity,
+    enabled: hasSite,
   });
 }
 
@@ -71,6 +73,7 @@ export function useGetSessionsInfinite({
   refetchInterval?: number;
 }) {
   const { time, site, timezone } = useStore();
+  const hasSite = !!site;
 
   const filteredFilters = getFilteredFilters(SESSION_PAGE_FILTERS);
 
@@ -100,6 +103,7 @@ export function useGetSessionsInfinite({
     },
     staleTime: Infinity,
     refetchInterval,
+    enabled: hasSite,
   });
 }
 

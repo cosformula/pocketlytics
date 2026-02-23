@@ -214,6 +214,10 @@ export async function getPerformanceByDimension(
   const site = req.params.siteId;
 
   const isPaginatedRequest = page !== undefined;
+  const validDimensions = ["pathname", "country", "device_type", "browser", "operating_system", "region"];
+  if (!dimension || !validDimensions.includes(dimension)) {
+    return res.status(400).send({ error: `Invalid dimension: ${dimension}` });
+  }
 
   try {
     const dataQuery = getQuery(req, false);

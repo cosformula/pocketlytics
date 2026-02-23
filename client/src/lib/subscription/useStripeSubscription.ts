@@ -24,10 +24,9 @@ export function useStripeSubscription(): UseQueryResult<SubscriptionData | undef
   const { data: activeOrg } = authClient.useActiveOrganization();
 
   const fetchSubscription = async () => {
-    if (!activeOrg || !IS_CLOUD) {
-      return undefined;
+    if (!activeOrg) {
+      throw new Error("No active organization selected");
     }
-
     return authedFetch<SubscriptionData>(`/stripe/subscription?organizationId=${activeOrg.id}`);
   };
 
@@ -36,6 +35,6 @@ export function useStripeSubscription(): UseQueryResult<SubscriptionData | undef
     queryFn: fetchSubscription,
     staleTime: 5 * 60 * 1000,
     retry: false,
-    enabled: !!activeOrg,
+    enabled: !!activeOrg && IS_CLOUD,
   });
 }

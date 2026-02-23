@@ -403,6 +403,7 @@ const normalizeSql = (input: string): string => {
   });
   sql = replaceFunctionCalls(sql, "uniqExact", args => `COUNT(DISTINCT ${args[0] ?? "NULL"})`);
   sql = replaceFunctionCalls(sql, "uniq", args => `COUNT(DISTINCT ${args[0] ?? "NULL"})`);
+  sql = replaceFunctionCalls(sql, "any", args => `any_value(${args[0] ?? "NULL"})`);
   sql = replaceFunctionCalls(sql, "countIf", args => {
     if (args.length === 1) {
       return `COUNT_IF(${args[0]})`;

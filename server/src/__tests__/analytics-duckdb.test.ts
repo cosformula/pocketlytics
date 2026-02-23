@@ -350,6 +350,7 @@ beforeAll(async () => {
   app.get("/sites/:siteId/events", analytics.getEvents);
   app.get("/sites/:siteId/events/count", analytics.getSiteEventCount);
   app.get("/sites/:siteId/events/bucketed", analytics.getEventBucketed);
+  app.get("/sites/:siteId/events/names", analytics.getEventNames);
   app.get("/sites/:siteId/page-titles", analytics.getPageTitles);
   app.get("/sites/:siteId/journeys", analytics.getJourneys);
   app.get("/sites/:siteId/live-user-count", analytics.getLiveUsercount);
@@ -372,6 +373,32 @@ describe("analytics endpoints run against DuckDB", () => {
     const body = response.json() as { data: Record<string, unknown> };
     expectObjectKeys(body, ["data"]);
     expectObjectKeys(body.data, ["sessions", "pageviews", "users", "bounce_rate", "session_duration"]);
+  });
+
+  it("GET /sites/:id/overview with empty day range returns zeroed metrics", async () => {
+    const response = await app.inject({
+      method: "GET",
+      url: `/sites/${SITE_ID}/overview?start_date=1999-01-01&end_date=1999-01-01&time_zone=UTC`,
+    });
+    expect(response.statusCode).toBe(200);
+
+    const body = response.json() as {
+      data: {
+        sessions: number;
+        pageviews: number;
+        users: number;
+        pages_per_session: number;
+        bounce_rate: number;
+        session_duration: number;
+      };
+    };
+
+    expect(body.data.sessions).toBe(0);
+    expect(body.data.pageviews).toBe(0);
+    expect(body.data.users).toBe(0);
+    expect(body.data.pages_per_session).toBe(0);
+    expect(body.data.bounce_rate).toBe(0);
+    expect(body.data.session_duration).toBe(0);
   });
 
   it("GET /sites/:id/overview-bucketed", async () => {
@@ -430,6 +457,32 @@ describe("analytics endpoints run against DuckDB", () => {
     expect(Array.isArray(body.data.data)).toBe(true);
   });
 
+  it("GET /sites/:id/metric?parameter=referrer with day filter + pagination", async () => {
+    const today = new Date().toISOString().slice(0, 10);
+    const response = await app.inject({
+      method: "GET",
+      url: `/sites/${SITE_ID}/metric?parameter=referrer&start_date=${today}&end_date=${today}&time_zone=UTC&limit=100&page=1`,
+    });
+    expect(response.statusCode).toBe(200);
+
+    const body = response.json() as { data: { data: Array<Record<string, unknown>>; totalCount: number } };
+    expect(Array.isArray(body.data.data)).toBe(true);
+    expect(typeof body.data.totalCount).toBe("number");
+  });
+
+  it("GET /sites/:id/metric?parameter=browser with day filter + pagination", async () => {
+    const today = new Date().toISOString().slice(0, 10);
+    const response = await app.inject({
+      method: "GET",
+      url: `/sites/${SITE_ID}/metric?parameter=browser&start_date=${today}&end_date=${today}&time_zone=UTC&limit=100&page=1`,
+    });
+    expect(response.statusCode).toBe(200);
+
+    const body = response.json() as { data: { data: Array<Record<string, unknown>>; totalCount: number } };
+    expect(Array.isArray(body.data.data)).toBe(true);
+    expect(typeof body.data.totalCount).toBe("number");
+  });
+
   it("GET /sites/:id/sessions", async () => {
     const response = await app.inject({ method: "GET", url: `/sites/${SITE_ID}/sessions?limit=20&page=1` });
     expect(response.statusCode).toBe(200);
@@ -479,6 +532,18 @@ describe("analytics endpoints run against DuckDB", () => {
     expect(Array.isArray(body.data)).toBe(true);
     expect(body.data.length).toBeGreaterThan(0);
     expectObjectKeys(body.data[0], ["time", "event_name", "event_count"]);
+  });
+
+  it("GET /sites/:id/events/names with day filter", async () => {
+    const today = new Date().toISOString().slice(0, 10);
+    const response = await app.inject({
+      method: "GET",
+      url: `/sites/${SITE_ID}/events/names?start_date=${today}&end_date=${today}&time_zone=UTC`,
+    });
+    expect(response.statusCode).toBe(200);
+
+    const body = response.json() as { data: Array<Record<string, unknown>> };
+    expect(Array.isArray(body.data)).toBe(true);
   });
 
   it("GET /sites/:id/page-titles", async () => {

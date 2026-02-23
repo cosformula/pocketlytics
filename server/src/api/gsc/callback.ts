@@ -49,7 +49,7 @@ export async function gscCallback(req: FastifyRequest<GSCCallbackRequest>, res: 
     const redirectUri = process.env.GOOGLE_REDIRECT_URI || `${process.env.SERVER_URL}/api/gsc/callback`;
 
     if (!clientId || !clientSecret) {
-      return res.status(500).send({ error: "Google OAuth not configured" });
+      return res.status(400).send({ error: "Google OAuth not configured" });
     }
 
     // Exchange code for tokens
