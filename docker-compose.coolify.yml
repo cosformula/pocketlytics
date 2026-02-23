@@ -1,4 +1,15 @@
 services:
+  caddy:
+    image: caddy:2.10.0
+    restart: unless-stopped
+    volumes:
+      - ./Caddyfile.coolify:/etc/caddy/Caddyfile
+    depends_on:
+      backend:
+        condition: service_healthy
+      client:
+        condition: service_started
+
   backend:
     build:
       context: .
@@ -13,7 +24,6 @@ services:
       MAPBOX_TOKEN: ${MAPBOX_TOKEN:-}
       SQLITE_DB_PATH: ${SQLITE_DB_PATH:-file:/app/data/rybbit.sqlite}
       DUCKDB_PATH: ${DUCKDB_PATH:-/app/data/rybbit-analytics.duckdb}
-      RYBBIT_HOST: ${RYBBIT_HOST}
     volumes:
       - rybbit-data:/app/data
     healthcheck:
@@ -41,7 +51,6 @@ services:
       NODE_ENV: production
       NEXT_PUBLIC_BACKEND_URL: ${BASE_URL}
       NEXT_PUBLIC_DISABLE_SIGNUP: ${DISABLE_SIGNUP:-false}
-      RYBBIT_HOST: ${RYBBIT_HOST}
     depends_on:
       backend:
         condition: service_healthy
