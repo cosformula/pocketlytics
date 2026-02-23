@@ -3,20 +3,25 @@ import {
   PutObjectCommand,
   GetObjectCommand,
   DeleteObjectCommand,
-  GetObjectCommandOutput,
 } from "@aws-sdk/client-s3";
 import { NodeHttpHandler } from "@smithy/node-http-handler";
 import { Readable } from "stream";
-import { gunzipSync } from "zlib";
-import { compress as zstdCompress, decompress as zstdDecompress } from "@mongodb-js/zstd";
+import { gunzipSync, gzipSync } from "zlib";
 import { IS_CLOUD } from "../../lib/const.js";
 import { createServiceLogger } from "../../lib/logger/logger.js";
+
+type ZstdModule = {
+  compress: (input: Buffer, level?: number | null) => Promise<Buffer>;
+  decompress: (input: Buffer) => Promise<Buffer>;
+};
 
 class R2StorageService {
   private client: S3Client | null = null;
   private bucketName: string = "";
   private enabled: boolean = false;
   private logger = createServiceLogger("r2-storage");
+  private zstdModulePromise: Promise<ZstdModule | null> | null = null;
+  private zstdUnavailableLogged = false;
 
   constructor() {
     // Only initialize R2 in cloud environment
@@ -65,6 +70,28 @@ class R2StorageService {
     return this.enabled;
   }
 
+  private async getZstdModule(): Promise<ZstdModule | null> {
+    if (!this.zstdModulePromise) {
+      this.zstdModulePromise = import("@mongodb-js/zstd")
+        .then((mod) => ({
+          compress: mod.compress,
+          decompress: mod.decompress,
+        }))
+        .catch((error) => {
+          if (!this.zstdUnavailableLogged) {
+            this.zstdUnavailableLogged = true;
+            this.logger.warn(
+              { error: error instanceof Error ? error.message : String(error) },
+              "zstd module unavailable, falling back to gzip where possible"
+            );
+          }
+          return null;
+        });
+    }
+
+    return this.zstdModulePromise;
+  }
+
   /**
    * Store a batch of event data in R2
    * Returns the storage key if successful, null if R2 is disabled
@@ -75,12 +102,13 @@ class R2StorageService {
     }
 
     const timestamp = Date.now();
-    const key = `${siteId}/${sessionId}/${timestamp}.json.zst`;
 
     try {
-      // Compress with zstd - much faster decompression than brotli
+      const zstd = await this.getZstdModule();
       const jsonBuffer = Buffer.from(JSON.stringify(eventDataArray));
-      const compressed = await zstdCompress(jsonBuffer, 3); // level 3 = good balance
+      const useZstd = zstd !== null;
+      const key = `${siteId}/${sessionId}/${timestamp}.json.${useZstd ? "zst" : "gz"}`;
+      const compressed = useZstd ? await zstd.compress(jsonBuffer, 3) : gzipSync(jsonBuffer);
 
       await this.client.send(
         new PutObjectCommand({
@@ -93,7 +121,7 @@ class R2StorageService {
             siteId: siteId.toString(),
             sessionId: sessionId,
             eventCount: eventDataArray.length.toString(),
-            compression: "zstd",
+            compression: useZstd ? "zstd" : "gzip",
           },
         })
       );
@@ -152,15 +180,26 @@ class R2StorageService {
 
       // Try to decompress based on file extension
       let decompressed: Buffer;
+      const zstd = await this.getZstdModule();
+      const compressionHint = (response.Metadata?.compression || "").toLowerCase();
 
       try {
-        if (key.endsWith(".zst")) {
-          decompressed = await zstdDecompress(buffer);
-        } else if (key.endsWith(".gz")) {
+        const isZstd = key.endsWith(".zst") || compressionHint === "zstd";
+        const isGzip = key.endsWith(".gz") || compressionHint === "gzip";
+
+        if (isZstd) {
+          if (!zstd) {
+            throw new Error("zstd-compressed payload cannot be read: @mongodb-js/zstd is unavailable");
+          }
+          decompressed = await zstd.decompress(buffer);
+        } else if (isGzip) {
           decompressed = gunzipSync(buffer);
         } else {
-          // Assume zstd for unknown extensions
-          decompressed = await zstdDecompress(buffer);
+          if (zstd) {
+            decompressed = await zstd.decompress(buffer);
+          } else {
+            decompressed = gunzipSync(buffer);
+          }
         }
         return JSON.parse(decompressed.toString());
       } catch (decompressionError: any) {
