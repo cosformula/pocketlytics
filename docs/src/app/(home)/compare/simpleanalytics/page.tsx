@@ -4,22 +4,22 @@ import { SimpleAnalyticsComparisonContent } from "./ComparisonContent";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Rybbit vs Simple Analytics: Feature Comparison 2025",
+  title: "Pocketlytics vs Simple Analytics: Feature Comparison 2025",
   description:
-    "Compare Rybbit and Simple Analytics. Both are privacy-focused, but Rybbit offers more advanced features like session replay, funnels, and user journeys.",
+    "Compare Pocketlytics and Simple Analytics. Both are privacy-focused, but Pocketlytics offers more advanced features like session replay, funnels, and user journeys.",
   openGraph: {
-    title: "Rybbit vs Simple Analytics: Simple AND Powerful",
-    description: "Simple Analytics keeps it basic. Rybbit adds power without complexity. Compare features.",
+    title: "Pocketlytics vs Simple Analytics: Simple AND Powerful",
+    description: "Simple Analytics keeps it basic. Pocketlytics adds power without complexity. Compare features.",
     type: "website",
-    url: "https://rybbit.com/compare/simpleanalytics",
+    url: "https://pocketlytics.local/compare/simpleanalytics",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Rybbit vs Simple Analytics",
+    title: "Pocketlytics vs Simple Analytics",
     description: "Privacy-first analytics compared. See which offers the best value.",
   },
   alternates: {
-    canonical: "https://rybbit.com/compare/simpleanalytics",
+    canonical: "https://pocketlytics.local/compare/simpleanalytics",
   },
 };
 
@@ -28,14 +28,14 @@ const structuredData = {
   "@graph": [
     {
       "@type": "WebPage",
-      "@id": "https://rybbit.com/compare/simpleanalytics",
-      name: "Rybbit vs Simple Analytics Comparison",
-      description: "Compare Rybbit and Simple Analytics platforms",
-      url: "https://rybbit.com/compare/simpleanalytics",
+      "@id": "https://pocketlytics.local/compare/simpleanalytics",
+      name: "Pocketlytics vs Simple Analytics Comparison",
+      description: "Compare Pocketlytics and Simple Analytics platforms",
+      url: "https://pocketlytics.local/compare/simpleanalytics",
       isPartOf: {
         "@type": "WebSite",
-        name: "Rybbit",
-        url: "https://rybbit.com",
+        name: "Pocketlytics",
+        url: "https://pocketlytics.local",
       },
     },
     {
@@ -43,26 +43,26 @@ const structuredData = {
       mainEntity: [
         {
           "@type": "Question",
-          name: "How does Rybbit compare to Simple Analytics?",
+          name: "How does Pocketlytics compare to Simple Analytics?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "Both are privacy-first analytics platforms, but Rybbit offers more advanced features like session replay, funnels, user journeys, and error tracking while maintaining a simple, intuitive interface.",
+            text: "Both are privacy-first analytics platforms, but Pocketlytics offers more advanced features like session replay, funnels, user journeys, and error tracking while maintaining a simple, intuitive interface.",
           },
         },
         {
           "@type": "Question",
-          name: "Is Rybbit more feature-rich than Simple Analytics?",
+          name: "Is Pocketlytics more feature-rich than Simple Analytics?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "Yes. Rybbit includes session replay, funnel analysis, user journey visualization, Web Vitals monitoring, error tracking, and public dashboards. Simple Analytics focuses on basic metrics and simplicity.",
+            text: "Yes. Pocketlytics includes session replay, funnel analysis, user journey visualization, Web Vitals monitoring, error tracking, and public dashboards. Simple Analytics focuses on basic metrics and simplicity.",
           },
         },
         {
           "@type": "Question",
-          name: "Which is better value, Rybbit or Simple Analytics?",
+          name: "Which is better value, Pocketlytics or Simple Analytics?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "Rybbit offers more features at competitive pricing, plus a generous free tier and open-source self-hosting option. Simple Analytics has fixed pricing without a free tier.",
+            text: "Pocketlytics offers more features at competitive pricing, plus a generous free tier and open-source self-hosting option. Simple Analytics has fixed pricing without a free tier.",
           },
         },
       ],

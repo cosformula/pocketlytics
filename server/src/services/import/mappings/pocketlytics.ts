@@ -1,4 +1,4 @@
-export interface RybbitEvent {
+export interface PocketlyticsEvent {
   site_id: number;
   timestamp: string;
   session_id: string;

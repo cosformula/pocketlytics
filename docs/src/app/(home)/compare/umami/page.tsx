@@ -4,22 +4,22 @@ import { UmamiComparisonContent } from "./ComparisonContent";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Rybbit vs Umami: Open-Source Analytics Comparison 2025",
+  title: "Pocketlytics vs Umami: Open-Source Analytics Comparison 2025",
   description:
-    "Compare Rybbit and Umami analytics. Both are open-source and privacy-focused, but Rybbit offers advanced features like session replay, funnels, and a managed cloud option.",
+    "Compare Pocketlytics and Umami analytics. Both are open-source and privacy-focused, but Pocketlytics offers advanced features like session replay, funnels, and a managed cloud option.",
   openGraph: {
-    title: "Rybbit vs Umami: Open-Source Analytics Head-to-Head",
+    title: "Pocketlytics vs Umami: Open-Source Analytics Head-to-Head",
     description: "Two open-source analytics platforms compared. See which offers more features and flexibility.",
     type: "website",
-    url: "https://rybbit.com/compare/umami",
+    url: "https://pocketlytics.local/compare/umami",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Rybbit vs Umami Comparison",
+    title: "Pocketlytics vs Umami Comparison",
     description: "Open-source analytics showdown. Compare features, hosting options, and more.",
   },
   alternates: {
-    canonical: "https://rybbit.com/compare/umami",
+    canonical: "https://pocketlytics.local/compare/umami",
   },
 };
 
@@ -28,14 +28,14 @@ const structuredData = {
   "@graph": [
     {
       "@type": "WebPage",
-      "@id": "https://rybbit.com/compare/umami",
-      name: "Rybbit vs Umami Comparison",
-      description: "Compare Rybbit and Umami analytics platforms",
-      url: "https://rybbit.com/compare/umami",
+      "@id": "https://pocketlytics.local/compare/umami",
+      name: "Pocketlytics vs Umami Comparison",
+      description: "Compare Pocketlytics and Umami analytics platforms",
+      url: "https://pocketlytics.local/compare/umami",
       isPartOf: {
         "@type": "WebSite",
-        name: "Rybbit",
-        url: "https://rybbit.com",
+        name: "Pocketlytics",
+        url: "https://pocketlytics.local",
       },
     },
     {
@@ -43,26 +43,26 @@ const structuredData = {
       mainEntity: [
         {
           "@type": "Question",
-          name: "How does Rybbit compare to Umami?",
+          name: "How does Pocketlytics compare to Umami?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "Both are open-source, privacy-focused analytics platforms. Rybbit offers more advanced features like session replay, funnels, user journeys, and Web Vitals monitoring, plus a fully managed cloud option.",
+            text: "Both are open-source, privacy-focused analytics platforms. Pocketlytics offers more advanced features like session replay, funnels, user journeys, and Web Vitals monitoring, plus a fully managed cloud option.",
           },
         },
         {
           "@type": "Question",
-          name: "Does Rybbit offer more features than Umami?",
+          name: "Does Pocketlytics offer more features than Umami?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "Yes. Rybbit includes session replay, funnel analysis, user journey visualization, Web Vitals dashboard, error tracking, and public dashboards. Umami focuses on core analytics metrics.",
+            text: "Yes. Pocketlytics includes session replay, funnel analysis, user journey visualization, Web Vitals dashboard, error tracking, and public dashboards. Umami focuses on core analytics metrics.",
           },
         },
         {
           "@type": "Question",
-          name: "Which is easier to self-host, Rybbit or Umami?",
+          name: "Which is easier to self-host, Pocketlytics or Umami?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "Both are relatively easy to self-host with Docker. Rybbit uses ClickHouse for better performance at scale, while Umami uses MySQL/PostgreSQL. Rybbit also offers a managed cloud option if you prefer not to self-host.",
+            text: "Both are relatively easy to self-host with Docker. Pocketlytics uses ClickHouse for better performance at scale, while Umami uses MySQL/PostgreSQL. Pocketlytics also offers a managed cloud option if you prefer not to self-host.",
           },
         },
       ],

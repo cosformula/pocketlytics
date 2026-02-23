@@ -16,7 +16,7 @@ import { useRouter } from "next/navigation";
 import { parseAsInteger, useQueryState } from "nuqs";
 import React, { Suspense, useEffect, useState } from "react";
 import { addSite } from "../../api/admin/endpoints";
-import { RybbitLogo, RybbitTextLogo } from "../../components/RybbitLogo";
+import { PocketlyticsLogo, PocketlyticsTextLogo } from "../../components/PocketlyticsLogo";
 import { SpinningGlobe } from "../../components/SpinningGlobe";
 import { useSetPageTitle } from "../../hooks/useSetPageTitle";
 import { authClient } from "../../lib/auth";
@@ -27,7 +27,7 @@ import { cn, isValidDomain, normalizeDomain } from "../../lib/utils";
 
 function SignupPageContent() {
   const { configs, isLoading: isLoadingConfigs } = useConfigs();
-  useSetPageTitle("Rybbit · Signup");
+  useSetPageTitle("Pocketlytics · Signup");
 
   const [currentStep, setCurrentStep] = useState(1);
   const [stepParam] = useQueryState("step", parseAsInteger);
@@ -140,9 +140,9 @@ function SignupPageContent() {
 
       setOrganizationId(data.id);
 
-      // Track how user found Rybbit
+      // Track how user found Pocketlytics
       if (IS_CLOUD && referralSource && userStore.getState().user?.id) {
-        window.rybbit?.identify(userStore.getState().user?.id || "", {
+        window.pocketlytics?.identify(userStore.getState().user?.id || "", {
           source: referralSource,
         });
       }
@@ -264,7 +264,7 @@ function SignupPageContent() {
 
               {IS_CLOUD && (
                 <div className="space-y-2">
-                  <Label htmlFor="referralSource">How did you find Rybbit?</Label>
+                  <Label htmlFor="referralSource">How did you find Pocketlytics?</Label>
                   <Select value={referralSource} onValueChange={setReferralSource}>
                     <SelectTrigger className="h-10 bg-neutral-100 dark:bg-neutral-800/50 border-neutral-200 dark:border-neutral-700">
                       <SelectValue placeholder="Select an option" />
@@ -372,7 +372,7 @@ function SignupPageContent() {
       <div className="flex justify-center items-center h-dvh w-full">
         <Card className="w-full max-w-sm p-1">
           <CardHeader>
-            <RybbitLogo width={32} height={32} />
+            <PocketlyticsLogo width={32} height={32} />
             <CardTitle className="text-2xl flex justify-center">Sign Up Disabled</CardTitle>
           </CardHeader>
           <CardContent>
@@ -397,13 +397,13 @@ function SignupPageContent() {
       <div className="w-full lg:w-[550px] flex flex-col p-6 lg:p-10">
         {/* Logo at top left */}
         <div className="mb-8">
-          <a href="https://rybbit.com" target="_blank" className="inline-block">
-            <RybbitTextLogo />
+          <a href="https://pocketlytics.local" target="_blank" className="inline-block">
+            <PocketlyticsTextLogo />
           </a>
         </div>
 
         <div className="flex-1 flex flex-col justify-center w-full max-w-[550px] mx-auto">
-          <h1 className="text-lg text-neutral-600 dark:text-neutral-300 mb-6">Get started with Rybbit</h1>
+          <h1 className="text-lg text-neutral-600 dark:text-neutral-300 mb-6">Get started with Pocketlytics</h1>
 
           {/* Horizontal step indicator */}
           <div className="flex items-center w-full mb-8">
@@ -459,12 +459,12 @@ function SignupPageContent() {
         {!IS_CLOUD && (
           <div className="text-xs text-muted-foreground mt-8">
             <a
-              href="https://rybbit.com"
+              href="https://pocketlytics.local"
               target="_blank"
               rel="noopener"
-              title="Rybbit - Open Source Privacy-Focused Web Analytics"
+              title="Pocketlytics - Open Source Privacy-Focused Web Analytics"
             >
-              Open source web analytics powered by Rybbit
+              Open source web analytics powered by Pocketlytics
             </a>
           </div>
         )}

@@ -83,7 +83,7 @@
       console.error("Please provide a valid site ID using the data-site-id attribute");
       return null;
     }
-    const namespace = scriptTag.getAttribute("data-namespace") || "rybbit";
+    const namespace = scriptTag.getAttribute("data-namespace") || "pocketlytics";
     const skipPatterns = parseJsonSafely(scriptTag.getAttribute("data-skip-patterns"), []);
     const maskPatterns = parseJsonSafely(scriptTag.getAttribute("data-mask-patterns"), []);
     const sessionReplayMaskTextSelectors = parseJsonSafely(
@@ -178,7 +178,7 @@
   }
 
   // sessionReplay.ts
-  var SAMPLE_STORAGE_KEY = "rybbit-replay-sampled";
+  var SAMPLE_STORAGE_KEY = "pocketlytics-replay-sampled";
   function shouldSampleSession(sampleRate) {
     if (sampleRate >= 100) return true;
     if (sampleRate <= 0) return false;
@@ -1017,7 +1017,7 @@
     trackButtonClick(element) {
       const buttonElement = this.findButton(element);
       if (!buttonElement) return;
-      if (buttonElement.hasAttribute("data-rybbit-event")) return;
+      if (buttonElement.hasAttribute("data-pocketlytics-event")) return;
       const properties = {
         text: this.getElementText(buttonElement),
         ...this.extractDataAttributes(buttonElement)
@@ -1027,8 +1027,8 @@
     extractDataAttributes(element) {
       const attrs = {};
       for (const attr of element.attributes) {
-        if (attr.name.startsWith("data-rybbit-prop-")) {
-          const key = attr.name.replace("data-rybbit-prop-", "");
+        if (attr.name.startsWith("data-pocketlytics-prop-")) {
+          const key = attr.name.replace("data-pocketlytics-prop-", "");
           attrs[key] = attr.value;
         }
       }
@@ -1138,8 +1138,8 @@
     extractDataAttributes(element) {
       const attrs = {};
       for (const attr of element.attributes) {
-        if (attr.name.startsWith("data-rybbit-prop-")) {
-          const key = attr.name.replace("data-rybbit-prop-", "");
+        if (attr.name.startsWith("data-pocketlytics-prop-")) {
+          const key = attr.name.replace("data-pocketlytics-prop-", "");
           attrs[key] = attr.value;
         }
       }
@@ -1154,9 +1154,9 @@
       console.error("Could not find current script tag");
       return;
     }
-    const namespace = scriptTag.getAttribute("data-namespace") || "rybbit";
+    const namespace = scriptTag.getAttribute("data-namespace") || "pocketlytics";
     const optOutKey = `disable-${namespace}`;
-    if (window.__RYBBIT_OPTOUT__ || localStorage.getItem(optOutKey) !== null) {
+    if (window.__POCKETLYTICS_OPTOUT__ || localStorage.getItem(optOutKey) !== null) {
       window[namespace] = {
         pageview: () => {
         },
@@ -1228,13 +1228,13 @@
       document.addEventListener("click", function(e2) {
         let target = e2.target;
         while (target && target !== document.documentElement) {
-          if (target.hasAttribute("data-rybbit-event")) {
-            const eventName = target.getAttribute("data-rybbit-event");
+          if (target.hasAttribute("data-pocketlytics-event")) {
+            const eventName = target.getAttribute("data-pocketlytics-event");
             if (eventName) {
               const properties = {};
               for (const attr of target.attributes) {
-                if (attr.name.startsWith("data-rybbit-prop-")) {
-                  const propName = attr.name.replace("data-rybbit-prop-", "");
+                if (attr.name.startsWith("data-pocketlytics-prop-")) {
+                  const propName = attr.name.replace("data-pocketlytics-prop-", "");
                   properties[propName] = attr.value;
                 }
               }

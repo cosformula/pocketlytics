@@ -12,9 +12,11 @@
 
 We currently support the latest patch versions of the 2.x release line. Older versions are not actively maintained and may contain unpatched vulnerabilities.
 
-We take security seriously. If you discover a vulnerability in our software, we request that you responsibly disclose it by emailing us directly.
+We take security seriously. If you discover a vulnerability, please report it through GitHub private security reporting for this repository:
 
-**Email:** hello @ rybbit.com
+- https://github.com/cosformula/pocketlytics/security/advisories/new
+
+If private reporting is unavailable in your environment, open a private channel with repository maintainers first, and avoid disclosing exploit details publicly before a fix is available.
 
 Please include as much detail as possible to help us understand and resolve the issue quickly. This includes:
 

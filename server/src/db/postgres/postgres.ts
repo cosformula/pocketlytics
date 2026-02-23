@@ -9,7 +9,7 @@ dotenv.config();
 
 const sqliteUrl = process.env.SQLITE_DB_PATH?.startsWith("file:")
   ? process.env.SQLITE_DB_PATH
-  : `file:${process.env.SQLITE_DB_PATH || "./data/rybbit.sqlite"}`;
+  : `file:${process.env.SQLITE_DB_PATH || "./data/pocketlytics.sqlite"}`;
 const sqlitePath = resolve(sqliteUrl.replace(/^file:/, ""));
 mkdirSync(dirname(sqlitePath), { recursive: true });
 

@@ -30,7 +30,7 @@ const analyticsDbPath =
     ? configuredDuckDbPath
     : process.env.NODE_ENV === "test"
       ? ":memory:"
-      : path.join(analyticsDataDir, "rybbit-analytics.duckdb");
+      : path.join(analyticsDataDir, "pocketlytics-analytics.duckdb");
 
 if (analyticsDbPath !== ":memory:") {
   fs.mkdirSync(analyticsDataDir, { recursive: true });

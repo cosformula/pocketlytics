@@ -6,42 +6,42 @@ export const simpleAnalyticsComparisonData: ComparisonSection[] = [
     features: [
       {
         name: "Simple dashboard",
-        rybbitValue: true,
+        pocketlyticsValue: true,
         competitorValue: true,
       },
       {
         name: "Real-time data",
-        rybbitValue: true,
+        pocketlyticsValue: true,
         competitorValue: true,
       },
       {
         name: "Visitor analytics",
-        rybbitValue: true,
+        pocketlyticsValue: true,
         competitorValue: true,
       },
       {
         name: "Source tracking",
-        rybbitValue: true,
+        pocketlyticsValue: true,
         competitorValue: true,
       },
       {
         name: "UTM tracking",
-        rybbitValue: true,
+        pocketlyticsValue: true,
         competitorValue: true,
       },
       {
         name: "Custom events",
-        rybbitValue: "With attributes",
+        pocketlyticsValue: "With attributes",
         competitorValue: "Basic",
       },
       {
         name: "Conversion goals",
-        rybbitValue: true,
+        pocketlyticsValue: true,
         competitorValue: true,
       },
       {
         name: "Geographic data",
-        rybbitValue: "City-level",
+        pocketlyticsValue: "City-level",
         competitorValue: "Country-level",
       },
     ],
@@ -51,42 +51,42 @@ export const simpleAnalyticsComparisonData: ComparisonSection[] = [
     features: [
       {
         name: "Session Replay",
-        rybbitValue: true,
+        pocketlyticsValue: true,
         competitorValue: false,
       },
       {
         name: "Funnels",
-        rybbitValue: true,
+        pocketlyticsValue: true,
         competitorValue: false,
       },
       {
         name: "User journeys (Sankey)",
-        rybbitValue: true,
+        pocketlyticsValue: true,
         competitorValue: false,
       },
       {
         name: "User profiles",
-        rybbitValue: true,
+        pocketlyticsValue: true,
         competitorValue: false,
       },
       {
         name: "Sessions tracking",
-        rybbitValue: true,
+        pocketlyticsValue: true,
         competitorValue: false,
       },
       {
         name: "Real-time globe view",
-        rybbitValue: true,
+        pocketlyticsValue: true,
         competitorValue: false,
       },
       {
         name: "Web Vitals dashboard",
-        rybbitValue: true,
+        pocketlyticsValue: true,
         competitorValue: false,
       },
       {
         name: "Error tracking",
-        rybbitValue: true,
+        pocketlyticsValue: true,
         competitorValue: false,
       },
     ],
@@ -96,27 +96,27 @@ export const simpleAnalyticsComparisonData: ComparisonSection[] = [
     features: [
       {
         name: "Cookie-free tracking",
-        rybbitValue: true,
+        pocketlyticsValue: true,
         competitorValue: true,
       },
       // {
       //   name: "GDPR/CCPA compliant",
-      //   rybbitValue: true,
+      //   pocketlyticsValue: true,
       //   competitorValue: true,
       // },
       {
         name: "No personal data collection",
-        rybbitValue: true,
+        pocketlyticsValue: true,
         competitorValue: true,
       },
       {
         name: "Daily rotating salt option",
-        rybbitValue: true,
+        pocketlyticsValue: true,
         competitorValue: false,
       },
       {
         name: "Data stored in EU",
-        rybbitValue: true,
+        pocketlyticsValue: true,
         competitorValue: true,
       },
     ],
@@ -126,17 +126,17 @@ export const simpleAnalyticsComparisonData: ComparisonSection[] = [
     features: [
       {
         name: "Open source",
-        rybbitValue: true,
+        pocketlyticsValue: true,
         competitorValue: false,
       },
       {
         name: "Self-hostable",
-        rybbitValue: true,
+        pocketlyticsValue: true,
         competitorValue: false,
       },
       {
         name: "License",
-        rybbitValue: "AGPL v3",
+        pocketlyticsValue: "AGPL v3",
         competitorValue: "Proprietary",
       },
     ],
@@ -146,17 +146,17 @@ export const simpleAnalyticsComparisonData: ComparisonSection[] = [
     features: [
       {
         name: "No training required",
-        rybbitValue: true,
+        pocketlyticsValue: true,
         competitorValue: true,
       },
       {
         name: "Public dashboards",
-        rybbitValue: true,
+        pocketlyticsValue: true,
         competitorValue: true,
       },
       {
         name: "Live demo",
-        rybbitValue: true,
+        pocketlyticsValue: true,
         competitorValue: true,
       },
     ],
@@ -166,22 +166,22 @@ export const simpleAnalyticsComparisonData: ComparisonSection[] = [
     features: [
       {
         name: "Bot filtering",
-        rybbitValue: true,
+        pocketlyticsValue: true,
         competitorValue: true,
       },
       {
         name: "API access",
-        rybbitValue: true,
+        pocketlyticsValue: true,
         competitorValue: true,
       },
       {
         name: "Bypasses ad blockers",
-        rybbitValue: true,
+        pocketlyticsValue: true,
         competitorValue: true,
       },
       {
         name: "Organization support",
-        rybbitValue: true,
+        pocketlyticsValue: true,
         competitorValue: false,
       },
     ],

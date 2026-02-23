@@ -36,7 +36,7 @@ const buildSeedEvents = (): Record<string, unknown>[] => [
     querystring: "",
     url_parameters: { utm_source: "newsletter" },
     page_title: "Home",
-    referrer: "https://google.com/search?q=rybbit",
+    referrer: "https://google.com/search?q=pocketlytics",
     channel: "organic",
     browser: "Chrome",
     browser_version: "121",
@@ -62,7 +62,7 @@ const buildSeedEvents = (): Record<string, unknown>[] => [
     querystring: "",
     url_parameters: { utm_source: "newsletter" },
     page_title: "Pricing",
-    referrer: "https://google.com/search?q=rybbit",
+    referrer: "https://google.com/search?q=pocketlytics",
     channel: "organic",
     browser: "Chrome",
     browser_version: "121",
@@ -88,7 +88,7 @@ const buildSeedEvents = (): Record<string, unknown>[] => [
     querystring: "",
     url_parameters: { utm_source: "newsletter" },
     page_title: "Pricing",
-    referrer: "https://google.com/search?q=rybbit",
+    referrer: "https://google.com/search?q=pocketlytics",
     channel: "organic",
     browser: "Chrome",
     browser_version: "121",
@@ -116,7 +116,7 @@ const buildSeedEvents = (): Record<string, unknown>[] => [
     querystring: "",
     url_parameters: { utm_source: "newsletter" },
     page_title: "Pricing",
-    referrer: "https://google.com/search?q=rybbit",
+    referrer: "https://google.com/search?q=pocketlytics",
     channel: "organic",
     browser: "Chrome",
     browser_version: "121",
@@ -325,7 +325,7 @@ beforeAll(async () => {
   process.env.NODE_ENV = "test";
   process.env.DUCKDB_PATH = ":memory:";
 
-  const tempDir = mkdtempSync(path.join(tmpdir(), "rybbit-analytics-test-"));
+  const tempDir = mkdtempSync(path.join(tmpdir(), "pocketlytics-analytics-test-"));
   process.env.SQLITE_DB_PATH = `file:${path.join(tempDir, `${randomUUID()}.sqlite`)}`;
 
   const analytics = await import("../api/analytics/index.js");

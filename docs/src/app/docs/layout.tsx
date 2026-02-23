@@ -9,11 +9,11 @@ export default function Layout({ children }: { children: ReactNode }) {
     <DocsLayout
       tree={source.pageTree}
       {...baseOptions}
-      githubUrl="https://github.com/rybbit-io/rybbit"
+      githubUrl="https://github.com/cosformula/pocketlytics"
       links={[
         {
           type: "custom",
-          children: <GithubInfo owner="rybbit-io" repo="rybbit" className="lg:-mx-2" />,
+          children: <GithubInfo owner="cosformula" repo="pocketlytics" className="lg:-mx-2" />,
         },
       ]}
     >

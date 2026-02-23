@@ -10,7 +10,7 @@ import {
   TableRow,
   TableSortIndicator,
 } from "@/components/ui/table";
-import { FilterParameter } from "@rybbit/shared";
+import { FilterParameter } from "@pocketlytics/shared";
 import {
   createColumnHelper,
   flexRender,

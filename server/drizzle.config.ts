@@ -10,7 +10,7 @@ export default defineConfig({
   dbCredentials: {
     url: process.env.SQLITE_DB_PATH?.startsWith("file:")
       ? process.env.SQLITE_DB_PATH
-      : `file:${process.env.SQLITE_DB_PATH || "./data/rybbit.sqlite"}`,
+      : `file:${process.env.SQLITE_DB_PATH || "./data/pocketlytics.sqlite"}`,
   },
   verbose: true,
 });

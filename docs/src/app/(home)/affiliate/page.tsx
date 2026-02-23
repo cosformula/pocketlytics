@@ -11,18 +11,18 @@ const tilt_wrap = Tilt_Warp({
 });
 
 export const metadata: Metadata = {
-  title: "Affiliate Program - Rybbit Analytics",
+  title: "Affiliate Program - Pocketlytics Analytics",
   description:
-    "Earn 50% recurring commission for 12 months by referring customers to Rybbit, the open-source privacy-first analytics platform.",
+    "Earn 50% recurring commission for 12 months by referring customers to Pocketlytics, the open-source privacy-first analytics platform.",
   openGraph: {
-    title: "Rybbit Affiliate Program",
+    title: "Pocketlytics Affiliate Program",
     description:
-      "Earn 50% recurring commission for 12 months by referring customers to Rybbit.",
+      "Earn 50% recurring commission for 12 months by referring customers to Pocketlytics.",
     type: "website",
-    url: "https://rybbit.com/affiliate",
+    url: "https://pocketlytics.local/affiliate",
   },
   alternates: {
-    canonical: "https://rybbit.com/affiliate",
+    canonical: "https://pocketlytics.local/affiliate",
   },
 };
 
@@ -60,13 +60,13 @@ export default function AffiliatePage() {
         </h1>
         <h2 className="relative z-10 text-base md:text-xl pt-4 md:pt-6 px-4 tracking-tight max-w-4xl text-center text-neutral-600 dark:text-neutral-300 font-light">
           Earn 50% recurring commission for 12 months by referring customers to
-          Rybbit.
+          Pocketlytics.
         </h2>
 
         <div className="relative z-10 flex flex-col items-center my-8 md:my-10">
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 md:gap-6 text-base md:text-lg px-4">
             <TrackedButton
-              href="https://rybbit.getrewardful.com/signup"
+              href="https://pocketlytics.getrewardful.com/signup"
               eventName="affiliate_signup_click"
               eventProps={{
                 location: "hero",

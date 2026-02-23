@@ -1,4 +1,4 @@
-import { TimeBucket } from "@rybbit/shared";
+import { TimeBucket } from "@pocketlytics/shared";
 import { authedFetch } from "../../utils";
 import { CommonApiParams, PaginationParams, SortParams, toQueryParams } from "./types";
 

@@ -7,32 +7,32 @@ export const fathomComparisonData: ComparisonSection[] = [
     features: [
       {
         name: "Simple dashboard",
-        rybbitValue: true,
+        pocketlyticsValue: true,
         competitorValue: true,
       },
       {
         name: "Real-time data",
-        rybbitValue: true,
+        pocketlyticsValue: true,
         competitorValue: true,
       },
       {
         name: "Live visitor counter",
-        rybbitValue: true,
+        pocketlyticsValue: true,
         competitorValue: true,
       },
       {
         name: "UTM/Campaign tracking",
-        rybbitValue: true,
+        pocketlyticsValue: true,
         competitorValue: true,
       },
       {
         name: "Custom events",
-        rybbitValue: "With attributes",
+        pocketlyticsValue: "With attributes",
         competitorValue: "Basic",
       },
       {
         name: "Conversion goals",
-        rybbitValue: true,
+        pocketlyticsValue: true,
         competitorValue: true,
       },
     ],
@@ -42,42 +42,42 @@ export const fathomComparisonData: ComparisonSection[] = [
     features: [
       {
         name: "Session Replay",
-        rybbitValue: true,
+        pocketlyticsValue: true,
         competitorValue: false,
       },
       {
         name: "Funnels",
-        rybbitValue: true,
+        pocketlyticsValue: true,
         competitorValue: false,
       },
       {
         name: "User journeys (Sankey)",
-        rybbitValue: true,
+        pocketlyticsValue: true,
         competitorValue: false,
       },
       {
         name: "User profiles",
-        rybbitValue: true,
+        pocketlyticsValue: true,
         competitorValue: false,
       },
       {
         name: "Sessions tracking",
-        rybbitValue: true,
+        pocketlyticsValue: true,
         competitorValue: false,
       },
       {
         name: "Real-time globe view",
-        rybbitValue: true,
+        pocketlyticsValue: true,
         competitorValue: false,
       },
       {
         name: "Web Vitals dashboard",
-        rybbitValue: true,
+        pocketlyticsValue: true,
         competitorValue: false,
       },
       {
         name: "Error tracking",
-        rybbitValue: true,
+        pocketlyticsValue: true,
         competitorValue: false,
       },
     ],
@@ -87,32 +87,32 @@ export const fathomComparisonData: ComparisonSection[] = [
     features: [
       {
         name: "Cookie-free tracking",
-        rybbitValue: true,
+        pocketlyticsValue: true,
         competitorValue: true,
       },
       // {
       //   name: "GDPR compliant",
-      //   rybbitValue: true,
+      //   pocketlyticsValue: true,
       //   competitorValue: true,
       // },
       {
         name: "No consent banner needed",
-        rybbitValue: true,
+        pocketlyticsValue: true,
         competitorValue: true,
       },
       {
         name: "Daily rotating salt option",
-        rybbitValue: true,
+        pocketlyticsValue: true,
         competitorValue: false,
       },
       {
         name: "IP anonymization",
-        rybbitValue: true,
+        pocketlyticsValue: true,
         competitorValue: true,
       },
       {
         name: "Data stored in EU",
-        rybbitValue: true,
+        pocketlyticsValue: true,
         competitorValue: true,
       },
     ],
@@ -122,22 +122,22 @@ export const fathomComparisonData: ComparisonSection[] = [
     features: [
       {
         name: "Open source",
-        rybbitValue: true,
+        pocketlyticsValue: true,
         competitorValue: false,
       },
       {
         name: "Self-hostable",
-        rybbitValue: true,
+        pocketlyticsValue: true,
         competitorValue: false,
       },
       {
         name: "Code transparency",
-        rybbitValue: "Full",
+        pocketlyticsValue: "Full",
         competitorValue: "None",
       },
       {
         name: "License",
-        rybbitValue: "AGPL v3",
+        pocketlyticsValue: "AGPL v3",
         competitorValue: "Proprietary",
       },
     ],
@@ -147,17 +147,17 @@ export const fathomComparisonData: ComparisonSection[] = [
     features: [
       {
         name: "Beautiful UI",
-        rybbitValue: true,
+        pocketlyticsValue: true,
         competitorValue: true,
       },
       {
         name: "Public dashboards",
-        rybbitValue: true,
+        pocketlyticsValue: true,
         competitorValue: true,
       },
       {
         name: "Email reports",
-        rybbitValue: false,
+        pocketlyticsValue: false,
         competitorValue: true,
       },
     ],
@@ -167,22 +167,22 @@ export const fathomComparisonData: ComparisonSection[] = [
     features: [
       {
         name: "Script size",
-        rybbitValue: "18KB",
+        pocketlyticsValue: "18KB",
         competitorValue: "2KB",
       },
       {
         name: "Bot filtering",
-        rybbitValue: true,
+        pocketlyticsValue: true,
         competitorValue: true,
       },
       {
         name: "API access",
-        rybbitValue: true,
+        pocketlyticsValue: true,
         competitorValue: true,
       },
       {
         name: "Tech stack",
-        rybbitValue: "Typescript/ClickHouse",
+        pocketlyticsValue: "Typescript/ClickHouse",
         competitorValue: "PHP/Singlestore",
       },
     ],
@@ -192,17 +192,17 @@ export const fathomComparisonData: ComparisonSection[] = [
     features: [
       {
         name: "Free tier",
-        rybbitValue: DEFAULT_EVENT_LIMIT.toLocaleString() + " events",
+        pocketlyticsValue: DEFAULT_EVENT_LIMIT.toLocaleString() + " events",
         competitorValue: false,
       },
       {
         name: "Entry price",
-        rybbitValue: "$19/mo",
+        pocketlyticsValue: "$19/mo",
         competitorValue: "$15/mo",
       },
       {
         name: "Customer support",
-        rybbitValue: true,
+        pocketlyticsValue: true,
         competitorValue: true,
       },
     ],

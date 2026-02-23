@@ -1,4 +1,4 @@
-import { FilterParams } from "@rybbit/shared";
+import { FilterParams } from "@pocketlytics/shared";
 import { z } from "zod";
 
 // =============================================================================

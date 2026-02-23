@@ -1,0 +1,37 @@
+[Unit]
+Description=Pocketlytics Monitor Agent
+Documentation=https://github.com/pocketlytics/monitor-agent
+After=network.target
+
+[Service]
+Type=simple
+User=pocketlytics
+Group=pocketlytics
+WorkingDirectory=/opt/pocketlytics-monitor-agent
+ExecStart=/usr/bin/node /opt/pocketlytics-monitor-agent/dist/index.js
+Restart=always
+RestartSec=10
+
+# Environment
+Environment="NODE_ENV=production"
+EnvironmentFile=/opt/pocketlytics-monitor-agent/.env
+
+# Security
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/pocketlytics-monitor-agent/logs
+
+# Resource limits
+LimitNOFILE=65536
+MemoryLimit=1G
+CPUQuota=100%
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=pocketlytics-monitor-agent
+
+[Install]
+WantedBy=multi-user.target

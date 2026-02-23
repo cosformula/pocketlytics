@@ -15,7 +15,7 @@ export function VersionCheck() {
 
     sessionStorage.setItem("version-check-done", "1");
 
-    fetch("https://app.rybbit.io/api/version")
+    fetch("https://app.pocketlytics.local/api/version")
       .then((res) => res.json())
       .then((data: { version: string }) => {
         const latest = data.version;
@@ -33,10 +33,10 @@ export function VersionCheck() {
                 className="flex items-center gap-3 bg-white dark:bg-neutral-850 border border-neutral-150 dark:border-neutral-850 rounded-lg shadow-lg py-2 px-3 text-sm"
               >
                 <span>
-                  Rybbit v{latest} is available (you&apos;re on v{current})
+                  Pocketlytics v{latest} is available (you&apos;re on v{current})
                 </span>
                 <a
-                  href="https://rybbit.com/docs/managing-your-installation#updating-your-installation"
+                  href="https://pocketlytics.local/docs/managing-your-installation#updating-your-installation"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -57,7 +57,7 @@ export function VersionCheck() {
         }
       })
       .catch(() => {
-        // Silently ignore - user may be offline or app.rybbit.io unreachable
+        // Silently ignore - user may be offline or app.pocketlytics.local unreachable
       });
   }, []);
 

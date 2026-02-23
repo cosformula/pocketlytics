@@ -4,6 +4,7 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 BACKEND_URL="${BACKEND_URL:-http://127.0.0.1:3001}"
 FRONTEND_URL="${FRONTEND_URL:-http://127.0.0.1:3002}"
+KEEP_ALIVE="${KEEP_ALIVE:-0}"
 TMP_DIR="${ROOT_DIR}/.tmp"
 mkdir -p "${TMP_DIR}"
 
@@ -17,10 +18,10 @@ fi
 
 # Force local file paths for non-Docker dev runs.
 if [[ -z "${SQLITE_DB_PATH:-}" || "${SQLITE_DB_PATH}" == file:/app/* ]]; then
-  SQLITE_DB_PATH="file:./data/rybbit.sqlite"
+  SQLITE_DB_PATH="file:./data/pocketlytics.sqlite"
 fi
 if [[ -z "${DUCKDB_PATH:-}" || "${DUCKDB_PATH}" == /app/* ]]; then
-  DUCKDB_PATH="./data/rybbit-analytics.duckdb"
+  DUCKDB_PATH="./data/pocketlytics-analytics.duckdb"
 fi
 mkdir -p "${ROOT_DIR}/server/data"
 
@@ -127,3 +128,11 @@ fi
 echo "[dev-test-open] done."
 echo "[dev-test-open] backend log:  ${BACKEND_LOG}"
 echo "[dev-test-open] frontend log: ${FRONTEND_LOG}"
+
+if [[ "${KEEP_ALIVE}" == "1" ]]; then
+  echo "[dev-test-open] keep-alive enabled. Press Ctrl+C to stop backend/frontend."
+  trap 'echo "[dev-test-open] stopping services..."; bash "${ROOT_DIR}/scripts/dev-stop.sh"; exit 0' INT TERM
+  while true; do
+    sleep 3600
+  done
+fi

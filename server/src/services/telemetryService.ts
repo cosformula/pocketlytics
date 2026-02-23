@@ -79,7 +79,7 @@ class TelemetryService {
   // Get DuckDB database size in GB
   private async getClickhouseSizeGb(): Promise<number> {
     try {
-      const duckDbPath = path.resolve(process.cwd(), "data", "rybbit-analytics.duckdb");
+      const duckDbPath = path.resolve(process.cwd(), "data", "pocketlytics-analytics.duckdb");
       const stats = await fs.stat(duckDbPath);
       return stats.size / (1024 * 1024 * 1024);
     } catch (error) {
@@ -98,7 +98,7 @@ class TelemetryService {
   // Send telemetry to cloud instance
   private async sendTelemetry(data: any) {
     try {
-      const response = await fetch("https://demo.rybbit.com/api/admin/telemetry", {
+      const response = await fetch("https://demo.pocketlytics.local/api/admin/telemetry", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -1,4 +1,4 @@
-import { FilterParams } from "@rybbit/shared";
+import { FilterParams } from "@pocketlytics/shared";
 import { and, eq, inArray } from "drizzle-orm";
 import { DateTime } from "luxon";
 import SqlString from "sqlstring";

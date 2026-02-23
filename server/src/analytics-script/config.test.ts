@@ -42,7 +42,7 @@ describe("parseScriptConfig", () => {
     const config = await parseScriptConfig(mockScriptTag);
 
     expect(config).toEqual({
-      namespace: "rybbit",
+      namespace: "pocketlytics",
       analyticsHost: "https://analytics.example.com",
       siteId: "123",
       debounceDuration: 500,
@@ -97,7 +97,7 @@ describe("parseScriptConfig", () => {
     const config = await parseScriptConfig(mockScriptTag);
 
     expect(config).toEqual({
-      namespace: "rybbit",
+      namespace: "pocketlytics",
       analyticsHost: "https://analytics.example.com",
       siteId: "123",
       debounceDuration: 500,
@@ -144,7 +144,7 @@ describe("parseScriptConfig", () => {
     const config = await parseScriptConfig(mockScriptTag);
 
     expect(config).toEqual({
-      namespace: "rybbit",
+      namespace: "pocketlytics",
       analyticsHost: "https://analytics.example.com",
       siteId: "123",
       debounceDuration: 500,

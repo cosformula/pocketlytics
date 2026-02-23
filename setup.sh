@@ -112,8 +112,8 @@ BASE_URL=${BASE_URL}
 BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
 DISABLE_SIGNUP=false
 DISABLE_TELEMETRY=true
-SQLITE_DB_PATH=file:/app/data/rybbit.sqlite
-DUCKDB_PATH=/app/data/rybbit-analytics.duckdb
+SQLITE_DB_PATH=file:/app/data/pocketlytics.sqlite
+DUCKDB_PATH=/app/data/pocketlytics-analytics.duckdb
 EOL
 
 # Add MAPBOX_TOKEN if provided

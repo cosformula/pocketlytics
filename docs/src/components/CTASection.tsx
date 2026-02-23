@@ -15,9 +15,9 @@ export function CTASection({
   title = "Ready for better analytics?",
   description = "Powerful insights without the complexity. Privacy-focused analytics that just works.",
   primaryButtonText = "Get started",
-  primaryButtonHref = "https://app.rybbit.io/signup",
+  primaryButtonHref = "https://app.pocketlytics.local/signup",
   secondaryButtonText = "Live demo",
-  secondaryButtonHref = "https://demo.rybbit.com/81",
+  secondaryButtonHref = "https://demo.pocketlytics.local/81",
   eventLocation = "bottom_cta",
 }: CTASectionProps) {
   return (

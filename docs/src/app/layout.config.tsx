@@ -13,8 +13,8 @@ export const baseOptions: BaseLayoutProps = {
     title: (
       <>
         <Image
-          src="/rybbit1.svg"
-          alt="Rybbit"
+          src="/pocketlytics1.svg"
+          alt="Pocketlytics"
           width={120}
           height={0}
           style={{ height: "auto" }}
@@ -35,12 +35,12 @@ export const baseOptions: BaseLayoutProps = {
     //   },
     {
       text: "Demo",
-      url: "https://demo.rybbit.com/1",
+      url: "https://demo.pocketlytics.local/1",
       external: true,
     },
     //   {
     //     text: "GitHub",
-    //     url: "https://github.com/rybbit-io/rybbit",
+    //     url: "https://github.com/cosformula/pocketlytics",
     //     external: true,
     //   },
   ],

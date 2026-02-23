@@ -12,8 +12,8 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: "Rybbit - Privacy-First Web Analytics Platform",
-    template: "%s | Rybbit",
+    default: "Pocketlytics - Privacy-First Web Analytics Platform",
+    template: "%s | Pocketlytics",
   },
   description:
     "Open-source, privacy-focused web analytics platform. Track your website performance without compromising user privacy. Self-hostable alternative to Google Analytics.",
@@ -25,16 +25,16 @@ export const metadata: Metadata = {
     "website tracking",
     "self-hosted analytics",
   ],
-  authors: [{ name: "Rybbit Team" }],
-  creator: "Rybbit",
-  publisher: "Rybbit",
-  metadataBase: new URL("https://rybbit.com"),
+  authors: [{ name: "Pocketlytics Team" }],
+  creator: "Pocketlytics",
+  publisher: "Pocketlytics",
+  metadataBase: new URL("https://pocketlytics.local"),
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://rybbit.com",
-    siteName: "Rybbit",
-    title: "Rybbit - Privacy-First Web Analytics Platform",
+    url: "https://pocketlytics.local",
+    siteName: "Pocketlytics",
+    title: "Pocketlytics - Privacy-First Web Analytics Platform",
     description:
       "Open-source, privacy-focused web analytics platform. Track your website performance without compromising user privacy.",
     images: [
@@ -42,13 +42,13 @@ export const metadata: Metadata = {
         url: "/opengraph-image.png",
         width: 1200,
         height: 630,
-        alt: "Rybbit Analytics Dashboard",
+        alt: "Pocketlytics Analytics Dashboard",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Rybbit - Privacy-First Web Analytics Platform",
+    title: "Pocketlytics - Privacy-First Web Analytics Platform",
     description:
       "Open-source, privacy-focused web analytics platform. Track your website performance without compromising user privacy.",
     images: ["/opengraph-image.png"],
@@ -75,11 +75,11 @@ export const metadata: Metadata = {
 export default function Layout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <Script src="https://demo.rybbit.com/api/script.js" data-site-id="21" />
+      <Script src="https://demo.pocketlytics.local/api/script.js" data-site-id="21" />
       <Script
-        src="https://demo.rybbit.com/api/script.js?ns=demo"
+        src="https://demo.pocketlytics.local/api/script.js?ns=demo"
         data-site-id="3b023d1a7895"
-        data-namespace="rybbit_demo"
+        data-namespace="pocketlytics_demo"
       />
       <Script id="rewardful-queue" strategy="beforeInteractive">
         {`(function(w,r){w._rwq=r;w[r]=w[r]||function(){(w[r].q=w[r].q||[]).push(arguments)}})(window,'rewardful');`}

@@ -1,4 +1,4 @@
-import { Filter, TimeBucket } from "@rybbit/shared";
+import { Filter, TimeBucket } from "@pocketlytics/shared";
 import { UseQueryOptions, UseQueryResult, useQuery } from "@tanstack/react-query";
 import { useStore } from "../../../lib/store";
 import { APIResponse } from "../../types";

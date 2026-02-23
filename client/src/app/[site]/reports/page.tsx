@@ -3,7 +3,7 @@
 import { useSetPageTitle } from "../../../hooks/useSetPageTitle";
 
 export default function ReportsPage() {
-  useSetPageTitle("Rybbit · Reports");
+  useSetPageTitle("Pocketlytics · Reports");
 
   return (
     <div className="p-6">

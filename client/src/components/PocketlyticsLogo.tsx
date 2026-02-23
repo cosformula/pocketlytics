@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useWhiteLabel } from "../hooks/useIsWhiteLabel";
 import { Skeleton } from "./ui/skeleton";
 
-export function RybbitLogo({ width = 32, height = 32 }: { width?: number; height?: number }) {
+export function PocketlyticsLogo({ width = 32, height = 32 }: { width?: number; height?: number }) {
   const { whiteLabelImage, isPending } = useWhiteLabel();
   const [mounted, setMounted] = useState(false);
 
@@ -16,13 +16,13 @@ export function RybbitLogo({ width = 32, height = 32 }: { width?: number; height
   }
 
   if (whiteLabelImage) {
-    return <Image src={whiteLabelImage} alt="Rybbit" width={width} height={height} />;
+    return <Image src={whiteLabelImage} alt="Pocketlytics" width={width} height={height} />;
   }
 
   return (
     <Image
       src="/2.svg"
-      alt="Rybbit"
+      alt="Pocketlytics"
       width={width}
       height={height}
       className="invert dark:invert-0"
@@ -30,7 +30,7 @@ export function RybbitLogo({ width = 32, height = 32 }: { width?: number; height
   );
 }
 
-export function RybbitTextLogo({ width = 150, height = 34 }: { width?: number; height?: number }) {
+export function PocketlyticsTextLogo({ width = 150, height = 34 }: { width?: number; height?: number }) {
   const { whiteLabelImage, isPending } = useWhiteLabel();
   const [mounted, setMounted] = useState(false);
 
@@ -43,8 +43,8 @@ export function RybbitTextLogo({ width = 150, height = 34 }: { width?: number; h
   }
 
   if (whiteLabelImage) {
-    return <Image src={whiteLabelImage} alt="Rybbit" width={width} height={height} />;
+    return <Image src={whiteLabelImage} alt="Pocketlytics" width={width} height={height} />;
   }
 
-  return <Image src="/rybbit-text.svg" alt="Rybbit" width={width} height={height} className="dark:invert-0 invert" />;
+  return <Image src="/pocketlytics-text.svg" alt="Pocketlytics" width={width} height={height} className="dark:invert-0 invert" />;
 }

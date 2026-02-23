@@ -14,6 +14,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      target: backend
     restart: unless-stopped
     environment:
       NODE_ENV: production
@@ -22,10 +23,10 @@ services:
       DISABLE_SIGNUP: ${DISABLE_SIGNUP:-false}
       DISABLE_TELEMETRY: ${DISABLE_TELEMETRY:-true}
       MAPBOX_TOKEN: ${MAPBOX_TOKEN:-}
-      SQLITE_DB_PATH: ${SQLITE_DB_PATH:-file:/app/data/rybbit.sqlite}
-      DUCKDB_PATH: ${DUCKDB_PATH:-/app/data/rybbit-analytics.duckdb}
+      SQLITE_DB_PATH: ${SQLITE_DB_PATH:-file:/app/data/pocketlytics.sqlite}
+      DUCKDB_PATH: ${DUCKDB_PATH:-/app/data/pocketlytics-analytics.duckdb}
     volumes:
-      - rybbit-data:/app/data
+      - pocketlytics-data:/app/data
     healthcheck:
       test:
         [
@@ -42,7 +43,8 @@ services:
   client:
     build:
       context: .
-      dockerfile: client/Dockerfile
+      dockerfile: Dockerfile
+      target: client
       args:
         NEXT_PUBLIC_BACKEND_URL: ${BASE_URL}
         NEXT_PUBLIC_DISABLE_SIGNUP: ${DISABLE_SIGNUP:-false}
@@ -56,4 +58,4 @@ services:
         condition: service_healthy
 
 volumes:
-  rybbit-data:
+  pocketlytics-data:

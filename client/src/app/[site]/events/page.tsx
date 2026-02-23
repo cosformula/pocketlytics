@@ -10,7 +10,7 @@ import { EventsChart } from "./components/EventsChart";
 
 
 export default function EventsPage() {
-  useSetPageTitle("Rybbit · Events");
+  useSetPageTitle("Pocketlytics · Events");
 
   const { data: eventNamesData, isLoading: isLoadingEventNames } = useGetEventNames();
 

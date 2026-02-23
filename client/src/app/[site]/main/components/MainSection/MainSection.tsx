@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useGetOverview } from "../../../../../api/analytics/hooks/useGetOverview";
 import { useGetOverviewBucketed } from "../../../../../api/analytics/hooks/useGetOverviewBucketed";
 import { BucketSelection } from "../../../../../components/BucketSelection";
-import { RybbitLogo } from "../../../../../components/RybbitLogo";
+import { PocketlyticsLogo } from "../../../../../components/PocketlyticsLogo";
 import { useWhiteLabel } from "../../../../../hooks/useIsWhiteLabel";
 import { authClient } from "../../../../../lib/auth";
 import { useStore } from "../../../../../lib/store";
@@ -77,11 +77,11 @@ export function MainSection() {
             <div className="flex items-center space-x-4">
               {!isWhiteLabel && (
                 <Link
-                  href={session.data ? "/" : "https://rybbit.com"}
+                  href={session.data ? "/" : "https://pocketlytics.local"}
                   className={cn("text-lg font-semibold flex items-center gap-1 opacity-75", tilt_wrap.className)}
                 >
-                  <RybbitLogo width={24} height={24} />
-                  rybbit
+                  <PocketlyticsLogo width={24} height={24} />
+                  pocketlytics
                 </Link>
               )}
             </div>

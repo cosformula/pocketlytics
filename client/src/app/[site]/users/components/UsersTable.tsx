@@ -30,7 +30,7 @@ import { Label } from "../../../../components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../../components/ui/select";
 import { Switch } from "../../../../components/ui/switch";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../../../../components/ui/tooltip";
-import { FilterParameter } from "@rybbit/shared";
+import { FilterParameter } from "@pocketlytics/shared";
 import { getCountryName, getUserDisplayName } from "../../../../lib/utils";
 import { Browser } from "../../components/shared/icons/Browser";
 import { CountryFlag } from "../../components/shared/icons/CountryFlag";
@@ -358,7 +358,7 @@ export function UsersTable() {
           </Label>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Link href="https://www.rybbit.io/docs/identify-users" target="_blank">
+              <Link href="https://www.pocketlytics.local/docs/identify-users" target="_blank">
                 <Info className="h-4 w-4 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 cursor-pointer" />
               </Link>
             </TooltipTrigger>

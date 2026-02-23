@@ -1,7 +1,7 @@
 # AGENTS.md
 
 ## 项目定位
-- 项目：`rybbit-lite`（基于 `rybbit` 的 fork）。
+- 项目：`pocketlytics-lite`（基于 `pocketlytics` 的 fork）。
 - 目标：用 `SQLite + DuckDB` 替代 `Postgres + ClickHouse`，实现简易单机部署和最小资源占用。
 - 现状：迁移已完成核心路径，但还没完全收尾，仓库中仍有不少历史命名与旧部署配置。
 
@@ -15,7 +15,7 @@
 - `server/src/index.ts` 启动时执行 `initializeDuckDB()` 与 `initPostgres()`（后者实际上初始化 SQLite 数据）。
 
 3. 部署入口以 lite 为默认：
-- 根目录 `Dockerfile` 已是 lite 单进程路径（内置 `SQLITE_DB_PATH`、`DUCKDB_PATH`）。
+- 根目录 `Dockerfile` 统一了 backend/client/all-in-one 三种 target（内置 `SQLITE_DB_PATH`、`DUCKDB_PATH`）。
 - `docker-compose.yml` 已移除 `postgres` 服务并持久化 `/app/data`。
 - `.env.example` 和 `setup.sh` 已改为 `SQLite + DuckDB` 默认参数。
 - docs 仍有大量 `postgres/clickhouse` 旧表述待清理。
@@ -26,13 +26,13 @@
 - SQLite 适配层：`server/src/db/postgres/postgres.ts` + `server/src/db/postgres/schema.ts` 已落地。
 - 服务启动初始化：DuckDB 表结构与 SQLite 初始化已经接入主启动流程。
 - 回归测试：`server/src/__tests__/analytics-duckdb.test.ts` 覆盖一批核心 analytics 接口。
-- 单容器镜像：根目录 `Dockerfile` 支持 SQLite/DuckDB 单机运行。
+- 单容器镜像：根目录 `Dockerfile` 默认是 all-in-one 目标，支持 SQLite/DuckDB 单机运行。
 - 默认部署入口：`docker-compose.yml`、`.env.example`、`setup.sh` 已切换到 lite 路线。
 
 ### 未完成（重点）
 - docs 自托管与故障排查内容大量引用 `postgres/clickhouse`。
 - 代码与字段命名仍有历史残留（例如 `clickhouseSizeGb` 等）。
-- `server/Dockerfile` 与根 `Dockerfile` 仍存在双入口，需要后续统一策略并清理冗余。
+- Docker 构建入口已统一到根目录 `Dockerfile`，compose/CI 通过 target 区分 backend/client。
 
 ## 迭代优先级（建议）
 1. P0：把默认部署路径切到 lite
@@ -63,8 +63,8 @@ npm run test:run -- src/__tests__/analytics-duckdb.test.ts
 
 ### 环境变量（lite 关键）
 ```bash
-SQLITE_DB_PATH=file:./data/rybbit.sqlite
-DUCKDB_PATH=./data/rybbit-analytics.duckdb
+SQLITE_DB_PATH=file:./data/pocketlytics.sqlite
+DUCKDB_PATH=./data/pocketlytics-analytics.duckdb
 ```
 
 ## 每次改动的完成标准

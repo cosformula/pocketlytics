@@ -1,4 +1,4 @@
-import { Filter } from "@rybbit/shared";
+import { Filter } from "@pocketlytics/shared";
 import { authedFetch } from "../../utils";
 import {
   BucketedParams,

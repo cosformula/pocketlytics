@@ -33,7 +33,7 @@ function SiteSelectorContent({ onSiteSelect }: { onSiteSelect: () => void }) {
           {[
             {
               siteId: 81,
-              domain: "rybbit.com",
+              domain: "pocketlytics.local",
             },
             {
               siteId: 1,

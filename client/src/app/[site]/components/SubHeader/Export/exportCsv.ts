@@ -1,4 +1,4 @@
-import { FilterParameter } from "@rybbit/shared";
+import { FilterParameter } from "@pocketlytics/shared";
 import {
   fetchEventNames,
   fetchMetric,
@@ -10,7 +10,7 @@ import { fetchGSCConnectionStatus, fetchGSCData, GSCDimension } from "../../../.
 import { IS_CLOUD } from "../../../../../lib/const";
 import { CSVFile, downloadZip, formatDateForFilename } from "../../../../../lib/export";
 import { Time } from "../../../../../components/DateSelector/types";
-import { Filter } from "@rybbit/shared";
+import { Filter } from "@pocketlytics/shared";
 
 // Metric parameters for each section
 const REFERRER_METRICS: { param: FilterParameter; filename: string }[] = [
@@ -221,7 +221,7 @@ export async function exportCsv({ site, time, filters, timeZone }: ExportCsvPara
 
   // Generate ZIP filename
   const dateStr = formatDateForFilename();
-  const zipFilename = `rybbit-export-${site}-${dateStr}.zip`;
+  const zipFilename = `pocketlytics-export-${site}-${dateStr}.zip`;
 
   // Download the ZIP
   await downloadZip(nonEmptyFiles, zipFilename);

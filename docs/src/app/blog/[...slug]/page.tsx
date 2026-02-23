@@ -19,7 +19,7 @@ export async function generateMetadata(props: { params: Promise<{ slug: string[]
   const page = blogSource.getPage(params.slug);
   if (!page) return {};
 
-  const url = `https://rybbit.com/blog/${params.slug.join("/")}`;
+  const url = `https://pocketlytics.local/blog/${params.slug.join("/")}`;
   const publishedTime = page.data.date ? new Date(page.data.date).toISOString() : undefined;
   const ogImage = page.data.image || "/opengraph-image.png";
 
@@ -44,7 +44,7 @@ export async function generateMetadata(props: { params: Promise<{ slug: string[]
           alt: page.data.title,
         },
       ],
-      siteName: "Rybbit",
+      siteName: "Pocketlytics",
       locale: "en_US",
     },
     twitter: {
@@ -52,11 +52,11 @@ export async function generateMetadata(props: { params: Promise<{ slug: string[]
       title: page.data.title,
       description: page.data.description,
       images: [ogImage],
-      creator: "@rybbitio",
+      creator: "@pocketlyticsio",
     },
     keywords: page.data.tags
-      ? [...page.data.tags, "web analytics", "privacy analytics", "Rybbit"]
-      : ["web analytics", "privacy analytics", "Rybbit"],
+      ? [...page.data.tags, "web analytics", "privacy analytics", "Pocketlytics"]
+      : ["web analytics", "privacy analytics", "Pocketlytics"],
     authors: page.data.author ? [{ name: page.data.author }] : undefined,
   };
 }
@@ -82,14 +82,14 @@ export default async function BlogPostPage(props: { params: Promise<{ slug: stri
     dateModified: date?.toISOString(),
     author: {
       "@type": "Person",
-      name: page.data.author || "Rybbit Team",
+      name: page.data.author || "Pocketlytics Team",
     },
     publisher: {
       "@type": "Organization",
-      name: "Rybbit",
+      name: "Pocketlytics",
       logo: {
         "@type": "ImageObject",
-        url: "https://rybbit.com/public/rybbit.svg",
+        url: "https://pocketlytics.local/pocketlytics.svg",
       },
     },
     keywords: page.data.tags?.join(", "),

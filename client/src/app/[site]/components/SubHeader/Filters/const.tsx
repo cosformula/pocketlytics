@@ -1,4 +1,4 @@
-import { FilterParameter } from "@rybbit/shared";
+import { FilterParameter } from "@pocketlytics/shared";
 import {
   AppWindow,
   Brain,

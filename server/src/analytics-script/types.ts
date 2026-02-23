@@ -59,7 +59,7 @@ export interface TrackingPayload extends BasePayload {
 
 export interface ButtonClickProperties {
   text?: string;
-  [key: string]: string | undefined; // Additional data-rybbit-* attributes
+  [key: string]: string | undefined; // Additional data-pocketlytics-* attributes
 }
 
 export interface CopyProperties {
@@ -100,7 +100,7 @@ export interface ErrorProperties {
   [key: string]: any;
 }
 
-export interface RybbitAPI {
+export interface PocketlyticsAPI {
   pageview: () => void;
   event: (name: string, properties?: Record<string, any>) => void;
   error: (error: Error, properties?: ErrorProperties) => void;

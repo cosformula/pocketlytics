@@ -135,7 +135,7 @@ export function PricingSection({ isAnnual, setIsAnnual }: { isAnnual: boolean, s
             Pricing
           </h2>
           <p className="text-lg text-neutral-600 dark:text-neutral-300">
-            Try Rybbit today risk-free with our 30-day money-back guarantee.
+            Try Pocketlytics today risk-free with our 30-day money-back guarantee.
           </p>
         </div>
 
@@ -218,7 +218,7 @@ export function PricingSection({ isAnnual, setIsAnnual }: { isAnnual: boolean, s
               </div>
             }
             buttonText="Start for free"
-            buttonHref="https://app.rybbit.io/signup"
+            buttonHref="https://app.pocketlytics.local/signup"
             buttonVariant="default"
             features={FREE_FEATURES}
             variant="free"
@@ -242,7 +242,7 @@ export function PricingSection({ isAnnual, setIsAnnual }: { isAnnual: boolean, s
               )
             }
             buttonText={standardPrices.custom ? "Contact us" : "Get started"}
-            buttonHref={standardPrices.custom ? "https://www.rybbit.com/contact" : "https://app.rybbit.io/signup"}
+            buttonHref={standardPrices.custom ? "https://www.pocketlytics.local/contact" : "https://app.pocketlytics.local/signup"}
             features={STANDARD_FEATURES}
             eventLocation={standardPrices.custom ? undefined : "standard"}
           />
@@ -264,7 +264,7 @@ export function PricingSection({ isAnnual, setIsAnnual }: { isAnnual: boolean, s
               )
             }
             buttonText={proPrices.custom ? "Contact us" : "Get started"}
-            buttonHref={proPrices.custom ? "https://www.rybbit.com/contact" : "https://app.rybbit.io/signup"}
+            buttonHref={proPrices.custom ? "https://www.pocketlytics.local/contact" : "https://app.pocketlytics.local/signup"}
             features={PRO_FEATURES}
             eventLocation={proPrices.custom ? undefined : "pro"}
             recommended={true}
@@ -277,7 +277,7 @@ export function PricingSection({ isAnnual, setIsAnnual }: { isAnnual: boolean, s
             priceDisplay={<div className="text-3xl font-bold">Custom</div>}
             features={ENTERPRISE_FEATURES}
             buttonText={"Contact us"}
-            buttonHref={"https://www.rybbit.com/contact"}
+            buttonHref={"https://www.pocketlytics.local/contact"}
           />
         </div>
       </div>

@@ -5,12 +5,12 @@ import { ClickTrackingManager } from "./clickTracking.js";
 import { CopyTrackingManager } from "./copyTracking.js";
 import { FormTrackingManager } from "./formTracking.js";
 import { debounce, isOutboundLink } from "./utils.js";
-import { RybbitAPI, WebVitalsData, ErrorProperties } from "./types.js";
+import { PocketlyticsAPI, WebVitalsData, ErrorProperties } from "./types.js";
 
 declare global {
   interface Window {
-    __RYBBIT_OPTOUT__?: boolean;
-    rybbit: RybbitAPI;
+    __POCKETLYTICS_OPTOUT__?: boolean;
+    pocketlytics: PocketlyticsAPI;
     [key: string]: any;
   }
 }
@@ -23,11 +23,11 @@ declare global {
   }
 
   // Parse namespace early for opt-out check
-  const namespace = scriptTag.getAttribute("data-namespace") || "rybbit";
+  const namespace = scriptTag.getAttribute("data-namespace") || "pocketlytics";
   const optOutKey = `disable-${namespace}`;
 
   // Check if user has opted out
-  if (window.__RYBBIT_OPTOUT__ || localStorage.getItem(optOutKey) !== null) {
+  if (window.__POCKETLYTICS_OPTOUT__ || localStorage.getItem(optOutKey) !== null) {
     // Create no-op implementation
     window[namespace] = {
       pageview: () => {},
@@ -118,13 +118,13 @@ declare global {
 
       // Check for custom events via data attributes
       while (target && target !== document.documentElement) {
-        if (target.hasAttribute("data-rybbit-event")) {
-          const eventName = target.getAttribute("data-rybbit-event");
+        if (target.hasAttribute("data-pocketlytics-event")) {
+          const eventName = target.getAttribute("data-pocketlytics-event");
           if (eventName) {
             const properties: Record<string, string> = {};
             for (const attr of target.attributes) {
-              if (attr.name.startsWith("data-rybbit-prop-")) {
-                const propName = attr.name.replace("data-rybbit-prop-", "");
+              if (attr.name.startsWith("data-pocketlytics-prop-")) {
+                const propName = attr.name.replace("data-pocketlytics-prop-", "");
                 properties[propName] = attr.value;
               }
             }

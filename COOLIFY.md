@@ -1,4 +1,4 @@
-# Deploy rybbit-lite on Coolify
+# Deploy pocketlytics-lite on Coolify
 
 This repo includes a Coolify-ready compose file at `docker-compose.coolify.yml`.
 
@@ -13,7 +13,7 @@ This repo includes a Coolify-ready compose file at `docker-compose.coolify.yml`.
 Copy values from `.env.coolify.example` and set them in Coolify:
 
 - `BASE_URL`: full public URL, e.g. `https://analytics.example.com`
-- `RYBBIT_HOST`: hostname only, e.g. `analytics.example.com`
+- `POCKETLYTICS_HOST`: hostname only, e.g. `analytics.example.com`
 - `BETTER_AUTH_SECRET`: long random secret string
 - `DISABLE_SIGNUP`: `false` or `true`
 - `DISABLE_TELEMETRY`: recommended `true`
@@ -29,7 +29,7 @@ Copy values from `.env.coolify.example` and set them in Coolify:
 
 ## Notes
 
-- This setup uses embedded `SQLite + DuckDB` and a persistent Docker volume (`rybbit-data`).
+- This setup uses embedded `SQLite + DuckDB` and a persistent Docker volume (`pocketlytics-data`).
 - Traefik routing in compose sends:
   - `/api` and `/auth` to backend
   - all other paths to client

@@ -192,8 +192,8 @@ async function main() {
 
   const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:3001";
   const clientOrigin = process.env.CLIENT_ORIGIN || "http://127.0.0.1:3002";
-  const testEmail = process.env.TEST_USER_EMAIL || "test@rybbit-lite.local";
-  const testPassword = process.env.TEST_USER_PASSWORD || "RybbitLite!12345";
+  const testEmail = process.env.TEST_USER_EMAIL || "test@pocketlytics-lite.local";
+  const testPassword = process.env.TEST_USER_PASSWORD || "PocketlyticsLite!12345";
 
   const cookies = new Map();
   const setCookieFromResponse = response => {

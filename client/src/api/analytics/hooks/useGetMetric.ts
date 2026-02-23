@@ -1,4 +1,4 @@
-import { Filter, FilterParameter } from "@rybbit/shared";
+import { Filter, FilterParameter } from "@pocketlytics/shared";
 import {
   InfiniteData,
   useInfiniteQuery,
