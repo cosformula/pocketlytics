@@ -7,6 +7,8 @@
     "endpoints:dev": "node ./scripts/endpoint-sweep-dev.mjs",
     "dev:test:open": "bash ./scripts/dev-test-open.sh",
     "dev:test:open:stay": "KEEP_ALIVE=1 bash ./scripts/dev-test-open.sh",
-    "dev:stop": "bash ./scripts/dev-stop.sh"
+    "dev:stop": "bash ./scripts/dev-stop.sh",
+    "docker:up": "bash ./scripts/docker-up.sh",
+    "docker:down": "bash ./scripts/docker-down.sh"
   }
 }
