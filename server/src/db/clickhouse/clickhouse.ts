@@ -37,6 +37,7 @@ if (analyticsDbPath !== ":memory:") {
 }
 
 let connectionPromise: Promise<DuckDBConnection> | null = null;
+let operationQueue: Promise<void> = Promise.resolve();
 
 const getConnection = async (): Promise<DuckDBConnection> => {
   if (!connectionPromise) {
@@ -48,6 +49,17 @@ const getConnection = async (): Promise<DuckDBConnection> => {
       });
   }
   return connectionPromise;
+};
+
+// DuckDB Node API is not safe for concurrent statements on the same connection.
+// Queue all DB operations to avoid "Failed to execute prepared statement" under load.
+const queueDuckDbOperation = async <T>(operation: () => Promise<T>): Promise<T> => {
+  const queuedOperation = operationQueue.then(operation, operation);
+  operationQueue = queuedOperation.then(
+    () => undefined,
+    () => undefined
+  );
+  return queuedOperation;
 };
 
 const normalizeDuckDbValue = (value: unknown): unknown => {
@@ -500,76 +512,88 @@ const applyClickHouseParams = (query: string, queryParams: QueryParams = {}): st
 
 export const clickhouse = {
   async query<T extends JsonRow = JsonRow>(options: ClickhouseQueryOptions) {
-    const normalizedSql = normalizeSql(options.query);
-    const sql = applyClickHouseParams(normalizedSql, options.query_params);
-    const rows = (await queryRows(sql)) as T[];
-    return new DuckDBQueryResult<T>(rows, options.format);
+    return queueDuckDbOperation(async () => {
+      const normalizedSql = normalizeSql(options.query);
+      const sql = applyClickHouseParams(normalizedSql, options.query_params);
+      const rows = (await queryRows(sql)) as T[];
+      return new DuckDBQueryResult<T>(rows, options.format);
+    });
   },
 
   async exec(options: ClickhouseExecOptions) {
-    const normalizedSql = normalizeSql(options.query);
-    const sql = applyClickHouseParams(normalizedSql, options.query_params);
-    await runStatement(sql);
+    await queueDuckDbOperation(async () => {
+      const normalizedSql = normalizeSql(options.query);
+      const sql = applyClickHouseParams(normalizedSql, options.query_params);
+      await runStatement(sql);
+    });
   },
 
   async command(options: ClickhouseExecOptions) {
-    const normalizedSql = normalizeSql(options.query);
-    const sql = applyClickHouseParams(normalizedSql, options.query_params);
-    await runStatement(sql);
+    await queueDuckDbOperation(async () => {
+      const normalizedSql = normalizeSql(options.query);
+      const sql = applyClickHouseParams(normalizedSql, options.query_params);
+      await runStatement(sql);
+    });
   },
 
   async insert(options: ClickhouseInsertOptions) {
-    const tableName = normalizeTableName(options.table);
-    if (!isSafeIdentifier(tableName)) {
-      throw new Error(`Unsafe table name: ${tableName}`);
-    }
+    await queueDuckDbOperation(async () => {
+      const tableName = normalizeTableName(options.table);
+      if (!isSafeIdentifier(tableName)) {
+        throw new Error(`Unsafe table name: ${tableName}`);
+      }
 
-    if (!options.values.length) {
-      return;
-    }
+      if (!options.values.length) {
+        return;
+      }
 
-    const allColumns = Array.from(
-      new Set(options.values.flatMap(row => Object.keys(row)).filter(column => isSafeIdentifier(column)))
-    );
+      const allColumns = Array.from(
+        new Set(options.values.flatMap(row => Object.keys(row)).filter(column => isSafeIdentifier(column)))
+      );
 
-    if (!allColumns.length) {
-      return;
-    }
+      if (!allColumns.length) {
+        return;
+      }
 
-    const columnSql = allColumns.map(column => `"${column}"`).join(", ");
-    const placeholderSql = allColumns.map(() => "?").join(", ");
-    const insertSql = `INSERT INTO ${tableName} (${columnSql}) VALUES (${placeholderSql})`;
+      const columnSql = allColumns.map(column => `"${column}"`).join(", ");
+      const placeholderSql = allColumns.map(() => "?").join(", ");
+      const insertSql = `INSERT INTO ${tableName} (${columnSql}) VALUES (${placeholderSql})`;
 
-    if (tableName === "session_replay_metadata") {
-      for (const row of options.values) {
-        const siteId = row.site_id;
-        const sessionId = row.session_id;
-        if (siteId !== undefined && sessionId !== undefined) {
-          await runStatement("DELETE FROM session_replay_metadata WHERE site_id = ? AND session_id = ?", [siteId, sessionId]);
+      if (tableName === "session_replay_metadata") {
+        for (const row of options.values) {
+          const siteId = row.site_id;
+          const sessionId = row.session_id;
+          if (siteId !== undefined && sessionId !== undefined) {
+            await runStatement("DELETE FROM session_replay_metadata WHERE site_id = ? AND session_id = ?", [
+              siteId,
+              sessionId,
+            ]);
+          }
+
+          const values = allColumns.map(column => normalizeInsertValue(row[column]));
+          await runStatement(insertSql, values);
         }
-
-        const values = allColumns.map(column => normalizeInsertValue(row[column]));
-        await runStatement(insertSql, values);
+        return;
       }
-      return;
-    }
 
-    await runStatement("BEGIN TRANSACTION");
-    try {
-      for (const row of options.values) {
-        const values = allColumns.map(column => normalizeInsertValue(row[column]));
-        await runStatement(insertSql, values);
+      await runStatement("BEGIN TRANSACTION");
+      try {
+        for (const row of options.values) {
+          const values = allColumns.map(column => normalizeInsertValue(row[column]));
+          await runStatement(insertSql, values);
+        }
+        await runStatement("COMMIT");
+      } catch (error) {
+        await runStatement("ROLLBACK");
+        throw error;
       }
-      await runStatement("COMMIT");
-    } catch (error) {
-      await runStatement("ROLLBACK");
-      throw error;
-    }
+    });
   },
 };
 
 export const initializeDuckDB = async () => {
-  await runStatement(`
+  await queueDuckDbOperation(async () => {
+    await runStatement(`
     CREATE TABLE IF NOT EXISTS events (
       site_id INTEGER,
       timestamp TIMESTAMP,
@@ -626,7 +650,7 @@ export const initializeDuckDB = async () => {
     )
   `);
 
-  await runStatement(`
+    await runStatement(`
     CREATE TABLE IF NOT EXISTS session_replay_events (
       site_id INTEGER,
       session_id VARCHAR,
@@ -645,7 +669,7 @@ export const initializeDuckDB = async () => {
     )
   `);
 
-  await runStatement(`
+    await runStatement(`
     CREATE TABLE IF NOT EXISTS session_replay_metadata (
       site_id INTEGER,
       session_id VARCHAR,
@@ -678,7 +702,7 @@ export const initializeDuckDB = async () => {
     )
   `);
 
-  await runStatement(`
+    await runStatement(`
     CREATE TABLE IF NOT EXISTS uptime_monitor_events (
       monitor_id INTEGER,
       organization_id VARCHAR,
@@ -704,7 +728,7 @@ export const initializeDuckDB = async () => {
     )
   `);
 
-  await runStatement(`
+    await runStatement(`
     CREATE VIEW IF NOT EXISTS hourly_events_by_site_mv_target AS
     SELECT
       date_trunc('hour', timestamp) AS event_hour,
@@ -713,6 +737,7 @@ export const initializeDuckDB = async () => {
     FROM events
     GROUP BY 1, 2
   `);
+  });
 };
 
 export const initializeClickhouse = initializeDuckDB;
