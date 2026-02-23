@@ -1,9 +1,9 @@
 services:
   caddy:
-    image: caddy:2.10.0
+    build:
+      context: .
+      dockerfile: caddy.Dockerfile
     restart: unless-stopped
-    volumes:
-      - ./Caddyfile.coolify:/etc/caddy/Caddyfile
     depends_on:
       backend:
         condition: service_healthy
